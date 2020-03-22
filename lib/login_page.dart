@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'registration_page.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -38,9 +39,49 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 30,),
-                    loginButton,
+                    Container(
+                      height: 50.0,
+                      child: MaterialButton(
+                        onPressed: () {},
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: EdgeInsets.all(0.0),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(colors: [
+                                Colors.orangeAccent,
+                                Color.fromRGBO(200, 100, 20, .4)
+                              ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(10)
+                          ),
+                          child: Container(
+                            constraints: BoxConstraints(
+                                maxWidth: 300.0, minHeight: 50.0),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Login",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 20,),
-                    signUpHyperlink
+                    InkWell(
+                      child: Text('Or Sign Up', style: TextStyle(
+                          color: Colors.orangeAccent,
+                          fontWeight: FontWeight.bold),),
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (
+                            context) => RegistrationPage()));
+                      },
+                    )
                   ],
                 ),
               )
@@ -94,39 +135,4 @@ class LoginPage extends StatelessWidget {
       ),
     ),
   );
-
-  final loginButton = Container(
-    height: 50.0,
-    child: MaterialButton(
-      onPressed: () {},
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      padding: EdgeInsets.all(0.0),
-      child: Ink(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              Colors.orangeAccent,
-              Color.fromRGBO(200, 100, 20, .4)
-            ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(10)
-        ),
-        child: Container(
-          constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
-          alignment: Alignment.center,
-          child: Text(
-            "Login",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: Colors.white
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  final signUpHyperlink = InkWell(
-  child: Text('Or Sign Up', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold),));
 }
