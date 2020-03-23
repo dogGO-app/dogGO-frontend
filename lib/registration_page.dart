@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'set_user_data_page.dart';
+import 'package:http/http.dart' as http;
 
 class RegistrationPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
+
+  final url = 'https://doggo-app-server.herokuapp.com/api/auth/signup';
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +85,20 @@ class RegistrationPage extends StatelessWidget {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
+                        // ignore: missing_return
                         onPressed: () {
+                          if (passwordController.text.isEmpty || repeatPasswordController.text.isEmpty) {
+                            return showDialog(context: context, builder: (context) {
+                              return AlertDialog(content: Text('Both Password and Repeat password fields must be filled!'));
+                            });
+                          }
+
+                          if (passwordController.text != repeatPasswordController.text) {
+                            return showDialog(context: context, builder: (context) {
+                              return AlertDialog(content: Text('Passwords must match!'));
+                            });
+                          }
+
                           Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) => SetUserDataPage()),
