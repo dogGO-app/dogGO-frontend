@@ -13,8 +13,8 @@ class DogsList extends StatefulWidget {
 }
 
 class _DogsListState extends State<DogsList> {
-  List<Dog> dogs = List();
-
+  List dogs = List();
+  Future dogList;
   Map data = {};
 
   Future getDogs() async {
@@ -23,16 +23,17 @@ class _DogsListState extends State<DogsList> {
 
     final response = await http.get(url, headers: headers);
     if(response.statusCode == 200){
-      return Dog.fromJson(json.decode(response.body));
+      List dogList = jsonDecode(response.body);
+      print(data);
+      return dogList;
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     
     data = ModalRoute.of(context).settings.arguments;
-    getDogs();
+    dogList = getDogs();
 
     return Scaffold(
       appBar: AppBar(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:doggo_frontend/UserProfile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -47,14 +48,16 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
       'lastVaccinationDate': '${vaccinationDateController.text}'
     });
     var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer ${data['token']}'};
-    final response = await http.put(url, body: reqBody, headers: headers);
-    if(response.statusCode == 200){
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/userprofile', (Route<dynamic> route) => false,
-          arguments: {'token': data['token']});
+    final response = await http.post(url, body: reqBody, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) => UserProfileView(token: data['token'])),
+          (Route<dynamic> route) => false
+          );
     }
     else {
-      return showAlertDialogWithMessage('Error!');
+      showAlertDialogWithMessage('Error!');
     }
     print(response.body);
   }
@@ -94,6 +97,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(
+                              controller: nameController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Name",
@@ -105,6 +109,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(
+                              controller: breedController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Breed",
@@ -116,6 +121,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(
+                              controller: colorController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Color",
@@ -127,6 +133,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(
+                              controller: descriptionController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Description",
@@ -137,6 +144,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                           Divider(color: Colors.grey),
                           Text('Click below to select vaccination date', style: TextStyle(color: Colors.grey)),
                           DateTimeField(
+                            controller: vaccinationDateController,
                             format: DateFormat("yyyy-MM-dd"),
                             onShowPicker: (context, currentValue) {
                               return showDatePicker(
