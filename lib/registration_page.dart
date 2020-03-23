@@ -46,7 +46,7 @@ class RegistrationPage extends StatelessWidget {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).push(
+                          Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                   builder: (context) => SetUserDataPage()));
                         },

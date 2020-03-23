@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'set_dog_data_page.dart';
+import 'package:intl/intl.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class SetUserDataState extends State<SetUserDataPage> {
+class SetDogDataPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,7 +12,7 @@ class SetUserDataState extends State<SetUserDataPage> {
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.only(top: 30),
+          margin: EdgeInsets.only(top: 10),
           child: Column(
             children: <Widget>[
               Padding(
@@ -31,34 +32,25 @@ class SetUserDataState extends State<SetUserDataPage> {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          firstNameTextField,
+                          nameField,
                           Divider(color: Colors.grey),
-                          lastNameTextField,
+                          breed,
                           Divider(color: Colors.grey),
-                          Container(
-                              padding: EdgeInsets.all(8),
-                              child: DropdownButton(
-                                value: dropdownValue,
-                                icon: Icon(Icons.arrow_downward),
-                                iconSize: 16,
-                                hint: Text("Age"),
-                                style: TextStyle(color: Colors.orangeAccent),
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                  });
-                                },
-                                items: dropdownMenuItems
-                                  .map((String value) {
-                                    return DropdownMenuItem(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                })
-                                  .toList(),
-                              )),
+                          color,
                           Divider(color: Colors.grey),
-                          hobbyTextField,
+                          description,
+                          Divider(color: Colors.grey),
+                          Text('Click below to select vaccination date', style: TextStyle(color: Colors.grey)),
+                          DateTimeField(
+                            format: DateFormat("yyyy-MM-dd"),
+                            onShowPicker: (context, currentValue) {
+                              return showDatePicker(
+                                  context: context,
+                                  firstDate: DateTime(1900),
+                                  initialDate: currentValue ?? DateTime.now(),
+                                  lastDate: DateTime(2100));
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -68,11 +60,7 @@ class SetUserDataState extends State<SetUserDataPage> {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => SetDogDataPage()));
-                        },
+                        onPressed: () {},
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.all(0.0),
@@ -113,45 +101,47 @@ class SetUserDataState extends State<SetUserDataPage> {
     );
   }
 
-  String dropdownValue;
-
-  List<String> dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
-
-  final firstNameTextField = Container(
+  final nameField = Container(
     padding: EdgeInsets.all(8),
     child: TextField(
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "First name",
+        hintText: "Name",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
 
-  final lastNameTextField = Container(
+  final breed = Container(
     padding: EdgeInsets.all(8),
     child: TextField(
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "Last name",
+        hintText: "Breed",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
 
-  final hobbyTextField = Container(
+  final color = Container(
     padding: EdgeInsets.all(8),
     child: TextField(
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "Hobby",
+        hintText: "Color",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
-}
 
-class SetUserDataPage extends StatefulWidget {
-  @override
-  SetUserDataState createState() => SetUserDataState();
+  final description = Container(
+    padding: EdgeInsets.all(8),
+    child: TextField(
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        hintText: "Description",
+        hintStyle: TextStyle(color: Colors.grey),
+      ),
+    ),
+  );
 }
