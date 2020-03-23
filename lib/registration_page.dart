@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'set_user_data_page.dart';
+import 'login_page.dart';
 import 'package:http/http.dart' as http;
 
-class RegistrationPage extends StatelessWidget {
+import 'http/add_user_response.dart';
+
+class RegistrationPageState extends State<RegistrationPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
 
   final url = 'https://doggo-app-server.herokuapp.com/api/auth/signup';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   @override
   Widget build(BuildContext context) {
@@ -87,22 +92,22 @@ class RegistrationPage extends StatelessWidget {
                       child: MaterialButton(
                         // ignore: missing_return
                         onPressed: () {
-                          if (passwordController.text.isEmpty || repeatPasswordController.text.isEmpty) {
-                            return showDialog(context: context, builder: (context) {
-                              return AlertDialog(content: Text('Both Password and Repeat password fields must be filled!'));
-                            });
-                          }
-
-                          if (passwordController.text != repeatPasswordController.text) {
-                            return showDialog(context: context, builder: (context) {
-                              return AlertDialog(content: Text('Passwords must match!'));
-                            });
-                          }
-
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => SetUserDataPage()),
-                                  (Route route) => false);
+                          if (emailController.text.isEmpty)
+                            return showAlertDialogWithMessage(
+                                'Email field must be filled!');
+                          else if (passwordController.text.isEmpty ||
+                              repeatPasswordController.text.isEmpty)
+                            return showAlertDialogWithMessage(
+                                'Both Password and Repeat password fields must be filled!');
+                          else if (passwordController.text.length < 8)
+                            return showAlertDialogWithMessage(
+                                "Password must be at least 8 characters long!");
+                          else if (passwordController.text !=
+                              repeatPasswordController.text)
+                            return showAlertDialogWithMessage(
+                                'Passwords must match!');
+                          else
+                            addUser();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -143,4 +148,38 @@ class RegistrationPage extends StatelessWidget {
       ),
     );
   }
+
+  Future addUser() async {
+    var body = jsonEncode({
+      'email': '${emailController.text}',
+      'password': '${passwordController.text}'
+    });
+    final response = await http.post(url, body: body, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pop(true);
+    }
+    else if (response.statusCode == 400) {
+      return showAlertDialogWithMessage(
+          'You have to provide a valid email!');
+    }
+    else if (response.statusCode == 409) {
+      return showAlertDialogWithMessage(
+          'Account with given email already exists!');
+    }
+    else
+      throw Exception('Failed to create user.');
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+}
+
+class RegistrationPage extends StatefulWidget {
+  @override
+  RegistrationPageState createState() => RegistrationPageState();
 }
