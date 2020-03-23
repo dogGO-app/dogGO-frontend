@@ -5,30 +5,21 @@ import '../http/user_details_response.dart';
 import 'package:http/http.dart' as http;
 
 class UserProfileView extends StatefulWidget {
-  final String token;
-
-  UserProfileView({Key key, @required this.token}) : super(key: key);
-
   @override
-  _UserProfileViewState createState() => _UserProfileViewState(token);
+  _UserProfileViewState createState() => _UserProfileViewState();
 }
 
 class _UserProfileViewState extends State<UserProfileView> {
-  String token;
-
-  _UserProfileViewState(this.token);
+  _UserProfileViewState();
 
   Map data = {};
   Future<UserDetailsResponse> userDetails;
 
   @override
-  void initState() {
-    super.initState();
-    userDetails = fetchUserDetails(token);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    data = ModalRoute.of(context).settings.arguments;
+    userDetails = fetchUserDetails();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -54,7 +45,6 @@ class _UserProfileViewState extends State<UserProfileView> {
               Container(
                 child: FutureBuilder<UserDetailsResponse>(
                   future: userDetails,
-                  // ignore: missing_return
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
                       return Text(
@@ -115,7 +105,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
                       return Text(
-                        snapshot.data.age,
+                        snapshot.data.age.toString(),
                         style: TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
@@ -264,17 +254,16 @@ class _UserProfileViewState extends State<UserProfileView> {
     );
   }
 
-  Future<UserDetailsResponse> fetchUserDetails(String token) async {
+  Future<UserDetailsResponse> fetchUserDetails() async {
     var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
     var headers = {
       'Content-Type': 'application/json',
       'Accept': '*/*',
-      'Authorization': 'Bearer $token'
+      'Authorization': 'Bearer ${data['token']}'
     };
 
     final response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
-      print(response.body);
       return UserDetailsResponse.fromJson(json.decode(response.body));
     } else
       showAlertDialogWithMessage('Error!');

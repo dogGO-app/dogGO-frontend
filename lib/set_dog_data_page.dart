@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:doggo_frontend/UserProfile/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -50,11 +49,9 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
     var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer ${data['token']}'};
     final response = await http.post(url, body: reqBody, headers: headers);
     if (response.statusCode == 200) {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (BuildContext context) => UserProfileView(token: data['token'])),
-          (Route<dynamic> route) => false
-          );
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/userprofile', (Route<dynamic> route) => false,
+          arguments: {'token': data['token']});
     }
     else {
       showAlertDialogWithMessage('Error!');

@@ -1,7 +1,7 @@
 class UserDetailsResponse {
   final String firstName;
   final String lastName;
-  final String age;
+  final int age;
   final String hobby;
 
   UserDetailsResponse({this.firstName, this.lastName, this.age, this.hobby});
