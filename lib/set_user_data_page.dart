@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SetUserDataState extends State<SetUserDataPage> {
+  Map data = {};
+
   @override
   Widget build(BuildContext context) {
+
+    data = ModalRoute.of(context).settings.arguments;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Set Your Details'),
@@ -69,7 +74,8 @@ class SetUserDataState extends State<SetUserDataPage> {
                       child: MaterialButton(
                         onPressed: () {
                           Navigator.of(context).pushNamedAndRemoveUntil('/adddogdata',
-                                  (Route<dynamic> route) => false);
+                                  (Route<dynamic> route) => false,
+                              arguments: {'token': data['token']});
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
