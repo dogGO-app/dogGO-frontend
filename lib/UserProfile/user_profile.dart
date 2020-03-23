@@ -156,6 +156,41 @@ class _UserProfileViewState extends State<UserProfileView> {
               ),
             ),
             ),
+            SizedBox(height: 15.0),
+            Center(child: MaterialButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/home', (Route<dynamic> route) => false);
+              },
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              padding: EdgeInsets.all(0.0),
+              child: Ink(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      Colors.orangeAccent,
+                      Color.fromRGBO(200, 100, 20, .4)
+                    ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Logout",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            ),
+
           ],
         ),
       ),
