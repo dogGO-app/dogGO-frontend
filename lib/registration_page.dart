@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'set_user_data_page.dart';
 
 class RegistrationPage extends StatelessWidget {
   @override
@@ -44,7 +45,11 @@ class RegistrationPage extends StatelessWidget {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => SetUserDataPage()));
+                        },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.all(0.0),
@@ -84,6 +89,7 @@ class RegistrationPage extends StatelessWidget {
       ),
     );
   }
+
   final emailTextField = Container(
     padding: EdgeInsets.all(8),
     decoration: BoxDecoration(),
