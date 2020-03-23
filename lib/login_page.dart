@@ -1,7 +1,64 @@
 import 'package:flutter/material.dart';
-import 'registration_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class LoginPage extends StatelessWidget {
+
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final emailLoginController = TextEditingController();
+  final passwordLoginController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailLoginController.dispose();
+    passwordLoginController.dispose();
+    super.dispose();
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+
+  Future loginUser() async {
+
+    var url = 'https://doggo-app-server.herokuapp.com/api/auth/signin';
+    var reqBody = jsonEncode({'email': '${emailLoginController.text}', 
+      'password': '${passwordLoginController.text}'});
+    var headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+    final response = await http.post(url, body: reqBody, headers: headers);
+    print(response.body);
+    Map<String, dynamic> token = jsonDecode(response.body);
+    print(token['token']);
+    if(response.statusCode == 200){
+      var url2 = 'https://doggo-app-server.herokuapp.com/api/dogLover';
+      var headers2 = {'Authorization': 'Bearer ${token['token']}'};
+      final response2 = await http.get(url2, headers:  headers2);
+      print(response2.body);
+      if(response2.statusCode == 200){
+        Navigator.of(context).pushNamedAndRemoveUntil('/userprofile', (Route<dynamic> route) => false,
+            arguments:{ 'token': token['token'] });
+      }
+      else if(response2.statusCode == 404){
+        Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata', (Route<dynamic> route) => false,
+            arguments:{ 'token': token['token'] });
+      }
+      else{
+        return showAlertDialogWithMessage('Error!');
+      }
+    }
+    else {
+      return showAlertDialogWithMessage('Error!');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,9 +89,31 @@ class LoginPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          emailTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(),
+                            child: TextField(
+                              controller: emailLoginController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Email",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          passwordTextField
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: passwordLoginController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -44,7 +123,9 @@ class LoginPage extends StatelessWidget {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          loginUser();
+                        },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.all(0.0),
@@ -83,8 +164,7 @@ class LoginPage extends StatelessWidget {
                             fontWeight: FontWeight.bold),
                       ),
                       onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => RegistrationPage()));
+                        Navigator.of(context).pushNamed('/register');
                       },
                     ),
                   ],
@@ -111,30 +191,6 @@ class LoginPage extends StatelessWidget {
       image: DecorationImage(
         fit: BoxFit.fill,
         image: AssetImage('images/doggo.jpg'),
-      ),
-    ),
-  );
-
-  final emailTextField = Container(
-    padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Email",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final passwordTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      obscureText: true,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Password",
-        hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
