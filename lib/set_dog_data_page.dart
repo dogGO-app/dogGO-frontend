@@ -1,10 +1,69 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:http/http.dart' as http;
 
-class SetDogDataPage extends StatelessWidget {
+class SetDogDataPage extends StatefulWidget {
+  @override
+  _SetDogDataPageState createState() => _SetDogDataPageState();
+}
+
+class _SetDogDataPageState extends State<SetDogDataPage> {
+
+  final nameController = TextEditingController();
+  final breedController = TextEditingController();
+  final colorController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final vaccinationDateController = TextEditingController();
+
+  Map data = {};
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    breedController.dispose();
+    colorController.dispose();
+    descriptionController.dispose();
+    vaccinationDateController.dispose();
+    super.dispose();
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+
+  Future setDogData() async {
+    var url = 'https://doggo-app-server.herokuapp.com/api/dogs';
+    var reqBody = jsonEncode({
+      'name': '${nameController.text}',
+      'breed': '${breedController.text}',
+      'color': '${colorController.text}',
+      'description': '${descriptionController.text}',
+      'lastVaccinationDate': '${vaccinationDateController.text}'
+    });
+    var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer ${data['token']}'};
+    final response = await http.put(url, body: reqBody, headers: headers);
+    if(response.statusCode == 200){
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/userprofile', (Route<dynamic> route) => false,
+          arguments: {'token': data['token']});
+    }
+    else {
+      return showAlertDialogWithMessage('Error!');
+    }
+    print(response.body);
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    data = ModalRoute.of(context).settings.arguments;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Set Dog\'s Details'),
@@ -32,13 +91,49 @@ class SetDogDataPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          nameField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Name",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          breed,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Breed",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          color,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Color",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          description,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Description",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
                           Text('Click below to select vaccination date', style: TextStyle(color: Colors.grey)),
                           DateTimeField(
@@ -61,8 +156,7 @@ class SetDogDataPage extends StatelessWidget {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil('/userprofile',
-                                  (Route<dynamic> route) => false);
+                          setDogData();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -103,48 +197,4 @@ class SetDogDataPage extends StatelessWidget {
       ),
     );
   }
-
-  final nameField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Name",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final breed = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Breed",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final color = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Color",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final description = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Description",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
 }
