@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'registration_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPageState extends State<LoginPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,9 +42,31 @@ class LoginPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          emailTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(),
+                            child: TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Email",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          passwordTextField
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -114,28 +146,9 @@ class LoginPage extends StatelessWidget {
       ),
     ),
   );
+}
 
-  final emailTextField = Container(
-    padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Email",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final passwordTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      obscureText: true,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Password",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+class LoginPage extends StatefulWidget {
+  @override
+  LoginPageState createState() => LoginPageState();
 }
