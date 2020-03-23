@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
+class EditUserData extends StatefulWidget {
+  @override
+  _EditUserDataState createState() => _EditUserDataState();
+}
+
+class _EditUserDataState extends State<EditUserData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login to DogGO!'),
+        title: Text('Edit Your Details'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -13,7 +18,6 @@ class LoginPage extends StatelessWidget {
           margin: EdgeInsets.only(top: 30),
           child: Column(
             children: <Widget>[
-              doggoPicture,
               Padding(
                 padding: EdgeInsets.all(30),
                 child: Column(
@@ -31,9 +35,34 @@ class LoginPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          emailTextField,
+                          firstNameTextField,
                           Divider(color: Colors.grey),
-                          passwordTextField
+                          lastNameTextField,
+                          Divider(color: Colors.grey),
+                          Container(
+                              padding: EdgeInsets.all(8),
+                              child: DropdownButton(
+                                value: dropdownValue,
+                                icon: Icon(Icons.arrow_downward),
+                                iconSize: 16,
+                                hint: Text("Age"),
+                                style: TextStyle(color: Colors.orangeAccent),
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    dropdownValue = newValue;
+                                  });
+                                },
+                                items: dropdownMenuItems
+                                    .map((String value) {
+                                  return DropdownMenuItem(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                })
+                                    .toList(),
+                              )),
+                          Divider(color: Colors.grey),
+                          hobbyTextField,
                         ],
                       ),
                     ),
@@ -44,7 +73,7 @@ class LoginPage extends StatelessWidget {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/userprofile');
+                          Navigator.of(context).pushNamed('/userprofile');
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -65,7 +94,7 @@ class LoginPage extends StatelessWidget {
                                 maxWidth: 300.0, minHeight: 50.0),
                             alignment: Alignment.center,
                             child: Text(
-                              "Login",
+                              "Edit",
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white),
                             ),
@@ -76,64 +105,48 @@ class LoginPage extends StatelessWidget {
                     SizedBox(
                       height: 20,
                     ),
-                    InkWell(
-                      child: Text(
-                        'Or Sign Up',
-                        style: TextStyle(
-                            color: Colors.orangeAccent,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      onTap: () {
-                        Navigator.of(context).pushNamed('/register');
-                      },
-                    ),
                   ],
                 ),
-              ),
+              )
             ],
           ),
         ),
       ),
     );
-  }
+}
 
-  final doggoPicture = Container(
-    alignment: Alignment.center,
-    height: 200,
-    width: 200,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      border: Border.all(width: 1.5, color: Colors.orangeAccent),
-      boxShadow: [
-        BoxShadow(
-            color: Colors.orangeAccent, blurRadius: 20, offset: Offset(0, 10))
-      ],
-      image: DecorationImage(
-        fit: BoxFit.fill,
-        image: AssetImage('images/doggo.jpg'),
-      ),
-    ),
-  );
+  String dropdownValue;
 
-  final emailTextField = Container(
+  List<String> dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
+
+  final firstNameTextField = Container(
     padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(),
     child: TextField(
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "Email",
+        hintText: "First name",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
 
-  final passwordTextField = Container(
+  final lastNameTextField = Container(
     padding: EdgeInsets.all(8),
     child: TextField(
-      obscureText: true,
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "Password",
+        hintText: "Last name",
+        hintStyle: TextStyle(color: Colors.grey),
+      ),
+    ),
+  );
+
+  final hobbyTextField = Container(
+    padding: EdgeInsets.all(8),
+    child: TextField(
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        hintText: "Hobby",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),

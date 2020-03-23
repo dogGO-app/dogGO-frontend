@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'set_user_data_page.dart';
 
 class RegistrationPage extends StatelessWidget {
   @override
@@ -46,10 +45,8 @@ class RegistrationPage extends StatelessWidget {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => SetUserDataPage()),
-                                (Route route) => false);
+                          Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata',
+                              (Route<dynamic> route) => false);
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),

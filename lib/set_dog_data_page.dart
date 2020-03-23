@@ -60,7 +60,10 @@ class SetDogDataPage extends StatelessWidget {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamedAndRemoveUntil('/userprofile',
+                                  (Route<dynamic> route) => false);
+                        },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.all(0.0),
