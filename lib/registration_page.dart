@@ -156,7 +156,7 @@ class RegistrationPageState extends State<RegistrationPage> {
     });
     final response = await http.post(url, body: body, headers: headers);
     if (response.statusCode == 200) {
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop();
     }
     else if (response.statusCode == 400) {
       return showAlertDialogWithMessage(
