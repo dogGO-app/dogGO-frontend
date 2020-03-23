@@ -46,9 +46,10 @@ class RegistrationPage extends StatelessWidget {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacement(
+                          Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (context) => SetUserDataPage()));
+                                  builder: (context) => SetUserDataPage()),
+                                (Route route) => false);
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
