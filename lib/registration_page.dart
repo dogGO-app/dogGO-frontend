@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'set_user_data_page.dart';
 
 class RegistrationPage extends StatelessWidget {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final repeatPasswordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,11 +35,44 @@ class RegistrationPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          emailTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(),
+                            child: TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Email",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          passwordTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          repeatPasswordTextField
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: repeatPasswordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Repeat password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -49,7 +86,7 @@ class RegistrationPage extends StatelessWidget {
                           Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) => SetUserDataPage()),
-                                (Route route) => false);
+                                  (Route route) => false);
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -90,40 +127,4 @@ class RegistrationPage extends StatelessWidget {
       ),
     );
   }
-
-  final emailTextField = Container(
-    padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Email",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final passwordTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      obscureText: true,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Password",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final repeatPasswordTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      obscureText: true,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Repeat password",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
 }
