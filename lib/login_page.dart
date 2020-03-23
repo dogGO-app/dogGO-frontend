@@ -19,6 +19,14 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+
   Future loginUser() async {
 
     var url = 'https://doggo-app-server.herokuapp.com/api/auth/signin';
@@ -30,8 +38,24 @@ class _LoginPageState extends State<LoginPage> {
     Map<String, dynamic> token = jsonDecode(response.body);
     print(token['token']);
     if(response.statusCode == 200){
-      Navigator.of(context).pushNamedAndRemoveUntil('/userprofile', (Route<dynamic> route) => false,
-          arguments:{ 'token': token['token'] });
+      var url2 = 'https://doggo-app-server.herokuapp.com/api/dogLover';
+      var headers2 = {'Authorization': 'Bearer ${token['token']}'};
+      final response2 = await http.get(url2, headers:  headers2);
+      print(response2.body);
+      if(response2.statusCode == 200){
+        Navigator.of(context).pushNamedAndRemoveUntil('/userprofile', (Route<dynamic> route) => false,
+            arguments:{ 'token': token['token'] });
+      }
+      else if(response2.statusCode == 404){
+        Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata', (Route<dynamic> route) => false,
+            arguments:{ 'token': token['token'] });
+      }
+      else{
+        return showAlertDialogWithMessage('Error!');
+      }
+    }
+    else {
+      return showAlertDialogWithMessage('Error!');
     }
   }
 
