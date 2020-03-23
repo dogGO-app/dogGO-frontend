@@ -113,7 +113,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                   constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                   alignment: Alignment.center,
                   child: Text(
-                    "See information about your dogs",
+                    "See Information About Your Dogs",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white
@@ -126,7 +126,7 @@ class _UserProfileViewState extends State<UserProfileView> {
             SizedBox(height: 15.0,),
             Center(child: MaterialButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/userprofile');
+                Navigator.pushNamed(context, '/edituserdata');
               },
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -146,7 +146,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                   constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                   alignment: Alignment.center,
                   child: Text(
-                    "Edit your details",
+                    "Edit Your Details",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white

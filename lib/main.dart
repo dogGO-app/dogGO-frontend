@@ -1,3 +1,10 @@
+import 'package:doggo_frontend/UserProfile/dogs_list.dart';
+import 'package:doggo_frontend/UserProfile/edit_dog_data_page.dart';
+import 'package:doggo_frontend/UserProfile/edit_user_profile_page.dart';
+import 'package:doggo_frontend/UserProfile/user_profile.dart';
+import 'package:doggo_frontend/registration_page.dart';
+import 'package:doggo_frontend/set_dog_data_page.dart';
+import 'package:doggo_frontend/set_user_data_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'login_page.dart';
@@ -15,8 +22,17 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light
       ),
       debugShowCheckedModeBanner: false,
-      home: LoginPage(
-      ),
+      initialRoute: '/home',
+      routes: {
+        '/home': (context) => LoginPage(),
+        '/register': (context) => RegistrationPage(),
+        '/userprofile': (context) => UserProfileView(),
+        '/dogsinfo': (context) => DogsList(),
+        '/adduserdata': (context) => SetUserDataPage(),
+        '/adddogdata': (context) => SetDogDataPage(),
+        '/edituserdata': (context) => EditUserData(),
+        '/editdogdata': (context) => EditDogData(),
+      },
     );
   }
 }

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class SetDogDataPage extends StatelessWidget {
+class EditUserData extends StatefulWidget {
+  @override
+  _EditUserDataState createState() => _EditUserDataState();
+}
+
+class _EditUserDataState extends State<EditUserData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Set Dog\'s Details'),
+        title: Text('Edit Your Details'),
       ),
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.only(top: 10),
+          margin: EdgeInsets.only(top: 30),
           child: Column(
             children: <Widget>[
               Padding(
@@ -32,25 +35,34 @@ class SetDogDataPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          nameField,
+                          firstNameTextField,
                           Divider(color: Colors.grey),
-                          breed,
+                          lastNameTextField,
                           Divider(color: Colors.grey),
-                          color,
+                          Container(
+                              padding: EdgeInsets.all(8),
+                              child: DropdownButton(
+                                value: dropdownValue,
+                                icon: Icon(Icons.arrow_downward),
+                                iconSize: 16,
+                                hint: Text("Age"),
+                                style: TextStyle(color: Colors.orangeAccent),
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    dropdownValue = newValue;
+                                  });
+                                },
+                                items: dropdownMenuItems
+                                    .map((String value) {
+                                  return DropdownMenuItem(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                })
+                                    .toList(),
+                              )),
                           Divider(color: Colors.grey),
-                          description,
-                          Divider(color: Colors.grey),
-                          Text('Click below to select vaccination date', style: TextStyle(color: Colors.grey)),
-                          DateTimeField(
-                            format: DateFormat("yyyy-MM-dd"),
-                            onShowPicker: (context, currentValue) {
-                              return showDatePicker(
-                                  context: context,
-                                  firstDate: DateTime(1900),
-                                  initialDate: currentValue ?? DateTime.now(),
-                                  lastDate: DateTime(2100));
-                            },
-                          ),
+                          hobbyTextField,
                         ],
                       ),
                     ),
@@ -61,8 +73,7 @@ class SetDogDataPage extends StatelessWidget {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil('/userprofile',
-                                  (Route<dynamic> route) => false);
+                          Navigator.of(context).pushNamed('/userprofile');
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -83,7 +94,7 @@ class SetDogDataPage extends StatelessWidget {
                                 maxWidth: 300.0, minHeight: 50.0),
                             alignment: Alignment.center,
                             child: Text(
-                              "Submit",
+                              "Edit",
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white),
                             ),
@@ -102,47 +113,40 @@ class SetDogDataPage extends StatelessWidget {
         ),
       ),
     );
-  }
+}
 
-  final nameField = Container(
+  String dropdownValue;
+
+  List<String> dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
+
+  final firstNameTextField = Container(
     padding: EdgeInsets.all(8),
     child: TextField(
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "Name",
+        hintText: "First name",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
 
-  final breed = Container(
+  final lastNameTextField = Container(
     padding: EdgeInsets.all(8),
     child: TextField(
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "Breed",
+        hintText: "Last name",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
 
-  final color = Container(
+  final hobbyTextField = Container(
     padding: EdgeInsets.all(8),
     child: TextField(
       decoration: InputDecoration(
         border: InputBorder.none,
-        hintText: "Color",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final description = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Description",
+        hintText: "Hobby",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),

@@ -10,7 +10,9 @@ class DogCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pushNamed('/editdogdata');
+      },
       child: Card(
         margin: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 0.0),
         child: Padding(

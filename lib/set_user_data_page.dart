@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'set_dog_data_page.dart';
 
 class SetUserDataState extends State<SetUserDataPage> {
   @override
@@ -69,9 +68,8 @@ class SetUserDataState extends State<SetUserDataPage> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => SetDogDataPage()));
+                          Navigator.of(context).pushNamedAndRemoveUntil('/adddogdata',
+                                  (Route<dynamic> route) => false);
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
