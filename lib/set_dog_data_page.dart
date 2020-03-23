@@ -7,7 +7,7 @@ class SetDogDataPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Set Your Details'),
+        title: Text('Set Dog\'s Details'),
       ),
       body: SingleChildScrollView(
         child: Container(
