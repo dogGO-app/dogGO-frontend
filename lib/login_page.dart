@@ -1,6 +1,40 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class LoginPage extends StatelessWidget {
+
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final emailLoginController = TextEditingController();
+  final passwordLoginController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailLoginController.dispose();
+    passwordLoginController.dispose();
+    super.dispose();
+  }
+
+  Future loginUser() async {
+
+    var url = 'https://doggo-app-server.herokuapp.com/api/auth/signin';
+    var reqBody = jsonEncode({'email': '${emailLoginController.text}', 
+      'password': '${passwordLoginController.text}'});
+    var headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+    final response = await http.post(url, body: reqBody, headers: headers);
+    print(response.body);
+    Map<String, dynamic> token = jsonDecode(response.body);
+    print(token['token']);
+    if(response.statusCode == 200){
+      Navigator.of(context).pushNamedAndRemoveUntil('/userprofile', (Route<dynamic> route) => false,
+          arguments:{ 'token': token['token'] });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,9 +65,31 @@ class LoginPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          emailTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(),
+                            child: TextField(
+                              controller: emailLoginController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Email",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          passwordTextField
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: passwordLoginController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -44,7 +100,7 @@ class LoginPage extends StatelessWidget {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/userprofile');
+                          loginUser();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -111,30 +167,6 @@ class LoginPage extends StatelessWidget {
       image: DecorationImage(
         fit: BoxFit.fill,
         image: AssetImage('images/doggo.jpg'),
-      ),
-    ),
-  );
-
-  final emailTextField = Container(
-    padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Email",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final passwordTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      obscureText: true,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Password",
-        hintStyle: TextStyle(color: Colors.grey),
       ),
     ),
   );
