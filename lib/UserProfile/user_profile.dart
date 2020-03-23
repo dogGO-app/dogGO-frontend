@@ -90,7 +90,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                   letterSpacing: 1.5
               ),
             ),
-            SizedBox(height: 25.0),
+            SizedBox(height: 30.0),
             Center(child: MaterialButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/dogsinfo');
@@ -114,6 +114,39 @@ class _UserProfileViewState extends State<UserProfileView> {
                   alignment: Alignment.center,
                   child: Text(
                     "See information about your dogs",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            ),
+            SizedBox(height: 15.0,),
+            Center(child: MaterialButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/userprofile');
+              },
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              padding: EdgeInsets.all(0.0),
+              child: Ink(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      Colors.orangeAccent,
+                      Color.fromRGBO(200, 100, 20, .4)
+                    ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Edit your details",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white
