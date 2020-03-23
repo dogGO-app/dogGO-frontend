@@ -1,6 +1,19 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class RegistrationPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'login_page.dart';
+import 'package:http/http.dart' as http;
+
+import 'http/add_user_response.dart';
+
+class RegistrationPageState extends State<RegistrationPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final repeatPasswordController = TextEditingController();
+
+  final url = 'https://doggo-app-server.herokuapp.com/api/auth/signup';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,11 +43,44 @@ class RegistrationPage extends StatelessWidget {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          emailTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(),
+                            child: TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Email",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          passwordTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          repeatPasswordTextField
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: repeatPasswordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Repeat password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -44,9 +90,24 @@ class RegistrationPage extends StatelessWidget {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
+                        // ignore: missing_return
                         onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata',
-                              (Route<dynamic> route) => false);
+                          if (emailController.text.isEmpty)
+                            return showAlertDialogWithMessage(
+                                'Email field must be filled!');
+                          else if (passwordController.text.isEmpty ||
+                              repeatPasswordController.text.isEmpty)
+                            return showAlertDialogWithMessage(
+                                'Both Password and Repeat password fields must be filled!');
+                          else if (passwordController.text.length < 8)
+                            return showAlertDialogWithMessage(
+                                "Password must be at least 8 characters long!");
+                          else if (passwordController.text !=
+                              repeatPasswordController.text)
+                            return showAlertDialogWithMessage(
+                                'Passwords must match!');
+                          else
+                            addUser();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -88,39 +149,37 @@ class RegistrationPage extends StatelessWidget {
     );
   }
 
-  final emailTextField = Container(
-    padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Email",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+  Future addUser() async {
+    var body = jsonEncode({
+      'email': '${emailController.text}',
+      'password': '${passwordController.text}'
+    });
+    final response = await http.post(url, body: body, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pop();
+    }
+    else if (response.statusCode == 400) {
+      return showAlertDialogWithMessage(
+          'You have to provide a valid email!');
+    }
+    else if (response.statusCode == 409) {
+      return showAlertDialogWithMessage(
+          'Account with given email already exists!');
+    }
+    else
+      throw Exception('Failed to create user.');
+  }
 
-  final passwordTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      obscureText: true,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Password",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+}
 
-  final repeatPasswordTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      obscureText: true,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Repeat password",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+class RegistrationPage extends StatefulWidget {
+  @override
+  RegistrationPageState createState() => RegistrationPageState();
 }
