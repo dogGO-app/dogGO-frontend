@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import '../http/user_details_response.dart';
+import 'package:http/http.dart' as http;
 
 class UserProfileView extends StatefulWidget {
 
@@ -7,9 +11,14 @@ class UserProfileView extends StatefulWidget {
 }
 
 class _UserProfileViewState extends State<UserProfileView> {
-
+  Map data = {};
+  Future<UserDetailsResponse> userDetails;
+  
   @override
   Widget build(BuildContext context) {
+    data = ModalRoute.of(context).settings.arguments;
+    userDetails = fetchUserDetails(data['token']);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -24,37 +33,55 @@ class _UserProfileViewState extends State<UserProfileView> {
           children: <Widget>[
             SizedBox(height: 20.0),
             Text(
-              'NAME',
+              'FIRST NAME',
               style: TextStyle(
                 letterSpacing: 1.5,
                 fontSize: 14.0,
               ),
             ),
             SizedBox(height: 8.0),
-            Text(
-              'Radek',
-              style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5
-              ),
+            FutureBuilder<UserDetailsResponse>(
+              future: userDetails,
+              // ignore: missing_return
+              builder: (context, snapshot) {
+                if (snapshot.hasData)
+                  return Text(
+                    snapshot.data.firstName,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5
+                    ),
+                  );
+                else if (snapshot.hasError)
+                  return Text('ERROR');
+              },
             ),
             SizedBox(height: 15.0),
             Text(
-              'SURNAME',
+              'LAST NAME',
               style: TextStyle(
                 letterSpacing: 1.5,
                 fontSize: 14.0,
               ),
             ),
             SizedBox(height: 8.0),
-            Text(
-              'Leszkiewicz',
-              style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5
-              ),
+            FutureBuilder<UserDetailsResponse>(
+              future: userDetails,
+              // ignore: missing_return
+              builder: (context, snapshot) {
+                if (snapshot.hasData)
+                  return Text(
+                    snapshot.data.lastName,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5
+                    ),
+                  );
+                else if (snapshot.hasError)
+                  return Text('ERROR');
+              },
             ),
             SizedBox(height: 15.0),
             Text(
@@ -65,13 +92,22 @@ class _UserProfileViewState extends State<UserProfileView> {
               ),
             ),
             SizedBox(height: 8.0),
-            Text(
-              '21',
-              style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5
-              ),
+            FutureBuilder<UserDetailsResponse>(
+              future: userDetails,
+              // ignore: missing_return
+              builder: (context, snapshot) {
+                if (snapshot.hasData)
+                  return Text(
+                    snapshot.data.age,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5
+                    ),
+                  );
+                else if (snapshot.hasError)
+                  return Text('ERROR');
+              },
             ),
             SizedBox(height: 15.0),
             Text(
@@ -82,13 +118,22 @@ class _UserProfileViewState extends State<UserProfileView> {
               ),
             ),
             SizedBox(height: 8.0),
-            Text(
-              'Psy i koty',
-              style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5
-              ),
+            FutureBuilder<UserDetailsResponse>(
+              future: userDetails,
+              // ignore: missing_return
+              builder: (context, snapshot) {
+                if (snapshot.hasData)
+                  return Text(
+                    snapshot.data.hobby,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5
+                    ),
+                  );
+                else if (snapshot.hasError)
+                  return Text('ERROR');
+              },
             ),
             SizedBox(height: 30.0),
             Center(child: MaterialButton(
@@ -195,5 +240,24 @@ class _UserProfileViewState extends State<UserProfileView> {
         ),
       ),
     );
+  }
+
+  Future<UserDetailsResponse> fetchUserDetails(Map data) async {
+    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
+    var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer ${data['token']}'};
+
+    final response = await http.put(url, headers: headers);
+    if (response.statusCode == 200) {
+      return UserDetailsResponse.fromJson(json.decode(response.body));
+    } else
+      showAlertDialogWithMessage('Error!');
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
   }
 }
