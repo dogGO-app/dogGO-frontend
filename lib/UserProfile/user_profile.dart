@@ -167,7 +167,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                       constraints:
-                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                      BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                       alignment: Alignment.center,
                       child: Text(
                         "See Information About Your Dogs",
@@ -184,7 +184,7 @@ class _UserProfileViewState extends State<UserProfileView> {
               Center(
                 child: MaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/edituserdata');
+                    Navigator.pushNamed(context, '/edituserdata', arguments: {'token': data['token']});
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -202,7 +202,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                       constraints:
-                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                      BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                       alignment: Alignment.center,
                       child: Text(
                         "Edit Your Details",
@@ -236,7 +236,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                       constraints:
-                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                      BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                       alignment: Alignment.center,
                       child: Text(
                         "Logout",

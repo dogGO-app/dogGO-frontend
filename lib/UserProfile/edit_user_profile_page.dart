@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class EditUserData extends StatefulWidget {
@@ -6,8 +8,49 @@ class EditUserData extends StatefulWidget {
 }
 
 class _EditUserDataState extends State<EditUserData> {
+
+  Future addUserDetails() async {
+    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
+    var body = jsonEncode({
+      'firstName': '${firstNameController.text}',
+      'lastName': '${lastNameController.text}',
+      'age': '$dropdownValue',
+      'hobby': '${hobbyController.text}'
+    });
+    var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer ${data['token']}'};
+
+    final response = await http.put(url, body: body, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/userprofile', (Route<dynamic> route) => false,
+          arguments: {'token': data['token']});
+    } else
+      showAlertDialogWithMessage('Error!');
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+
+  String dropdownValue;
+
+  List<String> dropdownMenuItems =
+  List<String>.generate(99, (i) => (i + 1).toString());
+
+  Map data = {};
+
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final hobbyController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    data = ModalRoute.of(context).settings.arguments;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Your Details'),
@@ -35,9 +78,29 @@ class _EditUserDataState extends State<EditUserData> {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          firstNameTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: firstNameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "First name",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          lastNameTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: lastNameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Last name",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
                           Container(
                               padding: EdgeInsets.all(8),
@@ -52,17 +115,25 @@ class _EditUserDataState extends State<EditUserData> {
                                     dropdownValue = newValue;
                                   });
                                 },
-                                items: dropdownMenuItems
-                                    .map((String value) {
+                                items: dropdownMenuItems.map((String value) {
                                   return DropdownMenuItem(
                                     value: value,
                                     child: Text(value),
                                   );
-                                })
-                                    .toList(),
+                                }).toList(),
                               )),
                           Divider(color: Colors.grey),
-                          hobbyTextField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: hobbyController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Hobby",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -73,7 +144,7 @@ class _EditUserDataState extends State<EditUserData> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamed('/userprofile');
+                          addUserDetails();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -113,11 +184,7 @@ class _EditUserDataState extends State<EditUserData> {
         ),
       ),
     );
-}
-
-  String dropdownValue;
-
-  List<String> dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
+  }
 
   final firstNameTextField = Container(
     padding: EdgeInsets.all(8),
