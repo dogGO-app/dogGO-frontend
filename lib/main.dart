@@ -1,16 +1,15 @@
-import 'package:doggo_frontend/UserProfile/dogs_list.dart';
-import 'package:doggo_frontend/UserProfile/edit_dog_data_page.dart';
-import 'package:doggo_frontend/UserProfile/edit_user_profile_page.dart';
-import 'package:doggo_frontend/UserProfile/user_profile.dart';
 import 'package:doggo_frontend/registration_page.dart';
-import 'package:doggo_frontend/set_dog_data_page.dart';
-import 'package:doggo_frontend/set_user_data_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'Dog/dogs_list.dart';
+import 'Dog/edit_dog_data_page.dart';
+import 'Dog/set_dog_data_page.dart';
+import 'User/edit_user_profile_page.dart';
+import 'User/set_user_data_page.dart';
+import 'User/user_profile.dart';
 import 'login_page.dart';
 
 void main() => runApp(MyApp());
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -18,9 +17,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'dogGO!',
       theme: ThemeData(
-        appBarTheme: AppBarTheme(color: Colors.orangeAccent),
-        brightness: Brightness.light
-      ),
+          appBarTheme: AppBarTheme(color: Colors.orangeAccent),
+          brightness: Brightness.light),
       debugShowCheckedModeBanner: false,
       initialRoute: '/home',
       routes: {

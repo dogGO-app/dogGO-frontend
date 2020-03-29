@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -11,46 +12,6 @@ class LoginPageState extends State<LoginPage> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
-
-  Future loginUser() async {
-    var url = 'https://doggo-app-server.herokuapp.com/api/auth/signin';
-    var reqBody = jsonEncode({
-      'email': '${emailController.text}',
-      'password': '${passwordController.text}'
-    });
-    var headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
-    final response = await http.post(url, body: reqBody, headers: headers);
-    print(response.body);
-    Map<String, dynamic> token = jsonDecode(response.body);
-    print(token['token']);
-    if (response.statusCode == 200) {
-      var url2 = 'https://doggo-app-server.herokuapp.com/api/dogLover';
-      var headers2 = {'Authorization': 'Bearer ${token['token']}'};
-      final response2 = await http.get(url2, headers: headers2);
-      print(response2.body);
-      if (response2.statusCode == 200) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            '/userprofile', (Route<dynamic> route) => false,
-            arguments: {'token': token['token']});
-      } else if (response2.statusCode == 404) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            '/adduserdata', (Route<dynamic> route) => false,
-            arguments: {'token': token['token']});
-      } else {
-        return showAlertDialogWithMessage('Error!');
-      }
-    } else {
-      return showAlertDialogWithMessage('Error!');
-    }
   }
 
   @override
@@ -171,6 +132,42 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future loginUser() async {
+    final storage = FlutterSecureStorage();
+
+    var postUrl = 'https://doggo-app-server.herokuapp.com/api/auth/signin';
+    var postRequestBody = jsonEncode({
+      'email': '${emailController.text}',
+      'password': '${passwordController.text}'
+    });
+    var postHeaders = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
+    final postResponse =
+        await http.post(postUrl, body: postRequestBody, headers: postHeaders);
+    final token = jsonDecode(postResponse.body)['token'];
+
+    if (postResponse.statusCode == 200) {
+      var getUrl = 'https://doggo-app-server.herokuapp.com/api/dogLover';
+      var getHeaders = {'Authorization': 'Bearer $token'};
+
+      await storage.write(key: 'token', value: token);
+      final getResponse = await http.get(getUrl, headers: getHeaders);
+
+      if (getResponse.statusCode == 200) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            '/userprofile', (Route<dynamic> route) => false);
+      } else if (getResponse.statusCode == 404) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            '/adduserdata', (Route<dynamic> route) => false);
+      } else {
+        return showAlertDialogWithMessage('Error!');
+      }
+    } else {
+      return showAlertDialogWithMessage(
+          'There is no account with given email/password!');
+    }
+  }
+
   final doggoPicture = Container(
     alignment: Alignment.center,
     height: 200,
@@ -188,6 +185,14 @@ class LoginPageState extends State<LoginPage> {
       ),
     ),
   );
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
 }
 
 class LoginPage extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:doggo_frontend/UserProfile/dog_data.dart';
-import 'package:doggo_frontend/UserProfile/dog_card.dart';
+import 'package:doggo_frontend/Dog/dog_data.dart';
+import 'package:doggo_frontend/Dog/dog_card.dart';
 import 'package:http/http.dart' as http;
 
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -8,8 +9,26 @@ class EditUserData extends StatefulWidget {
 }
 
 class _EditUserDataState extends State<EditUserData> {
+  String dropdownValue;
+
+  var dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
+
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final hobbyController = TextEditingController();
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    hobbyController.dispose();
+    super.dispose();
+  }
 
   Future addUserDetails() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'token');
+
     var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
     var body = jsonEncode({
       'firstName': '${firstNameController.text}',
@@ -17,15 +36,18 @@ class _EditUserDataState extends State<EditUserData> {
       'age': '$dropdownValue',
       'hobby': '${hobbyController.text}'
     });
-    var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer ${data['token']}'};
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
 
     final response = await http.put(url, body: body, headers: headers);
     if (response.statusCode == 200) {
       Navigator.of(context).pushNamedAndRemoveUntil(
-          '/userprofile', (Route<dynamic> route) => false,
-          arguments: {'token': data['token']});
+          '/userprofile', (Route<dynamic> route) => false);
     } else
-      showAlertDialogWithMessage('Error!');
+      showAlertDialogWithMessage('Could not edit user data!');
   }
 
   Future showAlertDialogWithMessage(String message) {
@@ -36,21 +58,8 @@ class _EditUserDataState extends State<EditUserData> {
         });
   }
 
-  String dropdownValue;
-
-  List<String> dropdownMenuItems =
-  List<String>.generate(99, (i) => (i + 1).toString());
-
-  Map data = {};
-
-  final firstNameController = TextEditingController();
-  final lastNameController = TextEditingController();
-  final hobbyController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
-    data = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Your Details'),

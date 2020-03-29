@@ -1,25 +1,21 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/User/http/user_details_response.dart';
 import 'package:flutter/material.dart';
-import '../http/user_details_response.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class UserProfileView extends StatefulWidget {
-  @override
-  _UserProfileViewState createState() => _UserProfileViewState();
-}
-
 class _UserProfileViewState extends State<UserProfileView> {
-  _UserProfileViewState();
-
-  Map data = {};
   Future<UserDetailsResponse> userDetails;
 
   @override
-  Widget build(BuildContext context) {
-    data = ModalRoute.of(context).settings.arguments;
+  void initState() {
+    super.initState();
     userDetails = fetchUserDetails();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -55,7 +51,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                             letterSpacing: 1.5),
                       );
                     else if (snapshot.hasError)
-                      return Text('ERROR');
+                      return Text('Could not read first name');
                     else
                       return CircularProgressIndicator();
                   },
@@ -83,7 +79,8 @@ class _UserProfileViewState extends State<UserProfileView> {
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5),
                       );
-                    else if (snapshot.hasError) return Text('ERROR');
+                    else if (snapshot.hasError)
+                      return Text('Could not read last name');
                     else
                       return CircularProgressIndicator();
                   },
@@ -111,7 +108,8 @@ class _UserProfileViewState extends State<UserProfileView> {
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5),
                       );
-                    else if (snapshot.hasError) return Text('ERROR');
+                    else if (snapshot.hasError)
+                      return Text('Could not read age');
                     else
                       return CircularProgressIndicator();
                   },
@@ -139,7 +137,8 @@ class _UserProfileViewState extends State<UserProfileView> {
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5),
                       );
-                    else if (snapshot.hasError) return Text('ERROR');
+                    else if (snapshot.hasError)
+                      return Text('Could not read hobby');
                     else
                       return CircularProgressIndicator();
                   },
@@ -167,7 +166,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                       constraints:
-                      BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                       alignment: Alignment.center,
                       child: Text(
                         "See Information About Your Dogs",
@@ -184,7 +183,7 @@ class _UserProfileViewState extends State<UserProfileView> {
               Center(
                 child: MaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/edituserdata', arguments: {'token': data['token']});
+                    Navigator.pushNamed(context, '/edituserdata');
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -202,7 +201,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                       constraints:
-                      BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                       alignment: Alignment.center,
                       child: Text(
                         "Edit Your Details",
@@ -216,7 +215,9 @@ class _UserProfileViewState extends State<UserProfileView> {
               SizedBox(height: 15.0),
               Center(
                 child: MaterialButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    final storage = FlutterSecureStorage();
+                    await storage.delete(key: 'token');
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         '/home', (Route<dynamic> route) => false);
                   },
@@ -236,7 +237,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                       constraints:
-                      BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
                       alignment: Alignment.center,
                       child: Text(
                         "Logout",
@@ -255,18 +256,21 @@ class _UserProfileViewState extends State<UserProfileView> {
   }
 
   Future<UserDetailsResponse> fetchUserDetails() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'token');
+
     var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
     var headers = {
       'Content-Type': 'application/json',
       'Accept': '*/*',
-      'Authorization': 'Bearer ${data['token']}'
+      'Authorization': 'Bearer $token'
     };
 
     final response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
       return UserDetailsResponse.fromJson(json.decode(response.body));
     } else
-      showAlertDialogWithMessage('Error!');
+      showAlertDialogWithMessage('Could not fetch user details!');
   }
 
   Future showAlertDialogWithMessage(String message) {
@@ -276,4 +280,9 @@ class _UserProfileViewState extends State<UserProfileView> {
           return AlertDialog(content: Text(message));
         });
   }
+}
+
+class UserProfileView extends StatefulWidget {
+  @override
+  _UserProfileViewState createState() => _UserProfileViewState();
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'package:http/http.dart' as http;
 
-import 'http/add_user_response.dart';
+import 'User/http/add_user_response.dart';
 
 class RegistrationPageState extends State<RegistrationPage> {
   final emailController = TextEditingController();

@@ -1,77 +1,33 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class SetDogDataPage extends StatefulWidget {
-  @override
-  _SetDogDataPageState createState() => _SetDogDataPageState();
-}
+class SetUserDataState extends State<SetUserDataPage> {
 
-class _SetDogDataPageState extends State<SetDogDataPage> {
-
-  final nameController = TextEditingController();
-  final breedController = TextEditingController();
-  final colorController = TextEditingController();
-  final descriptionController = TextEditingController();
-  final vaccinationDateController = TextEditingController();
-
-  Map data = {};
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final hobbyController = TextEditingController();
 
   @override
   void dispose() {
-    nameController.dispose();
-    breedController.dispose();
-    colorController.dispose();
-    descriptionController.dispose();
-    vaccinationDateController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    hobbyController.dispose();
     super.dispose();
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
-
-  Future setDogData() async {
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogs';
-    var reqBody = jsonEncode({
-      'name': '${nameController.text}',
-      'breed': '${breedController.text}',
-      'color': '${colorController.text}',
-      'description': '${descriptionController.text}',
-      'lastVaccinationDate': '${vaccinationDateController.text}'
-    });
-    var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer ${data['token']}'};
-    final response = await http.post(url, body: reqBody, headers: headers);
-    if (response.statusCode == 200) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/userprofile', (Route<dynamic> route) => false,
-          arguments: {'token': data['token']});
-    }
-    else {
-      showAlertDialogWithMessage('Error!');
-    }
-    print(response.body);
   }
 
   @override
   Widget build(BuildContext context) {
 
-    data = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Set Dog\'s Details'),
+        title: Text('Set Your Details'),
       ),
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.only(top: 10),
+          margin: EdgeInsets.only(top: 30),
           child: Column(
             children: <Widget>[
               Padding(
@@ -94,10 +50,10 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(
-                              controller: nameController,
+                              controller: firstNameController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Name",
+                                hintText: "First name",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
@@ -106,50 +62,46 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(
-                              controller: breedController,
+                              controller: lastNameController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Breed",
+                                hintText: "Last name",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
                           ),
                           Divider(color: Colors.grey),
                           Container(
-                            padding: EdgeInsets.all(8),
-                            child: TextField(
-                              controller: colorController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Color",
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                          ),
+                              padding: EdgeInsets.all(8),
+                              child: DropdownButton(
+                                value: dropdownValue,
+                                icon: Icon(Icons.arrow_downward),
+                                iconSize: 16,
+                                hint: Text("Age"),
+                                style: TextStyle(color: Colors.orangeAccent),
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    dropdownValue = newValue;
+                                  });
+                                },
+                                items: dropdownMenuItems.map((String value) {
+                                  return DropdownMenuItem(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              )),
                           Divider(color: Colors.grey),
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(
-                              controller: descriptionController,
+                              controller: hobbyController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Description",
+                                hintText: "Hobby",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
-                          ),
-                          Divider(color: Colors.grey),
-                          Text('Click below to select vaccination date', style: TextStyle(color: Colors.grey)),
-                          DateTimeField(
-                            controller: vaccinationDateController,
-                            format: DateFormat("yyyy-MM-dd"),
-                            onShowPicker: (context, currentValue) {
-                              return showDatePicker(
-                                  context: context,
-                                  firstDate: DateTime(1900),
-                                  initialDate: currentValue ?? DateTime.now(),
-                                  lastDate: DateTime(2100));
-                            },
                           ),
                         ],
                       ),
@@ -161,7 +113,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          setDogData();
+                          addUserDetails();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -202,4 +154,44 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
       ),
     );
   }
+
+  Future addUserDetails() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'token');
+
+    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
+    var body = jsonEncode({
+      'firstName': '${firstNameController.text}',
+      'lastName': '${lastNameController.text}',
+      'age': '$dropdownValue',
+      'hobby': '${hobbyController.text}'
+    });
+    var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer $token'};
+
+    final response = await http.put(url, body: body, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/adddogdata', (Route<dynamic> route) => false
+      );
+    } else
+      showAlertDialogWithMessage('Could not set user data!');
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+
+  String dropdownValue;
+
+  List<String> dropdownMenuItems =
+      List<String>.generate(99, (i) => (i + 1).toString());
+}
+
+class SetUserDataPage extends StatefulWidget {
+  @override
+  SetUserDataState createState() => SetUserDataState();
 }
