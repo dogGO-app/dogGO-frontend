@@ -269,8 +269,10 @@ class _UserProfileViewState extends State<UserProfileView> {
     final response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
       return UserDetailsResponse.fromJson(json.decode(response.body));
-    } else
+    } else {
       showAlertDialogWithMessage('Could not fetch user details!');
+      throw Exception("Could not fetch user details!");
+    }
   }
 
   Future showAlertDialogWithMessage(String message) {
