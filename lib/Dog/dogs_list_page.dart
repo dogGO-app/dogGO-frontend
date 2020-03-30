@@ -42,20 +42,21 @@ class _DogsListPageState extends State<DogsListPage> {
         backgroundColor: Colors.orangeAccent,
       ),
       body: FutureBuilder<List<Dog>>(
-          future: _fetchDogs(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<Dog> data = snapshot.data;
-              return _dogsListView(data);
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.orangeAccent,
-              ),
-            );
-          }),
+        future: _fetchDogs(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<Dog> data = snapshot.data;
+            return _dogsListView(data);
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.orangeAccent,
+            ),
+          );
+        },
+      ),
     );
   }
 
