@@ -11,7 +11,15 @@ class DogsListPage extends StatefulWidget {
 }
 
 class _DogsListPageState extends State<DogsListPage> {
-  Future<List<Dog>> dogs;
+  Future<List<Dog>> _dogs;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _dogs = _fetchDogs();
+    });
+  }
 
   Future<List<Dog>> _fetchDogs() async {
     final storage = FlutterSecureStorage();
@@ -42,11 +50,29 @@ class _DogsListPageState extends State<DogsListPage> {
         backgroundColor: Colors.orangeAccent,
       ),
       body: FutureBuilder<List<Dog>>(
-        future: _fetchDogs(),
+        future: _dogs,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List<Dog> data = snapshot.data;
-            return _dogsListView(data);
+            List<Dog> dogs = snapshot.data;
+            return ListView.builder(
+              itemCount: dogs.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(
+                    dogs[index].name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                    ),
+                  ),
+                  subtitle: Text(dogs[index].breed),
+                  leading: Icon(
+                    Icons.pets,
+                    color: Colors.orangeAccent,
+                  ),
+                );
+              },
+            );
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
@@ -56,32 +82,6 @@ class _DogsListPageState extends State<DogsListPage> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  ListView _dogsListView(List<Dog> dogs) {
-    return ListView.builder(
-      itemCount: dogs.length,
-      itemBuilder: (context, index) {
-        return _tile(dogs[index].name, dogs[index].breed, Icons.pets);
-      },
-    );
-  }
-
-  ListTile _tile(String title, String subtitle, IconData icon) {
-    return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 20,
-        ),
-      ),
-      subtitle: Text(subtitle),
-      leading: Icon(
-        icon,
-        color: Colors.orangeAccent,
       ),
     );
   }
