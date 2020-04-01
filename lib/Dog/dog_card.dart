@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:doggo_frontend/Dog/dog_data.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:flutter/widgets.dart';
 
 class DogCard extends StatelessWidget {
-
   final Dog dog;
   DogCard({this.dog});
 
@@ -113,7 +112,7 @@ class DogCard extends StatelessWidget {
                   ),
                   SizedBox(height: 5.0),
                   Text(
-                    dog.vaccinationDate.toString().substring(0,10),
+                    dog.vaccinationDate.toString().substring(0, 10),
                     style: TextStyle(
                       letterSpacing: 0.5,
                       fontSize: 18.0,
