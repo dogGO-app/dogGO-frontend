@@ -50,6 +50,14 @@ class _DogsListPageState extends State<DogsListPage> {
         centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/adddogdata');
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.orangeAccent,
+        splashColor: Colors.orange,
+      ),
       body: FutureBuilder<List<Dog>>(
         future: _dogs,
         builder: (context, snapshot) {
@@ -79,6 +87,10 @@ class _DogsListPageState extends State<DogsListPage> {
                           ),
                           Align(
                             alignment: Alignment.centerLeft,
+                            child: Text("Description: ${dogs[index].description}"),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
                             child: Text(
                                 "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"
                             ),
@@ -89,9 +101,14 @@ class _DogsListPageState extends State<DogsListPage> {
                       Icons.pets,
                       color: Colors.orangeAccent,
                     ),
-                    trailing: Icon(
-                      Icons.edit,
-                      color: Colors.orangeAccent,
+                    trailing: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/editdogdata');
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: Colors.orangeAccent,
+                      ),
                     ),
                   ),
                   elevation: 5,
