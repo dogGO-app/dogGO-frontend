@@ -1,13 +1,13 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class EditDogData extends StatefulWidget {
+class EditDogDataPage extends StatefulWidget {
   @override
-  _EditDogDataState createState() => _EditDogDataState();
+  _EditDogDataPageState createState() => _EditDogDataPageState();
 }
 
-class _EditDogDataState extends State<EditDogData> {
+class _EditDogDataPageState extends State<EditDogDataPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,8 +68,7 @@ class _EditDogDataState extends State<EditDogData> {
                       child: MaterialButton(
                         onPressed: () {
                           Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/userprofile',
-                                  (Route<dynamic> route) => false);
+                              '/userroot', (Route<dynamic> route) => false);
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -110,6 +109,7 @@ class _EditDogDataState extends State<EditDogData> {
       ),
     );
   }
+
   final nameField = Container(
     padding: EdgeInsets.all(8),
     child: TextField(

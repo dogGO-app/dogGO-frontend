@@ -1,18 +1,11 @@
 import 'dart:convert';
+
+import 'package:doggo_frontend/globals.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
 
-class EditUserData extends StatefulWidget {
-  @override
-  _EditUserDataState createState() => _EditUserDataState();
-}
-
-class _EditUserDataState extends State<EditUserData> {
-  String dropdownValue;
-
-  var dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
-
+class SetUserDataState extends State<SetUserDataPage> {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final hobbyController = TextEditingController();
@@ -25,44 +18,11 @@ class _EditUserDataState extends State<EditUserData> {
     super.dispose();
   }
 
-  Future addUserDetails() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
-    var body = jsonEncode({
-      'firstName': '${firstNameController.text}',
-      'lastName': '${lastNameController.text}',
-      'age': '$dropdownValue',
-      'hobby': '${hobbyController.text}'
-    });
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http.put(url, body: body, headers: headers);
-    if (response.statusCode == 200) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/userprofile', (Route<dynamic> route) => false);
-    } else
-      showAlertDialogWithMessage('Could not edit user data!');
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Your Details'),
+        title: Text('Set Your Details'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -174,7 +134,7 @@ class _EditUserDataState extends State<EditUserData> {
                                 maxWidth: 300.0, minHeight: 50.0),
                             alignment: Alignment.center,
                             child: Text(
-                              "Edit",
+                              "Submit",
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white),
                             ),
@@ -195,36 +155,46 @@ class _EditUserDataState extends State<EditUserData> {
     );
   }
 
-  final firstNameTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "First name",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+  Future addUserDetails() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'token');
 
-  final lastNameTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Last name",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+    var url = '$apiAddress/dogLover';
+    var body = jsonEncode({
+      'firstName': '${firstNameController.text}',
+      'lastName': '${lastNameController.text}',
+      'age': '$dropdownValue',
+      'hobby': '${hobbyController.text}'
+    });
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
 
-  final hobbyTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Hobby",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
+    final response = await http.put(url, body: body, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/adddogdata', (Route<dynamic> route) => false);
+    } else
+      showAlertDialogWithMessage('Could not set user data!');
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+
+  String dropdownValue;
+
+  List<String> dropdownMenuItems =
+      List<String>.generate(99, (i) => (i + 1).toString());
+}
+
+class SetUserDataPage extends StatefulWidget {
+  @override
+  SetUserDataState createState() => SetUserDataState();
 }

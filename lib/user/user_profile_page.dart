@@ -1,11 +1,12 @@
 import 'dart:convert';
 
-import 'package:doggo_frontend/User/http/user_details_response.dart';
+import 'package:doggo_frontend/globals.dart';
+import 'package:doggo_frontend/user/http/user_details_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class _UserProfileViewState extends State<UserProfileView> {
+class _UserProfilePageState extends State<UserProfilePage> {
   Future<UserDetailsResponse> userDetails;
 
   @override
@@ -69,7 +70,6 @@ class _UserProfileViewState extends State<UserProfileView> {
               Container(
                 child: FutureBuilder<UserDetailsResponse>(
                   future: userDetails,
-                  // ignore: missing_return
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
                       return Text(
@@ -98,7 +98,6 @@ class _UserProfileViewState extends State<UserProfileView> {
               Container(
                 child: FutureBuilder<UserDetailsResponse>(
                   future: userDetails,
-                  // ignore: missing_return
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
                       return Text(
@@ -127,7 +126,6 @@ class _UserProfileViewState extends State<UserProfileView> {
               Container(
                 child: FutureBuilder<UserDetailsResponse>(
                   future: userDetails,
-                  // ignore: missing_return
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
                       return Text(
@@ -144,42 +142,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                   },
                 ),
               ),
-              SizedBox(height: 30.0),
-              Center(
-                child: MaterialButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/dogsinfo');
-                  },
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.all(0.0),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.orangeAccent,
-                            Color.fromRGBO(200, 100, 20, .4)
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Container(
-                      constraints:
-                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
-                      alignment: Alignment.center,
-                      child: Text(
-                        "See Information About Your Dogs",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
+              SizedBox(height: 45.0),
               Center(
                 child: MaterialButton(
                   onPressed: () {
@@ -259,7 +222,7 @@ class _UserProfileViewState extends State<UserProfileView> {
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'token');
 
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
+    var url = '$apiAddress/dogLover';
     var headers = {
       'Content-Type': 'application/json',
       'Accept': '*/*',
@@ -284,7 +247,7 @@ class _UserProfileViewState extends State<UserProfileView> {
   }
 }
 
-class UserProfileView extends StatefulWidget {
+class UserProfilePage extends StatefulWidget {
   @override
-  _UserProfileViewState createState() => _UserProfileViewState();
+  _UserProfilePageState createState() => _UserProfilePageState();
 }

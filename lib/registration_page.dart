@@ -1,17 +1,15 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/globals.dart';
 import 'package:flutter/material.dart';
-import 'login_page.dart';
 import 'package:http/http.dart' as http;
-
-import 'User/http/add_user_response.dart';
 
 class RegistrationPageState extends State<RegistrationPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
 
-  final url = 'https://doggo-app-server.herokuapp.com/api/auth/signup';
+  final url = '$apiAddress/signup';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   @override
@@ -90,7 +88,6 @@ class RegistrationPageState extends State<RegistrationPage> {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
-                        // ignore: missing_return
                         onPressed: () {
                           if (emailController.text.isEmpty)
                             return showAlertDialogWithMessage(
@@ -107,7 +104,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                             return showAlertDialogWithMessage(
                                 'Passwords must match!');
                           else
-                            addUser();
+                            return addUser();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -157,16 +154,12 @@ class RegistrationPageState extends State<RegistrationPage> {
     final response = await http.post(url, body: body, headers: headers);
     if (response.statusCode == 200) {
       Navigator.of(context).pop();
-    }
-    else if (response.statusCode == 400) {
-      return showAlertDialogWithMessage(
-          'You have to provide a valid email!');
-    }
-    else if (response.statusCode == 409) {
+    } else if (response.statusCode == 400) {
+      return showAlertDialogWithMessage('You have to provide a valid email!');
+    } else if (response.statusCode == 409) {
       return showAlertDialogWithMessage(
           'Account with given email already exists!');
-    }
-    else
+    } else
       throw Exception('Failed to create user.');
   }
 

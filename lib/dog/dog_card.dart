@@ -1,5 +1,5 @@
+import 'package:doggo_frontend/dog/http/dog_data.dart';
 import 'package:flutter/material.dart';
-import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:flutter/widgets.dart';
 
 class DogCard extends StatelessWidget {

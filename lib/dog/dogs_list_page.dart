@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:doggo_frontend/Dog/http/dog_data.dart';
+import 'package:doggo_frontend/dog/http/dog_data.dart';
+import 'package:doggo_frontend/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -25,7 +26,7 @@ class _DogsListPageState extends State<DogsListPage> {
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'token');
 
-    final url = 'https://doggo-app-server.herokuapp.com/api/dogs';
+    final url = '$apiAddress/dogs';
     final headers = {
       'Content-Type': 'application/json',
       'Accept': '*/*',
