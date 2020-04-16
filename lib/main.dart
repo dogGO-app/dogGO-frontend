@@ -1,3 +1,6 @@
+import 'package:doggo_frontend/Calendar/add_event_page.dart';
+import 'package:doggo_frontend/Calendar/edit_event_page.dart';
+import 'package:doggo_frontend/Calendar/events_list_page.dart';
 import 'package:doggo_frontend/registration_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +33,9 @@ class MyApp extends StatelessWidget {
         '/adddogdata': (context) => SetDogDataPage(),
         '/edituserdata': (context) => EditUserData(),
         '/editdogdata': (context) => EditDogDataPage(),
+        '/addcalendarevent' : (context) => AddEventPage(),
+        '/editcalendarevent' : (context) => EditEventPage(),
+        '/eventlist' : (context) => EventListPage(),
       },
     );
   }
