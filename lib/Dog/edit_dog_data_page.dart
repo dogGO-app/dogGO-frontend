@@ -1,13 +1,68 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:http/http.dart' as http;
 
-class EditDogData extends StatefulWidget {
+class EditDogDataPage extends StatefulWidget {
   @override
-  _EditDogDataState createState() => _EditDogDataState();
+  _EditDogDataPageState createState() => _EditDogDataPageState();
 }
 
-class _EditDogDataState extends State<EditDogData> {
+class _EditDogDataPageState extends State<EditDogDataPage> {
+  final nameController = TextEditingController();
+  final breedController = TextEditingController();
+  final colorController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final vaccinationDateController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    breedController.dispose();
+    colorController.dispose();
+    descriptionController.dispose();
+    vaccinationDateController.dispose();
+    super.dispose();
+  }
+
+  Future showAlertDialogWithMessage(String message) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(message));
+        });
+  }
+
+  Future editDogData() async {
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'token');
+
+    var url = 'https://doggo-app-server.herokuapp.com/api/dogs';
+    var reqBody = jsonEncode({
+      'name': '${nameController.text}',
+      'breed': '${breedController.text}',
+      'color': '${colorController.text}',
+      'description': '${descriptionController.text}',
+      'lastVaccinationDate': '${vaccinationDateController.text}'
+    });
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
+    final response = await http.put(url, body: reqBody, headers: headers);
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pop();
+    } else {
+      showAlertDialogWithMessage('Could not set dog data!');
+      throw Exception('Could not set dog data');
+    }
+    print(response.body);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,24 +92,65 @@ class _EditDogDataState extends State<EditDogData> {
                           ]),
                       child: Column(
                         children: <Widget>[
-                          nameField,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: nameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Name",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          breed,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: breedController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Breed",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          color,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: colorController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Color",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
-                          description,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: descriptionController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Description",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
                           Divider(color: Colors.grey),
                           Text('Click below to select vaccination date',
                               style: TextStyle(color: Colors.grey)),
                           DateTimeField(
+                            controller: vaccinationDateController,
                             format: DateFormat("yyyy-MM-dd"),
                             onShowPicker: (context, currentValue) {
                               return showDatePicker(
                                   context: context,
                                   firstDate: DateTime(1900),
                                   initialDate: currentValue ?? DateTime.now(),
-                                  lastDate: DateTime(2100));
+                                  lastDate: DateTime.now());
                             },
                           ),
                         ],
@@ -67,9 +163,14 @@ class _EditDogDataState extends State<EditDogData> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/userprofile',
-                                  (Route<dynamic> route) => false);
+                          if (vaccinationDateController.text == "") {
+                            showAlertDialogWithMessage(
+                                'Last vaccination date has to be filled!');
+                            throw Exception(
+                                'Last vaccination date has to be filled!');
+                          }
+                          else
+                            editDogData();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -90,7 +191,7 @@ class _EditDogDataState extends State<EditDogData> {
                                 maxWidth: 300.0, minHeight: 50.0),
                             alignment: Alignment.center,
                             child: Text(
-                              "Edit",
+                              "Submit",
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white),
                             ),
@@ -110,47 +211,4 @@ class _EditDogDataState extends State<EditDogData> {
       ),
     );
   }
-  final nameField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Name",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final breed = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Breed",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final color = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Color",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final description = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Description",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
 }

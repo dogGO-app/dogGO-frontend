@@ -4,6 +4,7 @@ import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class DogsListPage extends StatefulWidget {
   @override
@@ -49,6 +50,15 @@ class _DogsListPageState extends State<DogsListPage> {
         centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/adddogdata')
+              .whenComplete(() => { setState(() { _dogs = _fetchDogs(); }) });
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.orangeAccent,
+        splashColor: Colors.orange,
+      ),
       body: FutureBuilder<List<Dog>>(
         future: _dogs,
         builder: (context, snapshot) {
@@ -57,19 +67,53 @@ class _DogsListPageState extends State<DogsListPage> {
             return ListView.builder(
               itemCount: dogs.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(
-                    dogs[index].name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 20,
+                return Card(
+                  child: ListTile(
+                    title: Text(
+                      dogs[index].name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20,
+                      ),
+                    ),
+                    subtitle: Column(
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Breed: ${dogs[index].breed}"),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Color: ${dogs[index].color}"),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Description: ${dogs[index].description}"),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                                "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"
+                            ),
+                          )
+                        ],
+                      ),
+                    leading: Icon(
+                      Icons.pets,
+                      color: Colors.orangeAccent,
+                    ),
+                    trailing: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/editdogdata')
+                            .whenComplete(() => { setState(() { _dogs = _fetchDogs(); }) });
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: Colors.orangeAccent,
+                      ),
                     ),
                   ),
-                  subtitle: Text(dogs[index].breed),
-                  leading: Icon(
-                    Icons.pets,
-                    color: Colors.orangeAccent,
-                  ),
+                  elevation: 5,
                 );
               },
             );

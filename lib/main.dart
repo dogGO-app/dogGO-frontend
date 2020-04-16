@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         '/adduserdata': (context) => SetUserDataPage(),
         '/adddogdata': (context) => SetDogDataPage(),
         '/edituserdata': (context) => EditUserData(),
-        '/editdogdata': (context) => EditDogData(),
+        '/editdogdata': (context) => EditDogDataPage(),
       },
     );
   }
