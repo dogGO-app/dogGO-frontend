@@ -53,9 +53,9 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
       'Authorization': 'Bearer $token'
     };
     final response = await http.put(url, body: reqBody, headers: headers);
+    print(response.statusCode);
     if (response.statusCode == 200) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/dogsinfo', (Route<dynamic> route) => false);
+      Navigator.of(context).pop();
     } else {
       showAlertDialogWithMessage('Could not set dog data!');
       throw Exception('Could not set dog data');
@@ -163,7 +163,14 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          editDogData();
+                          if (vaccinationDateController.text == "") {
+                            showAlertDialogWithMessage(
+                                'Last vaccination date has to be filled!');
+                            throw Exception(
+                                'Last vaccination date has to be filled!');
+                          }
+                          else
+                            editDogData();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),

@@ -52,7 +52,8 @@ class _DogsListPageState extends State<DogsListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed('/adddogdata');
+          Navigator.of(context).pushNamed('/adddogdata')
+              .whenComplete(() => { setState(() { _dogs = _fetchDogs(); }) });
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.orangeAccent,
@@ -103,7 +104,8 @@ class _DogsListPageState extends State<DogsListPage> {
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/editdogdata');
+                        Navigator.of(context).pushNamed('/editdogdata')
+                            .whenComplete(() => { setState(() { _dogs = _fetchDogs(); }) });
                       },
                       icon: Icon(
                         Icons.edit,

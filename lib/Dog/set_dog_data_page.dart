@@ -63,8 +63,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
           await http.post(url, body: reqBody, headers: headers);
       if (pushResponse.statusCode == 200) {
         if (hasDogs)
-          Navigator.of(context).pushNamedAndRemoveUntil(
-              '/dogsinfo', (Route<dynamic> route) => false);
+          Navigator.of(context).pop();
         else
           Navigator.of(context).pushNamedAndRemoveUntil(
               '/userprofile', (Route<dynamic> route) => false);
@@ -178,7 +177,13 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          setDogData();
+                          if (vaccinationDateController.text == "") {
+                            showAlertDialogWithMessage(
+                                'Last vaccination date has to be filled!');
+                            throw Exception(
+                                'Last vaccination date has to be filled!');
+                          } else
+                            setDogData();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
