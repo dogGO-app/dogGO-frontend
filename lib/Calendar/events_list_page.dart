@@ -12,7 +12,8 @@ class EventListPage extends StatefulWidget {
 
 class _EventListPageState extends State<EventListPage> {
   Future<List<Event>> _events;
-  
+  final storage = FlutterSecureStorage();
+
   @override
   void initState() {
     super.initState();
@@ -20,7 +21,7 @@ class _EventListPageState extends State<EventListPage> {
       _events = _fetchEvents();
     });
   }
-  
+
   Future<List<Event>> _fetchEvents() async {
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'token');
@@ -33,14 +34,15 @@ class _EventListPageState extends State<EventListPage> {
     };
 
     final response = await http.get(url, headers: headers);
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
       return jsonResponse.map((event) => Event.fromJson(event)).toList();
     } else {
       throw Exception('Failed to load events from API');
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,22 +52,27 @@ class _EventListPageState extends State<EventListPage> {
         backgroundColor: Colors.orangeAccent,
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).pushNamed('/addcalendarevent')
-                .whenComplete(() => { setState(() { _events = _fetchEvents(); }) });
-          },
-      child: Icon(Icons.add),
-      backgroundColor: Colors.orangeAccent,
+        onPressed: () {
+          Navigator.of(context)
+              .pushNamed('/addcalendarevent')
+              .whenComplete(() => {
+                    setState(() {
+                      _events = _fetchEvents();
+                    })
+                  });
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.orangeAccent,
         splashColor: Colors.orange,
       ),
       body: FutureBuilder<List<Event>>(
         future: _events,
-        builder: (context, snapshot){
-          if(snapshot.hasData){
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
             List<Event> events = snapshot.data;
             return ListView.builder(
               itemCount: events.length,
-              itemBuilder: (context, index){
+              itemBuilder: (context, index) {
                 return Card(
                   child: ListTile(
                     title: Text(
@@ -79,11 +86,13 @@ class _EventListPageState extends State<EventListPage> {
                       children: <Widget>[
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text("Time: ${events[index].eventTime}"),
+                          child: Text(
+                              "Time: ${events[index].eventTime.hour}:${events[index].eventTime.minute}"),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text("Description: ${events[index].description}"),
+                          child:
+                              Text("Description: ${events[index].description}"),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -97,8 +106,14 @@ class _EventListPageState extends State<EventListPage> {
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/editcalendarevent')
-                            .whenComplete(() => { setState(() { _events = _fetchEvents(); }) });
+                        storage.write(key: 'eventId', value: events[index].eventId);
+                        Navigator.of(context)
+                            .pushNamed('/editcalendarevent')
+                            .whenComplete(() => {
+                                  setState(() {
+                                    _events = _fetchEvents();
+                                  })
+                                });
                       },
                       icon: Icon(
                         Icons.edit,
