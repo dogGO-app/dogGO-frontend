@@ -155,7 +155,7 @@ class LoginPageState extends State<LoginPage> {
 
       if (getResponse.statusCode == 200) {
         Navigator.of(context).pushNamedAndRemoveUntil(
-            '/userprofile', (Route<dynamic> route) => false);
+            '/eventlist', (Route<dynamic> route) => false);
       } else if (getResponse.statusCode == 404) {
         Navigator.of(context).pushNamedAndRemoveUntil(
             '/adduserdata', (Route<dynamic> route) => false);
