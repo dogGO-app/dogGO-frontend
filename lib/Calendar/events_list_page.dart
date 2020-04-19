@@ -1,9 +1,12 @@
+import 'dart:convert';
+
+import 'package:doggo_frontend/Calendar/add_event_page.dart';
+import 'package:doggo_frontend/Calendar/edit_event_page.dart';
+import 'package:doggo_frontend/Calendar/http/event_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'dart:convert';
-import 'package:doggo_frontend/Calendar/http/event_data.dart';
 
 class EventListPage extends StatefulWidget {
   @override
@@ -52,9 +55,14 @@ class _EventListPageState extends State<EventListPage> {
         backgroundColor: Colors.orangeAccent,
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "btn2",
         onPressed: () {
           Navigator.of(context)
-              .pushNamed('/addcalendarevent')
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => AddEventPage(),
+                ),
+              )
               .whenComplete(() => {
                     setState(() {
                       _events = _fetchEvents();
@@ -106,9 +114,14 @@ class _EventListPageState extends State<EventListPage> {
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        storage.write(key: 'eventId', value: events[index].eventId);
+                        storage.write(
+                            key: 'eventId', value: events[index].eventId);
                         Navigator.of(context)
-                            .pushNamed('/editcalendarevent')
+                            .push(
+                              MaterialPageRoute(
+                                builder: (context) => EditEventPage(),
+                              ),
+                            )
                             .whenComplete(() => {
                                   setState(() {
                                     _events = _fetchEvents();

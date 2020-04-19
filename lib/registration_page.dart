@@ -1,10 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'login_page.dart';
 import 'package:http/http.dart' as http;
-
-import 'User/http/add_user_response.dart';
 
 class RegistrationPageState extends State<RegistrationPage> {
   final emailController = TextEditingController();
@@ -157,16 +154,12 @@ class RegistrationPageState extends State<RegistrationPage> {
     final response = await http.post(url, body: body, headers: headers);
     if (response.statusCode == 200) {
       Navigator.of(context).pop();
-    }
-    else if (response.statusCode == 400) {
-      return showAlertDialogWithMessage(
-          'You have to provide a valid email!');
-    }
-    else if (response.statusCode == 409) {
+    } else if (response.statusCode == 400) {
+      return showAlertDialogWithMessage('You have to provide a valid email!');
+    } else if (response.statusCode == 409) {
       return showAlertDialogWithMessage(
           'Account with given email already exists!');
-    }
-    else
+    } else
       throw Exception('Failed to create user.');
   }
 

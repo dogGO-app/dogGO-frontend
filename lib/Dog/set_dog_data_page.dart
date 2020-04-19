@@ -1,10 +1,11 @@
 import 'dart:convert';
+
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class SetDogDataPage extends StatefulWidget {
   @override
@@ -66,7 +67,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
           Navigator.of(context).pop();
         else
           Navigator.of(context).pushNamedAndRemoveUntil(
-              '/userprofile', (Route<dynamic> route) => false);
+              '/userhomescreen', (Route<dynamic> route) => false);
       } else {
         showAlertDialogWithMessage('Could not set dog data!');
         throw Exception('Could not set dog data');

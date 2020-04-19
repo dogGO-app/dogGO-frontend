@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/Dog/edit_dog_data_page.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
+import 'package:doggo_frontend/Dog/set_dog_data_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -51,9 +53,19 @@ class _DogsListPageState extends State<DogsListPage> {
         backgroundColor: Colors.orangeAccent,
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "btn1",
         onPressed: () {
-          Navigator.of(context).pushNamed('/adddogdata')
-              .whenComplete(() => { setState(() { _dogs = _fetchDogs(); }) });
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => SetDogDataPage(),
+                ),
+              )
+              .whenComplete(() => {
+                    setState(() {
+                      _dogs = _fetchDogs();
+                    })
+                  });
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.orangeAccent,
@@ -77,35 +89,42 @@ class _DogsListPageState extends State<DogsListPage> {
                       ),
                     ),
                     subtitle: Column(
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Breed: ${dogs[index].breed}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Color: ${dogs[index].color}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Description: ${dogs[index].description}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"
-                            ),
-                          )
-                        ],
-                      ),
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Breed: ${dogs[index].breed}"),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Color: ${dogs[index].color}"),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child:
+                              Text("Description: ${dogs[index].description}"),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"),
+                        )
+                      ],
+                    ),
                     leading: Icon(
                       Icons.pets,
                       color: Colors.orangeAccent,
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/editdogdata')
-                            .whenComplete(() => { setState(() { _dogs = _fetchDogs(); }) });
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(
+                              builder: (context) => EditDogDataPage(),
+                            ))
+                            .whenComplete(() => {
+                                  setState(() {
+                                    _dogs = _fetchDogs();
+                                  })
+                                });
                       },
                       icon: Icon(
                         Icons.edit,
