@@ -1,34 +1,35 @@
 import 'dart:convert';
 
-import 'package:doggo_frontend/Dog/edit_dog_data_page.dart';
-import 'package:doggo_frontend/Dog/http/dog_data.dart';
-import 'package:doggo_frontend/Dog/set_dog_data_page.dart';
+import 'package:doggo_frontend/Calendar/add_event_page.dart';
+import 'package:doggo_frontend/Calendar/edit_event_page.dart';
+import 'package:doggo_frontend/Calendar/http/event_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-class DogsListPage extends StatefulWidget {
+class EventListPage extends StatefulWidget {
   @override
-  _DogsListPageState createState() => _DogsListPageState();
+  _EventListPageState createState() => _EventListPageState();
 }
 
-class _DogsListPageState extends State<DogsListPage> {
-  Future<List<Dog>> _dogs;
+class _EventListPageState extends State<EventListPage> {
+  Future<List<Event>> _events;
+  final storage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      _dogs = _fetchDogs();
+      _events = _fetchEvents();
     });
   }
 
-  Future<List<Dog>> _fetchDogs() async {
+  Future<List<Event>> _fetchEvents() async {
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'token');
 
-    final url = 'https://doggo-app-server.herokuapp.com/api/dogs';
+    final url = 'https://doggo-app-server.herokuapp.com/api/userCalendarEvents';
     final headers = {
       'Content-Type': 'application/json',
       'Accept': '*/*',
@@ -38,9 +39,10 @@ class _DogsListPageState extends State<DogsListPage> {
     final response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
-      return jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
+      print(jsonResponse);
+      return jsonResponse.map((event) => Event.fromJson(event)).toList();
     } else {
-      throw Exception('Failed to load dogs from API');
+      throw Exception('Failed to load events from API');
     }
   }
 
@@ -48,22 +50,22 @@ class _DogsListPageState extends State<DogsListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your dogs'),
+        title: Text('Your calendar'),
         centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),
       floatingActionButton: FloatingActionButton(
-        heroTag: "btn1",
+        heroTag: "btn2",
         onPressed: () {
           Navigator.of(context)
               .push(
                 MaterialPageRoute(
-                  builder: (context) => SetDogDataPage(),
+                  builder: (context) => AddEventPage(),
                 ),
               )
               .whenComplete(() => {
                     setState(() {
-                      _dogs = _fetchDogs();
+                      _events = _fetchEvents();
                     })
                   });
         },
@@ -71,58 +73,58 @@ class _DogsListPageState extends State<DogsListPage> {
         backgroundColor: Colors.orangeAccent,
         splashColor: Colors.orange,
       ),
-      body: FutureBuilder<List<Dog>>(
-        future: _dogs,
+      body: FutureBuilder<List<Event>>(
+        future: _events,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List<Dog> dogs = snapshot.data;
+            List<Event> events = snapshot.data;
             return ListView.builder(
-              itemCount: dogs.length,
+              itemCount: events.length,
               itemBuilder: (context, index) {
                 return Card(
                   child: ListTile(
                     title: Text(
-                      dogs[index].name,
+                      "${DateFormat("dd-MM-yyyy").format(events[index].eventDate)}",
                       style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 24.0,
                       ),
                     ),
                     subtitle: Column(
                       children: <Widget>[
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text("Breed: ${dogs[index].breed}"),
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Color: ${dogs[index].color}"),
+                          child: Text(
+                              "Time: ${events[index].eventTime.hour}:${events[index].eventTime.minute}"),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child:
-                              Text("Description: ${dogs[index].description}"),
+                              Text("Description: ${events[index].description}"),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                              "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"),
-                        )
+                          child: Text("Dog name: ${events[index].dogName}"),
+                        ),
                       ],
                     ),
                     leading: Icon(
-                      Icons.pets,
+                      Icons.calendar_today,
                       color: Colors.orangeAccent,
                     ),
                     trailing: IconButton(
                       onPressed: () {
+                        storage.write(
+                            key: 'eventId', value: events[index].eventId);
                         Navigator.of(context)
-                            .push(MaterialPageRoute(
-                              builder: (context) => EditDogDataPage(),
-                            ))
+                            .push(
+                              MaterialPageRoute(
+                                builder: (context) => EditEventPage(),
+                              ),
+                            )
                             .whenComplete(() => {
                                   setState(() {
-                                    _dogs = _fetchDogs();
+                                    _events = _fetchEvents();
                                   })
                                 });
                       },

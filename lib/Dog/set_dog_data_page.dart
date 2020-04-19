@@ -1,9 +1,11 @@
 import 'dart:convert';
+
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class SetDogDataPage extends StatefulWidget {
   @override
@@ -52,14 +54,28 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
       'Accept': '*/*',
       'Authorization': 'Bearer $token'
     };
-    final response = await http.post(url, body: reqBody, headers: headers);
-    if (response.statusCode == 200) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/userprofile', (Route<dynamic> route) => false);
+
+    final getResponse = await http.get(url, headers: headers);
+    if (getResponse.statusCode == 200) {
+      List jsonResponse = jsonDecode(getResponse.body);
+      bool hasDogs =
+          jsonResponse.map((dog) => Dog.fromJson(dog)).toList().isNotEmpty;
+      final pushResponse =
+          await http.post(url, body: reqBody, headers: headers);
+      if (pushResponse.statusCode == 200) {
+        if (hasDogs)
+          Navigator.of(context).pop();
+        else
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              '/userhomescreen', (Route<dynamic> route) => false);
+      } else {
+        showAlertDialogWithMessage('Could not set dog data!');
+        throw Exception('Could not set dog data');
+      }
     } else {
-      showAlertDialogWithMessage('Could not set dog data!');
+      showAlertDialogWithMessage('Could not get dog data!');
+      throw Exception('Could not get dog data');
     }
-    print(response.body);
   }
 
   @override
@@ -149,7 +165,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                                   context: context,
                                   firstDate: DateTime(1900),
                                   initialDate: currentValue ?? DateTime.now(),
-                                  lastDate: DateTime(2100));
+                                  lastDate: DateTime.now());
                             },
                           ),
                         ],
@@ -162,7 +178,13 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          setDogData();
+                          if (vaccinationDateController.text == "") {
+                            showAlertDialogWithMessage(
+                                'Last vaccination date has to be filled!');
+                            throw Exception(
+                                'Last vaccination date has to be filled!');
+                          } else
+                            setDogData();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),

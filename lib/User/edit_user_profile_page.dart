@@ -1,7 +1,8 @@
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
 
 class EditUserData extends StatefulWidget {
   @override
@@ -44,8 +45,7 @@ class _EditUserDataState extends State<EditUserData> {
 
     final response = await http.put(url, body: body, headers: headers);
     if (response.statusCode == 200) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/userprofile', (Route<dynamic> route) => false);
+      Navigator.of(context).pop();
     } else
       showAlertDialogWithMessage('Could not edit user data!');
   }

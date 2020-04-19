@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class LoginPageState extends State<LoginPage> {
@@ -154,8 +155,7 @@ class LoginPageState extends State<LoginPage> {
       final getResponse = await http.get(getUrl, headers: getHeaders);
 
       if (getResponse.statusCode == 200) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            '/userprofile', (Route<dynamic> route) => false);
+        Navigator.of(context).pushNamed('/userhomescreen');
       } else if (getResponse.statusCode == 404) {
         Navigator.of(context).pushNamedAndRemoveUntil(
             '/adduserdata', (Route<dynamic> route) => false);
