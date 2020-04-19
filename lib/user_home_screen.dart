@@ -1,4 +1,6 @@
 import 'package:doggo_frontend/Custom/app_flow.dart';
+import 'package:doggo_frontend/Custom/bottom_navigation_tab.dart';
+import 'package:doggo_frontend/Custom/material_bottom_navigation_scaffold.dart';
 import 'package:doggo_frontend/Dog/dogs_list_page.dart';
 import 'package:doggo_frontend/Map/MapPage.dart';
 import 'package:doggo_frontend/User/user_profile.dart';
@@ -12,7 +14,7 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  int _currentBarIndex = 0;
+  int _currentlySelectedIndex = 0;
 
   final List<AppFlow> appFlows = [
     AppFlow(
@@ -43,51 +45,40 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentFlow = appFlows[_currentBarIndex];
-
     return WillPopScope(
-      onWillPop: () async =>
-          !await currentFlow.navigatorKey.currentState.maybePop(),
-      child: Scaffold(
-        body: IndexedStack(
-          index: _currentBarIndex,
-          children: appFlows.map(_buildIndexedPageFlow).toList(),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.orangeAccent,
-          selectedItemColor: Colors.white,
-          currentIndex: _currentBarIndex,
-          items: appFlows
-              .map(
-                (flow) => BottomNavigationBarItem(
-                  title: Text(flow.title),
+      onWillPop: () async => !await appFlows[_currentlySelectedIndex]
+          .navigatorKey
+          .currentState
+          .maybePop(),
+      child: MaterialBottomNavigationScaffold(
+        navigationBarItems: appFlows
+            .map(
+              (flow) => BottomNavigationTab(
+                bottomNavigationBarItem: BottomNavigationBarItem(
                   icon: Icon(flow.iconData),
+                  title: Text(flow.title),
                 ),
-              )
-              .toList(),
-          onTap: (newIndex) => setState(
-            () {
-              if (_currentBarIndex != newIndex) {
-                _currentBarIndex = newIndex;
-              } else {
-                // If the user is re-selecting the tab, the common
-                // behavior is to empty the stack.
-                currentFlow.navigatorKey.currentState
-                    .popUntil((route) => route.isFirst);
-              }
-            },
-          ),
+                navigatorKey: flow.navigatorKey,
+                initialPageBuilder: (context) => flow.page,
+              ),
+            )
+            .toList(),
+        onItemSelected: (newIndex) => setState(
+          () {
+            if (_currentlySelectedIndex != newIndex) {
+              _currentlySelectedIndex = newIndex;
+            } else {
+              // If the user is re-selecting the tab, the common
+              // behavior is to empty the stack.
+              appFlows[_currentlySelectedIndex]
+                  .navigatorKey
+                  .currentState
+                  .popUntil((route) => route.isFirst);
+            }
+          },
         ),
+        selectedIndex: _currentlySelectedIndex,
       ),
     );
   }
-
-  Widget _buildIndexedPageFlow(AppFlow appFlow) => Navigator(
-        key: appFlow.navigatorKey,
-        onGenerateRoute: (settings) => MaterialPageRoute(
-          settings: settings,
-          builder: (context) => appFlow.page,
-        ),
-      );
 }
