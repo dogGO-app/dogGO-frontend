@@ -1,13 +1,21 @@
+import 'dart:convert';
+
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:doggo_frontend/Custom/extensions.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:http/http.dart' as http;
-import 'package:doggo_frontend/Dog/http/dog_data.dart';
-import 'dart:convert';
+import 'package:intl/intl.dart';
+
+import 'http/event_data.dart';
 
 class EditEventPage extends StatefulWidget {
+  final Event eventData;
+
+  const EditEventPage({Key key, this.eventData}) : super(key: key);
+
   @override
   _EditEventPageState createState() => _EditEventPageState();
 }
@@ -89,13 +97,20 @@ class _EditEventPageState extends State<EditEventPage> {
 
   @override
   void initState() {
+    if (widget.eventData != null) {
+      dateController.text =
+          DateFormat('yyyy-MM-dd').format(widget.eventData.eventDate);
+      timeController.text = widget.eventData.eventTime.parse();
+      descriptionController.text = widget.eventData.description;
+      selectedDog = widget.eventData.dogName;
+    }
     _fetchDogs();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
           title: Text('Edit Event In Your Calendar'),
           centerTitle: true,
@@ -186,16 +201,16 @@ class _EditEventPageState extends State<EditEventPage> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          if(dateController.text == ""){
-                            showAlertDialogWithMessage('Date and time has to be filled!');
+                          if (dateController.text == "") {
+                            showAlertDialogWithMessage(
+                                'Date and time has to be filled!');
                             throw Exception('Date and time are empty');
                           } else {
                             editEventData();
                           }
                         },
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)
-                        ),
+                            borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.all(0.0),
                         child: Ink(
                           decoration: BoxDecoration(
@@ -207,8 +222,7 @@ class _EditEventPageState extends State<EditEventPage> {
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
-                              borderRadius: BorderRadius.circular(10)
-                          ),
+                              borderRadius: BorderRadius.circular(10)),
                           child: Container(
                             constraints: BoxConstraints(
                                 maxWidth: 300.0, minHeight: 50.0),

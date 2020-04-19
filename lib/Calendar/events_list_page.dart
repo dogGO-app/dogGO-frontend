@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:doggo_frontend/Calendar/add_event_page.dart';
 import 'package:doggo_frontend/Calendar/edit_event_page.dart';
 import 'package:doggo_frontend/Calendar/http/event_data.dart';
+import 'package:doggo_frontend/Custom/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -94,8 +95,8 @@ class _EventListPageState extends State<EventListPage> {
                       children: <Widget>[
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                              "Time: ${events[index].eventTime.hour}:${events[index].eventTime.minute}"),
+                          child:
+                              Text("Time: ${events[index].eventTime.parse()}"),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -119,7 +120,9 @@ class _EventListPageState extends State<EventListPage> {
                         Navigator.of(context)
                             .push(
                               MaterialPageRoute(
-                                builder: (context) => EditEventPage(),
+                                builder: (context) => EditEventPage(
+                                  eventData: events[index],
+                                ),
                               ),
                             )
                             .whenComplete(() => {

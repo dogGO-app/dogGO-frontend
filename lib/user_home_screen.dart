@@ -18,7 +18,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   final List<AppFlow> appFlows = [
     AppFlow(
-      page: UserProfileView(),
+      page: UserProfilePage(),
       title: 'Your profile',
       iconData: Icons.person,
       navigatorKey: GlobalKey<NavigatorState>(),

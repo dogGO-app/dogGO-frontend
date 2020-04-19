@@ -1,11 +1,17 @@
 import 'dart:convert';
+
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class EditDogDataPage extends StatefulWidget {
+  final Dog dogData;
+
+  const EditDogDataPage({Key key, this.dogData}) : super(key: key);
+
   @override
   _EditDogDataPageState createState() => _EditDogDataPageState();
 }
@@ -25,6 +31,19 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
     descriptionController.dispose();
     vaccinationDateController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    if (widget.dogData != null) {
+      nameController.text = widget.dogData.name;
+      breedController.text = widget.dogData.breed;
+      colorController.text = widget.dogData.color;
+      descriptionController.text = widget.dogData.description;
+      vaccinationDateController.text =
+          DateFormat('yyyy-MM-dd').format(widget.dogData.vaccinationDate);
+    }
+    super.initState();
   }
 
   Future showAlertDialogWithMessage(String message) {
@@ -168,8 +187,7 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
                                 'Last vaccination date has to be filled!');
                             throw Exception(
                                 'Last vaccination date has to be filled!');
-                          }
-                          else
+                          } else
                             editDogData();
                         },
                         shape: RoundedRectangleBorder(

@@ -118,7 +118,9 @@ class _DogsListPageState extends State<DogsListPage> {
                       onPressed: () {
                         Navigator.of(context)
                             .push(MaterialPageRoute(
-                              builder: (context) => EditDogDataPage(),
+                              builder: (context) => EditDogDataPage(
+                                dogData: dogs[index],
+                              ),
                             ))
                             .whenComplete(() => {
                                   setState(() {
