@@ -62,7 +62,7 @@ class LoginPageState extends State<LoginPage> {
                             padding: EdgeInsets.all(8),
                             child: TextField(
                               controller: passwordController,
-                              obscureText: false,
+                              obscureText: true,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Password",
