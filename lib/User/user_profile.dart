@@ -252,6 +252,12 @@ class _UserProfileViewState extends State<UserProfileView> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed('/map');
+        },
+        child: Icon(Icons.map),
+      ),
     );
   }
 

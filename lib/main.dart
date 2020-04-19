@@ -8,6 +8,7 @@ import 'User/edit_user_profile_page.dart';
 import 'User/set_user_data_page.dart';
 import 'User/user_profile.dart';
 import 'login_page.dart';
+import 'Navigation/map_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/adddogdata': (context) => SetDogDataPage(),
         '/edituserdata': (context) => EditUserData(),
         '/editdogdata': (context) => EditDogData(),
+        '/map': (context) => MapPage()
       },
     );
   }
