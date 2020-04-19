@@ -31,23 +31,23 @@ class _MapPageState extends State<MapPage> {
   }
 
   void setInitialLocation() async {
-//    _serviceEnabled = await location.serviceEnabled();
-//    if (!_serviceEnabled) {
-//      _serviceEnabled = await location.requestService();
-//      if (!_serviceEnabled) {
-//        return;
-//      }
-//    }
-//
-//    _permissionGranted = await location.hasPermission();
-//    if (_permissionGranted == PermissionStatus.denied) {
-//      _permissionGranted = await location.requestPermission();
-//      if (_permissionGranted != PermissionStatus.granted) {
-//        return;
-//      }
-//    }
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
 
-    currentLocation = await location.getLocation();
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    currentLocation =  await location.getLocation();
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -77,6 +77,28 @@ class _MapPageState extends State<MapPage> {
       initialCameraPosition: initialCameraPosition(),
       myLocationEnabled: true,
       ),
+//      FutureBuilder<LocationData>(
+//        future: currentLocation,
+//        builder: (context, snapshot) {
+//          if (snapshot.hasData) {
+//            LocationData currentLocation = snapshot.data;
+//            return GoogleMap(
+//              onMapCreated: _onMapCreated,
+//              initialCameraPosition: CameraPosition(
+//                  target: LatLng(
+//                      currentLocation.latitude, currentLocation.longitude)),
+//              myLocationEnabled: true,
+//            );
+//          } else if (snapshot.hasError) {
+//            return (Text("${snapshot.error}"));
+//          }
+//          return Center(
+//            child: CircularProgressIndicator(
+//              backgroundColor: Colors.orangeAccent,
+//            ),
+//          );
+//        },
+//      ),
     );
   }
 }
