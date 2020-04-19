@@ -1,7 +1,7 @@
+import 'package:doggo_frontend/Custom/app_flow.dart';
 import 'package:doggo_frontend/Dog/dogs_list_page.dart';
 import 'package:doggo_frontend/Map/MapPage.dart';
 import 'package:doggo_frontend/User/user_profile.dart';
-import 'package:doggo_frontend/app_flow.dart';
 import 'package:flutter/material.dart';
 
 import 'Calendar/events_list_page.dart';
@@ -13,7 +13,6 @@ class UserHomeScreen extends StatefulWidget {
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
   int _currentBarIndex = 0;
-  final navKeys = List.generate(4, (_) => GlobalKey<NavigatorState>());
 
   final List<AppFlow> appFlows = [
     AppFlow(
@@ -74,8 +73,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               } else {
                 // If the user is re-selecting the tab, the common
                 // behavior is to empty the stack.
-                navKeys[_currentBarIndex]
-                    .currentState
+                currentFlow.navigatorKey.currentState
                     .popUntil((route) => route.isFirst);
               }
             },
