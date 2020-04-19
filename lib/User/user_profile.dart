@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/User/edit_user_profile_page.dart';
 import 'package:doggo_frontend/User/http/user_details_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -144,46 +145,21 @@ class _UserProfileViewState extends State<UserProfileView> {
                   },
                 ),
               ),
-              SizedBox(height: 30.0),
+              SizedBox(height: 45.0),
               Center(
                 child: MaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/dogsinfo');
-                  },
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.all(0.0),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.orangeAccent,
-                            Color.fromRGBO(200, 100, 20, .4)
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Container(
-                      constraints:
-                          BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
-                      alignment: Alignment.center,
-                      child: Text(
-                        "See Information About Your Dogs",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              Center(
-                child: MaterialButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/edituserdata');
+                    Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder: (context) => EditUserData(),
+                          ),
+                        )
+                        .whenComplete(() => {
+                              setState(() {
+                                userDetails = fetchUserDetails();
+                              })
+                            });
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -218,8 +194,9 @@ class _UserProfileViewState extends State<UserProfileView> {
                   onPressed: () async {
                     final storage = FlutterSecureStorage();
                     await storage.delete(key: 'token');
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/home', (Route<dynamic> route) => false);
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamedAndRemoveUntil(
+                            '/home', (Route<dynamic> route) => false);
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
