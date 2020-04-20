@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class _UserProfileViewState extends State<UserProfileView> {
+class _UserProfilePageState extends State<UserProfilePage> {
   Future<UserDetailsResponse> userDetails;
 
   @override
@@ -128,7 +128,6 @@ class _UserProfileViewState extends State<UserProfileView> {
               Container(
                 child: FutureBuilder<UserDetailsResponse>(
                   future: userDetails,
-                  // ignore: missing_return
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
                       return Text(
@@ -152,7 +151,19 @@ class _UserProfileViewState extends State<UserProfileView> {
                     Navigator.of(context)
                         .push(
                           MaterialPageRoute(
-                            builder: (context) => EditUserData(),
+                            builder: (context) => FutureBuilder(
+                              future: userDetails,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return EditUserDataPage(
+                                    userData: snapshot.data,
+                                  );
+                                } else
+                                  throw Exception(
+                                    "Couldn't acquire user data!",
+                                  );
+                              },
+                            ),
                           ),
                         )
                         .whenComplete(() => {
@@ -261,7 +272,7 @@ class _UserProfileViewState extends State<UserProfileView> {
   }
 }
 
-class UserProfileView extends StatefulWidget {
+class UserProfilePage extends StatefulWidget {
   @override
-  _UserProfileViewState createState() => _UserProfileViewState();
+  _UserProfilePageState createState() => _UserProfilePageState();
 }

@@ -2,7 +2,7 @@ import 'package:doggo_frontend/Custom/app_flow.dart';
 import 'package:doggo_frontend/Custom/bottom_navigation_tab.dart';
 import 'package:doggo_frontend/Custom/material_bottom_navigation_scaffold.dart';
 import 'package:doggo_frontend/Dog/dogs_list_page.dart';
-import 'package:doggo_frontend/User/user_profile.dart';
+import 'package:doggo_frontend/User/user_profile_page.dart';
 import 'package:flutter/material.dart';
 
 import 'Calendar/events_list_page.dart';
@@ -18,7 +18,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   final List<AppFlow> appFlows = [
     AppFlow(
-      page: UserProfileView(),
+      page: UserProfilePage(),
       title: 'Your profile',
       iconData: Icons.person,
       navigatorKey: GlobalKey<NavigatorState>(),

@@ -1,15 +1,20 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/User/http/user_details_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class EditUserData extends StatefulWidget {
+class EditUserDataPage extends StatefulWidget {
+  final UserDetailsResponse userData;
+
+  const EditUserDataPage({Key key, this.userData}) : super(key: key);
+
   @override
-  _EditUserDataState createState() => _EditUserDataState();
+  _EditUserDataPageState createState() => _EditUserDataPageState();
 }
 
-class _EditUserDataState extends State<EditUserData> {
+class _EditUserDataPageState extends State<EditUserDataPage> {
   String dropdownValue;
 
   var dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
@@ -24,6 +29,17 @@ class _EditUserDataState extends State<EditUserData> {
     lastNameController.dispose();
     hobbyController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    if (widget.userData != null) {
+      firstNameController.text = widget.userData.firstName;
+      lastNameController.text = widget.userData.lastName;
+      dropdownValue = widget.userData.age.toString();
+      hobbyController.text = widget.userData.hobby;
+    }
+    super.initState();
   }
 
   Future addUserDetails() async {
