@@ -78,7 +78,9 @@ class _MapPageState extends State<MapPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? CircularProgressIndicator()
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
           : Container(
               child: GoogleMap(
                 onMapCreated: _onMapCreated,
