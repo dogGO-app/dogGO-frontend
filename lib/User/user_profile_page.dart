@@ -158,10 +158,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   return EditUserDataPage(
                                     userData: snapshot.data,
                                   );
-                                } else
+                                } else if (snapshot.hasError) {
                                   throw Exception(
                                     "Couldn't acquire user data!",
                                   );
+                                } else {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
                               },
                             ),
                           ),
