@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-const double CAMERA_ZOOM = 16;
-const LatLng SOURCE_LOCATION = LatLng(52.401774, 16.951087);
+const double _cameraZoom = 16;
 
 class MapPage extends StatefulWidget {
   @override
@@ -17,20 +16,38 @@ class _MapPageState extends State<MapPage> {
   Location location;
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
+  CameraPosition _center;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     location = new Location();
-
-    location.onLocationChanged.listen((event) {
-      currentLocation = event;
-    });
-
-    setInitialLocation();
+    _getLocation();
   }
 
-  void setInitialLocation() async {
+  _getLocation() async {
+    setState(() {
+      isLoading = true;
+    });
+    initialize();
+    currentLocation = await location.getLocation();
+    if (currentLocation == null) {
+      return;
+    }
+    _center = CameraPosition(
+      target: LatLng(currentLocation.latitude, currentLocation.longitude),
+      zoom: _cameraZoom,
+    );
+
+    setState(() {
+      isLoading = false;
+    });
+
+    print("Current location: $currentLocation");
+  }
+
+  Future<void> initialize() async {
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
@@ -46,22 +63,10 @@ class _MapPageState extends State<MapPage> {
         return;
       }
     }
-
-    currentLocation =  await location.getLocation();
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
-  }
-
-
-  CameraPosition initialCameraPosition() {
-    LatLng target;
-    if (currentLocation != null)
-      target = LatLng(currentLocation.latitude, currentLocation.longitude);
-    else
-      target = SOURCE_LOCATION;
-    return CameraPosition(target: target, zoom: CAMERA_ZOOM);
   }
 
   @override
@@ -72,33 +77,15 @@ class _MapPageState extends State<MapPage> {
         title: Text('Map'),
         centerTitle: true,
       ),
-      body: GoogleMap(
-      onMapCreated: _onMapCreated,
-      initialCameraPosition: initialCameraPosition(),
-      myLocationEnabled: true,
-      ),
-//      FutureBuilder<LocationData>(
-//        future: currentLocation,
-//        builder: (context, snapshot) {
-//          if (snapshot.hasData) {
-//            LocationData currentLocation = snapshot.data;
-//            return GoogleMap(
-//              onMapCreated: _onMapCreated,
-//              initialCameraPosition: CameraPosition(
-//                  target: LatLng(
-//                      currentLocation.latitude, currentLocation.longitude)),
-//              myLocationEnabled: true,
-//            );
-//          } else if (snapshot.hasError) {
-//            return (Text("${snapshot.error}"));
-//          }
-//          return Center(
-//            child: CircularProgressIndicator(
-//              backgroundColor: Colors.orangeAccent,
-//            ),
-//          );
-//        },
-//      ),
+      body: isLoading
+          ? CircularProgressIndicator()
+          : Container(
+              child: GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: _center,
+                myLocationEnabled: true,
+              ),
+            ),
     );
   }
 }
