@@ -4,8 +4,9 @@ import 'package:doggo_frontend/Custom/material_bottom_navigation_scaffold.dart';
 import 'package:doggo_frontend/Dog/dogs_list_page.dart';
 import 'package:doggo_frontend/User/user_profile.dart';
 import 'package:flutter/material.dart';
+
 import 'Calendar/events_list_page.dart';
-import 'Navigation/map_page.dart';
+import 'Location/map_page.dart';
 
 class UserHomeScreen extends StatefulWidget {
   @override

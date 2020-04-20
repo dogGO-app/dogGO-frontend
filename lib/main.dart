@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'Dog/set_dog_data_page.dart';
 import 'User/set_user_data_page.dart';
 import 'login_page.dart';
-import 'Navigation/map_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,7 +25,6 @@ class MyApp extends StatelessWidget {
         '/userhomescreen': (context) => UserHomeScreen(),
         '/adduserdata': (context) => SetUserDataPage(),
         '/adddogdata': (context) => SetDogDataPage(),
-        '/map': (context) => MapPage()
       },
     );
   }

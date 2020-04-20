@@ -12,53 +12,53 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   GoogleMapController mapController;
-  LocationData currentLocation;
-  Location location;
+  LocationData _currentLocation;
+  Location _location;
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   CameraPosition _center;
-  bool isLoading = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    location = new Location();
+    _location = new Location();
     _getLocation();
   }
 
   _getLocation() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
     initialize();
-    currentLocation = await location.getLocation();
-    if (currentLocation == null) {
+    _currentLocation = await _location.getLocation();
+    if (_currentLocation == null) {
       return;
     }
     _center = CameraPosition(
-      target: LatLng(currentLocation.latitude, currentLocation.longitude),
+      target: LatLng(_currentLocation.latitude, _currentLocation.longitude),
       zoom: _cameraZoom,
     );
 
     setState(() {
-      isLoading = false;
+      _isLoading = false;
     });
 
-    print("Current location: $currentLocation");
+    print("Current location: $_currentLocation");
   }
 
   Future<void> initialize() async {
-    _serviceEnabled = await location.serviceEnabled();
+    _serviceEnabled = await _location.serviceEnabled();
     if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
+      _serviceEnabled = await _location.requestService();
       if (!_serviceEnabled) {
         return;
       }
     }
 
-    _permissionGranted = await location.hasPermission();
+    _permissionGranted = await _location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
+      _permissionGranted = await _location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
         return;
       }
@@ -77,7 +77,7 @@ class _MapPageState extends State<MapPage> {
         title: Text('Map'),
         centerTitle: true,
       ),
-      body: isLoading
+      body: _isLoading
           ? CircularProgressIndicator()
           : Container(
               child: GoogleMap(
