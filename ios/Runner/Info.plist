@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>The app needs Your location to work properly. It will use it to navigate You to the chosen dog walk destination."</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>The app needs Your location to work properly. Tap "Always allow" to make sure that it will navigate you to the chosen dog walk destination, even if it runs in the background.</string>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
