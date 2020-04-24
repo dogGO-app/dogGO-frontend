@@ -80,8 +80,25 @@ class _AddEventPageState extends State<AddEventPage> {
     if (pushResponse.statusCode == 200) {
       Navigator.of(context).pop();
     } else {
-      showAlertDialogWithMessage('Could not add calendar event!');
-      throw Exception('Could not add calendar event');
+      switch (pushResponse.statusCode) {
+        case 400:
+          {
+            showAlertDialogWithMessage(
+                'We cannot go back in time! Change the time you set and try again');
+            throw Exception('Could not add event bc its set in the past');
+          }
+        case 409:
+          {
+            showAlertDialogWithMessage(
+                'Two events cannot take place at the same time! Change date or time and try again');
+            throw Exception('Could not add second event at the same time');
+          }
+        default:
+          {
+            showAlertDialogWithMessage('Could not add calendar event!');
+            throw Exception('Could not add calendar event');
+          }
+      }
     }
   }
 
@@ -184,29 +201,28 @@ class _AddEventPageState extends State<AddEventPage> {
                       height: 50.0,
                       child: MaterialButton(
                         onPressed: () {
-                          if(dateController.text == ""){
-                            showAlertDialogWithMessage('Date and time has to be filled!');
+                          if (dateController.text == "") {
+                            showAlertDialogWithMessage(
+                                'Date and time has to be filled!');
                             throw Exception('Date and time are empty');
                           } else {
                             addEventData();
                           }
                         },
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                        ),
+                            borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.all(0.0),
                         child: Ink(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.orangeAccent,
-                                Color.fromRGBO(200, 100, 20, .4)
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                            borderRadius: BorderRadius.circular(10)
-                          ),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.orangeAccent,
+                                  Color.fromRGBO(200, 100, 20, .4)
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
                           child: Container(
                             constraints: BoxConstraints(
                                 maxWidth: 300.0, minHeight: 50.0),
