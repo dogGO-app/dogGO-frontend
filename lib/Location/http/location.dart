@@ -7,19 +7,24 @@ class LocationMarker {
   final double latitude;
   final double longitude;
 
-  LocationMarker(
-      {@required this.id,
-      @required this.name,
-      this.description,
-      @required this.latitude,
-      @required this.longitude});
+  const LocationMarker({
+    @required this.id,
+    @required this.name,
+    this.description,
+    @required this.latitude,
+    @required this.longitude,
+  })  : assert(id != null),
+        assert(name != null),
+        assert(latitude != null),
+        assert(longitude != null);
 
   factory LocationMarker.fromJson(Map<String, dynamic> json) {
     return LocationMarker(
-        id: json['id'],
-        name: json['name'],
-        description: json['description'],
-        latitude: json['latitude'],
-        longitude: json['longitude']);
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+    );
   }
 }

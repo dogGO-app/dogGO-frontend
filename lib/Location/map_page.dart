@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/Location/bottom_sheet_widget.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class _MapPageState extends State<MapPage> {
       }
     }
 
-    await _showMarkers();
+    await _showMarkersOnMap();
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -100,7 +101,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  Future<void> _showMarkers() async {
+  Future<void> _showMarkersOnMap() async {
     final locationMarkers = await _fetchLocationMarkers();
     locationMarkers.forEach((locationMarker) {
       final marker = Marker(
@@ -115,6 +116,26 @@ class _MapPageState extends State<MapPage> {
         _markers.putIfAbsent(marker.markerId, () => marker);
       });
     });
+  }
+
+  void addMarkerToMap(LocationMarker locationMarker) {
+    final markerId = MarkerId(locationMarker.id);
+    final latLng = LatLng(locationMarker.latitude, locationMarker.longitude);
+    final marker = Marker(
+      markerId: markerId,
+      position: latLng,
+      infoWindow: InfoWindow(
+        title: locationMarker.name,
+        snippet: locationMarker.description,
+      ),
+    );
+
+    setState(() {
+      _markers.putIfAbsent(markerId, () => marker);
+    });
+
+    mapController
+        .animateCamera(CameraUpdate.newLatLngZoom(latLng, _cameraZoom));
   }
 
   @override
@@ -136,6 +157,15 @@ class _MapPageState extends State<MapPage> {
                 initialCameraPosition: _center,
                 myLocationEnabled: true,
                 markers: Set<Marker>.of(_markers.values),
+                onLongPress: (latLng) => showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AddLocationBottomSheetWidget(
+                      latLng: latLng,
+                      addMarkerToMapCallback: addMarkerToMap,
+                    );
+                  },
+                ),
               ),
             ),
     );
