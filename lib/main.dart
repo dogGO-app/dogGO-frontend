@@ -15,8 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'dogGO!',
       theme: ThemeData(
-          appBarTheme: AppBarTheme(color: Colors.orangeAccent),
-          brightness: Brightness.light),
+        appBarTheme: AppBarTheme(color: Colors.orangeAccent),
+        brightness: Brightness.light,
+      ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/home',
       routes: {

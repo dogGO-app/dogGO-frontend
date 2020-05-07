@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:doggo_frontend/Location/bottom_sheet_widget.dart';
+import 'package:doggo_frontend/Location/add_location_bottom_sheet_widget.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -133,9 +133,6 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       _markers.putIfAbsent(markerId, () => marker);
     });
-
-    mapController
-        .animateCamera(CameraUpdate.newLatLngZoom(latLng, _cameraZoom));
   }
 
   @override
@@ -157,15 +154,22 @@ class _MapPageState extends State<MapPage> {
                 initialCameraPosition: _center,
                 myLocationEnabled: true,
                 markers: Set<Marker>.of(_markers.values),
-                onLongPress: (latLng) => showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AddLocationBottomSheetWidget(
-                      latLng: latLng,
-                      addMarkerToMapCallback: addMarkerToMap,
-                    );
-                  },
-                ),
+                onLongPress: (latLng) async {
+                  await mapController.animateCamera(
+                    CameraUpdate.newLatLngZoom(latLng, _cameraZoom),
+                  );
+                  return showModalBottomSheet(
+                    context: context,
+                    barrierColor: Colors.black12,
+                    backgroundColor: Colors.transparent,
+                    builder: (BuildContext context) {
+                      return AddLocationBottomSheetWidget(
+                        latLng: latLng,
+                        addMarkerToMapCallback: addMarkerToMap,
+                      );
+                    },
+                  );
+                },
               ),
             ),
     );
