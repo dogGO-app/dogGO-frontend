@@ -92,7 +92,7 @@ class _MapPageState extends State<MapPage> {
 
     final response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(response.body);
+      List jsonResponse = json.decode(utf8.decode(response.bodyBytes));
       return jsonResponse
           .map((location) => LocationMarker.fromJson(location))
           .toList();
