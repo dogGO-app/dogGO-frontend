@@ -139,7 +139,7 @@ class _AddLocationBottomSheetWidgetState
                   child: TextField(
                     controller: descriptionController,
                     decoration: InputDecoration.collapsed(
-                      hintText: 'Description',
+                      hintText: 'Description (optional)',
                     ),
                   ),
                 ),
@@ -153,7 +153,9 @@ class _AddLocationBottomSheetWidgetState
                     final locationMarker = LocationMarker(
                       id: Uuid().v4(),
                       name: nameController.text,
-                      description: descriptionController.text,
+                      description: descriptionController.text.isNotEmpty
+                          ? descriptionController.text
+                          : null,
                       latitude: widget.latLng.latitude,
                       longitude: widget.latLng.longitude,
                     );
