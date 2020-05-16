@@ -121,47 +121,88 @@ class _MapPageState extends State<MapPage> {
               backgroundColor: Colors.transparent,
               builder: (BuildContext context) {
                 return Container(
-                    height: 50,
-                    margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
-                    child: MaterialButton(
-                      onPressed: () {
-                        _navigationOn();
-                        _clearPolylines();
-                        _setPolylines(LatLng(
-                            locationMarker.latitude, locationMarker.longitude));
-                      },
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.all(0.0),
-                      child: Ink(
+                  height: 200,
+                  margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        height: 175,
                         decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.orangeAccent,
-                                Color.fromRGBO(200, 100, 20, .4)
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Container(
-                          constraints:
-                              BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Navigate",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 10,
+                              color: Colors.black12,
+                              spreadRadius: 5,
+                            )
+                          ],
                         ),
-                      ),
-                    ));
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                locationMarker.name,
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                                alignment: Alignment.centerLeft,
+                                child: Text(locationMarker.description),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            MaterialButton(
+                              onPressed: () {
+                                _navigationOn();
+                                _clearPolylines();
+                                _setPolylines(LatLng(locationMarker.latitude,
+                                    locationMarker.longitude));
+                              },
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              padding: EdgeInsets.all(0.0),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.orangeAccent,
+                                        Color.fromRGBO(200, 100, 20, .4)
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Container(
+                                  constraints: BoxConstraints(
+                                      maxWidth: 300.0, minHeight: 50.0),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    "Navigate",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
               });
         },
-        infoWindow: InfoWindow(
-          title: locationMarker.name,
-          snippet: locationMarker.description,
-        ),
       );
       setState(() {
         _markers.putIfAbsent(marker.markerId, () => marker);
@@ -182,46 +223,88 @@ class _MapPageState extends State<MapPage> {
             backgroundColor: Colors.transparent,
             builder: (BuildContext context) {
               return Container(
-                  height: 50,
-                  margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
-                  child: MaterialButton(
-                    onPressed: () {
-                      _navigationOn();
-                      _clearPolylines();
-                      _setPolylines(latLng);
-                    },
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    padding: EdgeInsets.all(0.0),
-                    child: Ink(
+                height: 200,
+                margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      height: 175,
                       decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.orangeAccent,
-                              Color.fromRGBO(200, 100, 20, .4)
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Container(
-                        constraints:
-                            BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Navigate",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 10,
+                            color: Colors.black12,
+                            spreadRadius: 5,
+                          )
+                        ],
                       ),
-                    ),
-                  ));
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              locationMarker.name,
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text(locationMarker.description),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          MaterialButton(
+                            onPressed: () {
+                              _navigationOn();
+                              _clearPolylines();
+                              _setPolylines(LatLng(
+                                  locationMarker.latitude, locationMarker.longitude));
+                            },
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: EdgeInsets.all(0.0),
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.orangeAccent,
+                                      Color.fromRGBO(200, 100, 20, .4)
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Container(
+                                constraints:
+                                BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Navigate",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              );
             });
       },
-      infoWindow: InfoWindow(
-        title: locationMarker.name,
-        snippet: locationMarker.description,
-      ),
     );
 
     setState(() {
@@ -289,9 +372,9 @@ class _MapPageState extends State<MapPage> {
 
       if (_isNavigating && _previousLocation != _currentLocation) {
         double latDistance =
-        (_destination.latitude - _currentLocation.latitude).abs();
+            (_destination.latitude - _currentLocation.latitude).abs();
         double lngDistance =
-        (_destination.longitude - _currentLocation.longitude).abs();
+            (_destination.longitude - _currentLocation.longitude).abs();
 
         _animateCameraToLocation(
             LatLng(_currentLocation.latitude, _currentLocation.longitude));
