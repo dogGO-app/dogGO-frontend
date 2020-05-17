@@ -41,6 +41,31 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     _location = new Location();
     _getLocation();
+
+    _location.onLocationChanged.listen((LocationData currentLocation) {
+      _previousLocation = _currentLocation;
+      _currentLocation = currentLocation;
+
+      if (_isNavigating &&
+          ((_previousLocation.latitude - _currentLocation.latitude).abs() > 0.00002 ||
+              (_previousLocation.longitude - _currentLocation.longitude).abs() > 0.00002) &&
+          _destination != null) {
+        double latDistance =
+            (_destination.latitude - _currentLocation.latitude).abs();
+        double lngDistance =
+            (_destination.longitude - _currentLocation.longitude).abs();
+
+        _animateCameraToLocation(
+            LatLng(_currentLocation.latitude, _currentLocation.longitude));
+
+        if (latDistance < 0.0005 || lngDistance < 0.0005) {
+          _navigationOff();
+        } else {
+          _clearPolylines();
+          _setPolylines(_destination);
+        }
+      }
+    });
   }
 
   void _getLocation() async {
@@ -63,7 +88,6 @@ class _MapPageState extends State<MapPage> {
 
     mapController.moveCamera(CameraUpdate.newLatLng(
         LatLng(_currentLocation.latitude, _currentLocation.longitude)));
-    print("Current location: $_currentLocation");
   }
 
   Future<void> initialize() async {
@@ -149,15 +173,16 @@ class _MapPageState extends State<MapPage> {
                               alignment: Alignment.center,
                               child: Text(
                                 locationMarker.name,
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                             ),
                             SizedBox(
                               height: 20,
                             ),
                             Container(
-                                alignment: Alignment.centerLeft,
-                                child: Text(locationMarker.description),
+                              alignment: Alignment.center,
+                              child: Text(locationMarker.description),
                             ),
                             SizedBox(
                               height: 20,
@@ -168,6 +193,7 @@ class _MapPageState extends State<MapPage> {
                                 _clearPolylines();
                                 _setPolylines(LatLng(locationMarker.latitude,
                                     locationMarker.longitude));
+                                Navigator.of(context).pop();
                               },
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
@@ -251,7 +277,8 @@ class _MapPageState extends State<MapPage> {
                             alignment: Alignment.center,
                             child: Text(
                               locationMarker.name,
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ),
                           SizedBox(
@@ -268,8 +295,9 @@ class _MapPageState extends State<MapPage> {
                             onPressed: () {
                               _navigationOn();
                               _clearPolylines();
-                              _setPolylines(LatLng(
-                                  locationMarker.latitude, locationMarker.longitude));
+                              _setPolylines(LatLng(locationMarker.latitude,
+                                  locationMarker.longitude));
+                              Navigator.of(context).pop();
                             },
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
@@ -286,8 +314,8 @@ class _MapPageState extends State<MapPage> {
                                   ),
                                   borderRadius: BorderRadius.circular(10)),
                               child: Container(
-                                constraints:
-                                BoxConstraints(maxWidth: 300.0, minHeight: 50.0),
+                                constraints: BoxConstraints(
+                                    maxWidth: 300.0, minHeight: 50.0),
                                 alignment: Alignment.center,
                                 child: Text(
                                   "Navigate",
@@ -366,28 +394,6 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    _location.onLocationChanged.listen((LocationData currentLocation) {
-      _previousLocation = _currentLocation;
-      _currentLocation = currentLocation;
-
-      if (_isNavigating && _previousLocation != _currentLocation) {
-        double latDistance =
-            (_destination.latitude - _currentLocation.latitude).abs();
-        double lngDistance =
-            (_destination.longitude - _currentLocation.longitude).abs();
-
-        _animateCameraToLocation(
-            LatLng(_currentLocation.latitude, _currentLocation.longitude));
-
-        if (latDistance < 0.005 || lngDistance < 0.005) {
-          _navigationOff();
-        } else {
-          _clearPolylines();
-          _setPolylines(_destination);
-        }
-      }
-    });
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
