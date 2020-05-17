@@ -172,7 +172,7 @@ class _MapPageState extends State<MapPage> {
                             Container(
                               alignment: Alignment.center,
                               child: Text(
-                                locationMarker.name,
+                                locationMarker.name ?? "",
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
@@ -182,7 +182,7 @@ class _MapPageState extends State<MapPage> {
                             ),
                             Container(
                               alignment: Alignment.center,
-                              child: Text(locationMarker.description),
+                              child: Text(locationMarker.description ?? ""),
                             ),
                             SizedBox(
                               height: 20,
@@ -276,7 +276,7 @@ class _MapPageState extends State<MapPage> {
                           Container(
                             alignment: Alignment.center,
                             child: Text(
-                              locationMarker.name,
+                              locationMarker.name ?? "",
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
@@ -286,7 +286,7 @@ class _MapPageState extends State<MapPage> {
                           ),
                           Container(
                             alignment: Alignment.center,
-                            child: Text(locationMarker.description),
+                            child: Text(locationMarker.description ?? ""),
                           ),
                           SizedBox(
                             height: 20,
