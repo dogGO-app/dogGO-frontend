@@ -439,15 +439,20 @@ class _MapPageState extends State<MapPage> {
                           _navigationOff();
                         },
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                        ),
+                            borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.fromLTRB(0, 0, 0, 65),
                         child: Ink(
                           decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.orangeAccent,
+                                    blurRadius: 20,
+                                    offset: Offset(0, 4)),
+                              ],
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.orangeAccent,
-                                  Color.fromRGBO(200, 100, 20, .8)
+                                  Color.fromRGBO(200, 100, 20, .85)
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
