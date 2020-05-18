@@ -47,8 +47,10 @@ class _MapPageState extends State<MapPage> {
       _currentLocation = currentLocation;
 
       if (_isNavigating &&
-          ((_previousLocation.latitude - _currentLocation.latitude).abs() > 0.00002 ||
-              (_previousLocation.longitude - _currentLocation.longitude).abs() > 0.00002) &&
+          ((_previousLocation.latitude - _currentLocation.latitude).abs() >
+                  0.00002 ||
+              (_previousLocation.longitude - _currentLocation.longitude).abs() >
+                  0.00002) &&
           _destination != null) {
         double latDistance =
             (_destination.latitude - _currentLocation.latitude).abs();
@@ -405,30 +407,71 @@ class _MapPageState extends State<MapPage> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Container(
-              child: GoogleMap(
-                onMapCreated: _onMapCreated,
-                initialCameraPosition: _center,
-                myLocationEnabled: true,
-                markers: Set<Marker>.of(_markers.values),
-                polylines: _polylines,
-                onLongPress: (latLng) async {
-                  await mapController.animateCamera(
-                    CameraUpdate.newLatLngZoom(latLng, _cameraZoom),
-                  );
-                  return showModalBottomSheet(
-                    context: context,
-                    barrierColor: Colors.black12,
-                    backgroundColor: Colors.transparent,
-                    builder: (BuildContext context) {
-                      return AddLocationBottomSheetWidget(
-                        latLng: latLng,
-                        addMarkerToMapCallback: addMarkerToMap,
-                      );
-                    },
-                  );
-                },
-              ),
+          : Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: _center,
+                  myLocationEnabled: true,
+                  markers: Set<Marker>.of(_markers.values),
+                  polylines: _polylines,
+                  onLongPress: (latLng) async {
+                    await mapController.animateCamera(
+                      CameraUpdate.newLatLngZoom(latLng, _cameraZoom),
+                    );
+                    return showModalBottomSheet(
+                      context: context,
+                      barrierColor: Colors.black12,
+                      backgroundColor: Colors.transparent,
+                      builder: (BuildContext context) {
+                        return AddLocationBottomSheetWidget(
+                          latLng: latLng,
+                          addMarkerToMapCallback: addMarkerToMap,
+                        );
+                      },
+                    );
+                  },
+                ),
+                _isNavigating
+                    ? MaterialButton(
+                        onPressed: () {
+                          _navigationOff();
+                        },
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 65),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.orangeAccent,
+                                    blurRadius: 20,
+                                    offset: Offset(0, 4)),
+                              ],
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.orangeAccent,
+                                  Color.fromRGBO(200, 100, 20, .85)
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Container(
+                            constraints: BoxConstraints(
+                                maxWidth: 200.0, maxHeight: 50.0),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "End Navigation",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Text("")
+              ],
             ),
     );
   }
