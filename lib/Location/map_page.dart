@@ -345,15 +345,14 @@ class _MapPageState extends State<MapPage> {
   _setPolylines(LatLng destination) async {
     _destination = destination;
 
-    List<PointLatLng> result = await polylinePoints?.getRouteBetweenCoordinates(
+    PolylineResult result = await polylinePoints?.getRouteBetweenCoordinates(
         googleApiKey,
-        _currentLocation.latitude,
-        _currentLocation.longitude,
-        destination.latitude,
-        destination.longitude);
+        PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
+        PointLatLng(destination.latitude, destination.longitude),
+        );
 
-    if (result.isNotEmpty) {
-      result.forEach((PointLatLng point) {
+    if (result.status == 'OK') {
+      result.points.forEach((PointLatLng point) {
         _polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       });
     }
