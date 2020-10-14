@@ -19,7 +19,7 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login to DogGO!'),
+        title: Text('Login to DogGO'),
       ),
       body: SingleChildScrollView(
         child: Container(

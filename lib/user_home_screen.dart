@@ -56,7 +56,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               (flow) => BottomNavigationTab(
                 bottomNavigationBarItem: BottomNavigationBarItem(
                   icon: Icon(flow.iconData),
-                  title: Text(flow.title),
+                  label: flow.title,
                 ),
                 navigatorKey: flow.navigatorKey,
                 initialPageBuilder: (context) => flow.page,

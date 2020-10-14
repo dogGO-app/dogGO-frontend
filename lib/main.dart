@@ -1,4 +1,5 @@
 import 'package:doggo_frontend/registration_page.dart';
+import 'package:doggo_frontend/registration_verify_page.dart';
 import 'package:doggo_frontend/user_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/userhomescreen': (context) => UserHomeScreen(),
         '/adduserdata': (context) => SetUserDataPage(),
         '/adddogdata': (context) => SetDogDataPage(),
+        '/verify': (context) => RegistrationVerifyPage(),
       },
     );
   }
