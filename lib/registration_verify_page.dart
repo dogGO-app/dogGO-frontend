@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:icon_shadow/icon_shadow.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class RegistrationVerifyState extends State<RegistrationVerifyPage> {
@@ -40,15 +39,11 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
               vertical: screenHeight * 0.1, horizontal: screenWidth * 0.025),
           child: Column(
             children: <Widget>[
-              IconShadowWidget(
                 Icon(
                   Icons.vpn_key,
                   color: Colors.amber,
                   size: 128,
                 ),
-                shadowColor: Colors.orangeAccent,
-                showShadow: false,
-              ),
               Text(
                 'Please pass 6-digit verification code sent to your email:',
                 style: TextStyle(
@@ -71,7 +66,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                       shape: PinCodeFieldShape.underline,
                       fieldHeight: screenHeight * 0.05,
                       fieldWidth: screenWidth * 0.04,
-                      activeColor: hasError ? Colors.red : Colors.orangeAccent,
+                      activeColor: hasError ? Colors.red : Colors.green,
                       inactiveColor: Colors.black,
                       selectedColor: Colors.deepOrange,
                     ),
@@ -81,6 +76,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                     controller: textEditingController,
                     errorAnimationController: errorController,
                     enableActiveFill: false,
+                    showCursor: false,
                     beforeTextPaste: (text) {
                       return true;
                     },
