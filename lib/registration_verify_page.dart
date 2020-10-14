@@ -100,6 +100,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                         errorController.add(ErrorAnimationType.shake);
                       } else
                         filled = true;
+                      // TODO: call API (check if verified, if true - and navigate to SetUserDataPage)
                       setState(() {
                         currentText = value;
                       });
@@ -116,7 +117,9 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                       children: [
                         TextSpan(
                             text: " RESEND",
-                            recognizer: TapGestureRecognizer()..onTap = () {},
+                            recognizer: TapGestureRecognizer()..onTap = () {
+                              // TODO: call API (resend verification code)
+                            },
                             style: TextStyle(
                                 color: Colors.orangeAccent,
                                 fontWeight: FontWeight.bold,
@@ -125,6 +128,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                 ),
               ),
               Padding(
+                // TODO: switch to error message after API integration
                 padding: EdgeInsets.symmetric(
                     vertical: screenHeight * 0.05,
                     horizontal: screenWidth * 0.02),
