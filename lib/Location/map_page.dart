@@ -27,6 +27,7 @@ class _MapPageState extends State<MapPage> {
   CameraPosition _center;
   bool _isLoading = false;
   bool _isNavigating = false;
+  bool _nearLocation = false;
   LatLng _destination;
   Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
@@ -61,7 +62,8 @@ class _MapPageState extends State<MapPage> {
             LatLng(_currentLocation.latitude, _currentLocation.longitude));
 
         if (latDistance < 0.0005 || lngDistance < 0.0005) {
-          _navigationOff();
+          // _navigationOff();
+          _atLocation();
         } else {
           _clearPolylines();
           _setPolylines(_destination);
@@ -110,6 +112,11 @@ class _MapPageState extends State<MapPage> {
     }
 
     await _showMarkersOnMap();
+  }
+
+  void _atLocation() async {
+    _nearLocation = true;
+    _navigationOff();
   }
 
   Future<List<LocationMarker>> _fetchLocationMarkers() async {
@@ -346,10 +353,10 @@ class _MapPageState extends State<MapPage> {
     _destination = destination;
 
     PolylineResult result = await polylinePoints?.getRouteBetweenCoordinates(
-        googleApiKey,
-        PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
-        PointLatLng(destination.latitude, destination.longitude),
-        );
+      googleApiKey,
+      PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
+      PointLatLng(destination.latitude, destination.longitude),
+    );
 
     if (result.status == 'OK') {
       result.points.forEach((PointLatLng point) {
@@ -395,6 +402,9 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    // double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -466,6 +476,35 @@ class _MapPageState extends State<MapPage> {
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white),
                             ),
+                          ),
+                        ),
+                      )
+                    : Text(""),
+                _nearLocation
+                    ? Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, screenHeight * 0.1),
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.orangeAccent,
+                                blurRadius: 20,
+                                offset: Offset(0, 3)),
+                          ],
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.orangeAccent,
+                              Colors.orange
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              "You are at your destination",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white)
                           ),
                         ),
                       )
