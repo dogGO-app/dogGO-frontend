@@ -28,6 +28,7 @@ class _MapPageState extends State<MapPage> {
   bool _isLoading = false;
   bool _isNavigating = false;
   bool _nearLocation = false;
+  String _currentLocationName = "";
   LatLng _destination;
   Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
@@ -57,14 +58,17 @@ class _MapPageState extends State<MapPage> {
             (_destination.latitude - _currentLocation.latitude).abs();
         double lngDistance =
             (_destination.longitude - _currentLocation.longitude).abs();
+        print('latDistance: $latDistance, lngDistance: $lngDistance');
 
         _animateCameraToLocation(
             LatLng(_currentLocation.latitude, _currentLocation.longitude));
 
-        if (latDistance < 0.0005 || lngDistance < 0.0005) {
-          // _navigationOff();
+        if (latDistance < 0.0004 || lngDistance < 0.0004) {
           _atLocation();
-        } else {
+        } else if ((latDistance >= 0.0004 || lngDistance >= 0.0004) && _nearLocation){
+          _awayFromLocation();
+        }
+        else {
           _clearPolylines();
           _setPolylines(_destination);
         }
@@ -114,11 +118,6 @@ class _MapPageState extends State<MapPage> {
     await _showMarkersOnMap();
   }
 
-  void _atLocation() async {
-    _nearLocation = true;
-    _navigationOff();
-  }
-
   Future<List<LocationMarker>> _fetchLocationMarkers() async {
     final storage = FlutterSecureStorage();
     final token = await storage.read(key: 'token');
@@ -148,6 +147,7 @@ class _MapPageState extends State<MapPage> {
         markerId: MarkerId(locationMarker.id),
         position: LatLng(locationMarker.latitude, locationMarker.longitude),
         onTap: () {
+          _currentLocationName = locationMarker.name;
           showModalBottomSheet(
               context: context,
               barrierColor: Colors.black12,
@@ -396,6 +396,19 @@ class _MapPageState extends State<MapPage> {
     _clearPolylines();
   }
 
+  void _atLocation() async {
+    _nearLocation = true;
+    _clearPolylines();
+  }
+
+  void _awayFromLocation() {
+    setState(() {
+      _isNavigating = false;
+      _nearLocation = false;
+      _destination = null;
+    });
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -442,7 +455,7 @@ class _MapPageState extends State<MapPage> {
                     );
                   },
                 ),
-                _isNavigating
+                _isNavigating && !_nearLocation
                     ? MaterialButton(
                         onPressed: () {
                           _navigationOff();
@@ -502,7 +515,7 @@ class _MapPageState extends State<MapPage> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                              "You are at your destination",
+                              "You arrived to the " + _currentLocationName,
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.white)
                           ),
