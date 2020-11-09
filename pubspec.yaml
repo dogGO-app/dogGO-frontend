@@ -23,11 +23,14 @@ dependencies:
   datetime_picker_formfield: ^1.0.0
   http: ^0.12.2
   flutter_secure_storage: ^3.3.5
-  google_maps_flutter: ^1.0.2
+  google_maps_flutter: ^1.0.5
   location: ^3.0.2
   uuid: ^2.2.2
   flutter_polyline_points: ^0.2.4
   pin_code_fields: ^6.0.0
+  oauth2: ^1.6.3
+  path_provider: ^1.6.22
+  toast: ^0.1.5
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

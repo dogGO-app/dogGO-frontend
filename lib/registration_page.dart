@@ -1,15 +1,70 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:oauth2/oauth2.dart' as oauth2;
+
+import 'Custom/doggo_toast.dart';
 
 class RegistrationPageState extends State<RegistrationPage> {
+  oauth2.Client client;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
 
-  final url = 'https://doggo-app-server.herokuapp.com/api/auth/signup';
+  final signUpUrl = 'https://doggo-service.herokuapp.com/api/auth/user/sign-up';
+
+  final authority = 'doggo-service.herokuapp.com';
+  final mailPath = '/api/auth/user/send-activation-mail';
+
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
+  @override
+  void initState() {
+    _getClient();
+    super.initState();
+  }
+
+  void _getClient() async {
+    while (client == null) {
+      client = await OAuth2Client().getClientCredentialsGrant();
+    }
+  }
+
+  Future addUser() async {
+    var body = jsonEncode({
+      'email': '${emailController.text}',
+      'password': '${passwordController.text}'
+    });
+    final signUpResponse =
+        await client.post(signUpUrl, headers: headers, body: body);
+
+    if (signUpResponse.statusCode == 201) {
+      _sendVerificationEmail();
+      DoggoToast.of(context).showToast('Registration completed. Welcome!');
+      Navigator.of(context).pop();
+    } else if (signUpResponse.statusCode == 400) {
+      DoggoToast.of(context).showToast('You have to provide a valid email!');
+    } else if (signUpResponse.statusCode == 409) {
+      DoggoToast.of(context)
+          .showToast('Account with given email already exists!');
+    } else
+      DoggoToast.of(context)
+          .showToast('Failed to create user.');
+    throw Exception('Failed to create user.\nCode: ${signUpResponse.statusCode}');
+  }
+
+  Future _sendVerificationEmail() async {
+    var mailQueryParameters = {'userEmail': '${emailController.text}'};
+    var mailUri = Uri.https(authority, mailPath, mailQueryParameters);
+
+    final mailResponse = await client.post(mailUri, headers: headers);
+    if (mailResponse.statusCode != 200) {
+      DoggoToast.of(context).showToast('Activation email could not be sent!');
+      throw Exception(
+          'Activation email could not be sent!\nCode: ${mailResponse.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,19 +145,19 @@ class RegistrationPageState extends State<RegistrationPage> {
                         // ignore: missing_return
                         onPressed: () {
                           if (emailController.text.isEmpty)
-                            return showAlertDialogWithMessage(
-                                'Email field must be filled!');
+                            DoggoToast.of(context)
+                                .showToast('Email field must be filled!');
                           else if (passwordController.text.isEmpty ||
                               repeatPasswordController.text.isEmpty)
-                            return showAlertDialogWithMessage(
+                            DoggoToast.of(context).showToast(
                                 'Both Password and Repeat password fields must be filled!');
                           else if (passwordController.text.length < 8)
-                            return showAlertDialogWithMessage(
-                                "Password must be at least 8 characters long!");
+                            DoggoToast.of(context).showToast(
+                                'Password must be at least 8 characters long!');
                           else if (passwordController.text !=
                               repeatPasswordController.text)
-                            return showAlertDialogWithMessage(
-                                'Passwords must match!');
+                            DoggoToast.of(context)
+                                .showToast('Passwords must match!');
                           else
                             addUser();
                         },
@@ -144,31 +199,6 @@ class RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
     );
-  }
-
-  Future addUser() async {
-    var body = jsonEncode({
-      'email': '${emailController.text}',
-      'password': '${passwordController.text}'
-    });
-    final response = await http.post(url, body: body, headers: headers);
-    if (response.statusCode == 200) {
-      Navigator.of(context).pop();
-    } else if (response.statusCode == 400) {
-      return showAlertDialogWithMessage('You have to provide a valid email!');
-    } else if (response.statusCode == 409) {
-      return showAlertDialogWithMessage(
-          'Account with given email already exists!');
-    } else
-      throw Exception('Failed to create user.');
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
   }
 }
 
