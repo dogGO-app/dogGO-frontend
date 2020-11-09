@@ -1,7 +1,8 @@
 import 'dart:convert';
-
+import 'dart:async';
 import 'package:doggo_frontend/Location/add_location_bottom_sheet_widget.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -27,6 +28,10 @@ class _MapPageState extends State<MapPage> {
   CameraPosition _center;
   bool _isLoading = false;
   bool _isNavigating = false;
+  bool _nearLocation = false;
+  bool _flushbarAtLocationAppeared = false;
+  bool _leavingLocation = false;
+  String _currentLocationName = "";
   LatLng _destination;
   Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
@@ -48,21 +53,28 @@ class _MapPageState extends State<MapPage> {
 
       if (_isNavigating &&
           ((_previousLocation.latitude - _currentLocation.latitude).abs() >
-                  0.00002 ||
+              0.00002 ||
               (_previousLocation.longitude - _currentLocation.longitude).abs() >
                   0.00002) &&
           _destination != null) {
         double latDistance =
-            (_destination.latitude - _currentLocation.latitude).abs();
+        (_destination.latitude - _currentLocation.latitude).abs();
         double lngDistance =
-            (_destination.longitude - _currentLocation.longitude).abs();
+        (_destination.longitude - _currentLocation.longitude).abs();
+        print('latDistance: $latDistance, lngDistance: $lngDistance');
 
         _animateCameraToLocation(
             LatLng(_currentLocation.latitude, _currentLocation.longitude));
 
-        if (latDistance < 0.0005 || lngDistance < 0.0005) {
-          _navigationOff();
-        } else {
+        if (latDistance < 0.0004 || lngDistance < 0.0004) {
+          _atLocation();
+        }
+        else
+        if ((latDistance >= 0.0004 || lngDistance >= 0.0004) && _nearLocation) {
+          _awayFromLocation();
+        }
+        
+        else {
           _clearPolylines();
           _setPolylines(_destination);
         }
@@ -141,6 +153,7 @@ class _MapPageState extends State<MapPage> {
         markerId: MarkerId(locationMarker.id),
         position: LatLng(locationMarker.latitude, locationMarker.longitude),
         onTap: () {
+          _currentLocationName = locationMarker.name;
           showModalBottomSheet(
               context: context,
               barrierColor: Colors.black12,
@@ -346,10 +359,10 @@ class _MapPageState extends State<MapPage> {
     _destination = destination;
 
     PolylineResult result = await polylinePoints?.getRouteBetweenCoordinates(
-        googleApiKey,
-        PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
-        PointLatLng(destination.latitude, destination.longitude),
-        );
+      googleApiKey,
+      PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
+      PointLatLng(destination.latitude, destination.longitude),
+    );
 
     if (result.status == 'OK') {
       result.points.forEach((PointLatLng point) {
@@ -389,89 +402,126 @@ class _MapPageState extends State<MapPage> {
     _clearPolylines();
   }
 
+  void _atLocation() async {
+    _nearLocation = true;
+    _clearPolylines();
+    Timer(Duration(seconds: 3), (){
+      _flushbarAtLocationAppeared = true;
+    });
+  }
+
+  void _awayFromLocation() {
+    setState(() {
+      _isNavigating = false;
+      _nearLocation = false;
+      _destination = null;
+      _flushbarAtLocationAppeared = false;
+      _leavingLocation = true;
+      _callTimer();
+    });
+  }
+
+  void _callTimer(){
+    Timer(Duration(seconds: 3), () {
+      setState(() {
+        _leavingLocation = false;
+      });
+    });
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: Colors.orangeAccent,
-        title: Text('Map'),
-        centerTitle: true,
-      ),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : Stack(
-              alignment: Alignment.bottomCenter,
-              children: <Widget>[
-                GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: _center,
-                  myLocationEnabled: true,
-                  markers: Set<Marker>.of(_markers.values),
-                  polylines: _polylines,
-                  onLongPress: (latLng) async {
-                    await mapController.animateCamera(
-                      CameraUpdate.newLatLngZoom(latLng, _cameraZoom),
-                    );
-                    return showModalBottomSheet(
-                      context: context,
-                      barrierColor: Colors.black12,
-                      backgroundColor: Colors.transparent,
-                      builder: (BuildContext context) {
-                        return AddLocationBottomSheetWidget(
-                          latLng: latLng,
-                          addMarkerToMapCallback: addMarkerToMap,
-                        );
-                      },
-                    );
-                  },
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          backgroundColor: Colors.orangeAccent,
+          title: Text('Map'),
+          centerTitle: true,
+        ),
+        body: _isLoading
+            ? Center(
+          child: CircularProgressIndicator(),
+        )
+            : Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+          GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: _center,
+          myLocationEnabled: true,
+          markers: Set<Marker>.of(_markers.values),
+          polylines: _polylines,
+          onLongPress: (latLng) async {
+            await mapController.animateCamera(
+              CameraUpdate.newLatLngZoom(latLng, _cameraZoom),
+            );
+            return showModalBottomSheet(
+              context: context,
+              barrierColor: Colors.black12,
+              backgroundColor: Colors.transparent,
+              builder: (BuildContext context) {
+                return AddLocationBottomSheetWidget(
+                  latLng: latLng,
+                  addMarkerToMapCallback: addMarkerToMap,
+                );
+              },
+            );
+          },
+        ),
+        _isNavigating && !_nearLocation
+            ? MaterialButton(
+          onPressed: () {
+            _navigationOff();
+          },
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10)),
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 65),
+          child: Ink(
+            decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.orangeAccent,
+                      blurRadius: 20,
+                      offset: Offset(0, 4)),
+                ],
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.orangeAccent,
+                    Color.fromRGBO(200, 100, 20, .85)
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-                _isNavigating
-                    ? MaterialButton(
-                        onPressed: () {
-                          _navigationOff();
-                        },
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        padding: EdgeInsets.fromLTRB(0, 0, 0, 65),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.orangeAccent,
-                                    blurRadius: 20,
-                                    offset: Offset(0, 4)),
-                              ],
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.orangeAccent,
-                                  Color.fromRGBO(200, 100, 20, .85)
-                                ],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ),
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Container(
-                            constraints: BoxConstraints(
-                                maxWidth: 200.0, maxHeight: 50.0),
-                            alignment: Alignment.center,
-                            child: Text(
-                              "End Navigation",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Text("")
-              ],
+                borderRadius: BorderRadius.circular(10)),
+            child: Container(
+              constraints: BoxConstraints(
+                  maxWidth: 200.0, maxHeight: 50.0),
+              alignment: Alignment.center,
+              child: Text(
+                "End Navigation",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
+          ),
+        )
+            : Text(""),
+        _nearLocation && !_flushbarAtLocationAppeared ? Flushbar(
+          message: 'You arrived to the ' + _currentLocationName,
+          backgroundColor: Colors.orangeAccent,
+        ) : Text(''),
+            _leavingLocation ? Flushbar(
+              message: 'You are leaving the ' + _currentLocationName,
+              backgroundColor: Colors.orangeAccent,
+              duration: Duration(seconds: 2),
+            ) : Text('')
+    ],
+    ),
     );
   }
 }
