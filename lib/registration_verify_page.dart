@@ -9,6 +9,8 @@ import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:toast/toast.dart';
 
+import 'Custom/doggo_toast.dart';
+
 class RegistrationVerifyState extends State<RegistrationVerifyPage> {
   oauth2.Client client;
   TextEditingController textEditingController = TextEditingController()
@@ -50,7 +52,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
     if (response.statusCode == 200) {
       Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata', (route) => false);
     } else {
-      showToast('Failed to activate user - wrong activation code.');
+      DoggoToast.of(context).showToast('Failed to activate user - wrong activation code.');
       throw Exception('Failed to activate user.\nCode: ${response.statusCode}');
     }
   }
@@ -61,15 +63,9 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
 
     final mailResponse = await client.post(mailUri, headers: headers);
     if (mailResponse.statusCode != 200) {
-      showToast('Activation email could not be sent!');
+      DoggoToast.of(context).showToast('Activation email could not be sent!');
       throw Exception('Activation email could not be sent!\nCode: ${mailResponse.statusCode}');
     }
-  }
-
-  void showToast(String msg) {
-    Toast.show(msg, context,
-        duration: Toast.LENGTH_LONG,
-        backgroundColor: Colors.orangeAccent);
   }
 
   @override
