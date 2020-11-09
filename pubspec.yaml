@@ -28,6 +28,7 @@ dependencies:
   uuid: ^2.2.2
   flutter_polyline_points: ^0.2.4
   pin_code_fields: ^6.0.0
+  flushbar: ^1.5.0
   oauth2: ^1.6.3
   path_provider: ^1.6.22
   toast: ^0.1.5
