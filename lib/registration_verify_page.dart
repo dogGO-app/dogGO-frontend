@@ -1,21 +1,39 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:toast/toast.dart';
+
+import 'Custom/doggo_toast.dart';
 
 class RegistrationVerifyState extends State<RegistrationVerifyPage> {
+  oauth2.Client client;
   TextEditingController textEditingController = TextEditingController()
     ..text = "";
   StreamController<ErrorAnimationType> errorController;
   var hasError = false;
-  var filled = false;
   var currentText = '';
+
+  final activateUrl = 'https://doggo-service.herokuapp.com/api/auth/user/activate';
+
+  final authority = 'doggo-service.herokuapp.com';
+  final mailPath = '/api/auth/user/send-activation-mail';
+
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
+  void _getClient() async {
+      client = await OAuth2Client().getClientCredentialsGrant();
+  }
 
   @override
   void initState() {
     errorController = StreamController<ErrorAnimationType>();
+    _getClient();
     super.initState();
   }
 
@@ -25,10 +43,37 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
     super.dispose();
   }
 
+  Future verifyUser(String email, String activationCode) async {
+    var body = jsonEncode({
+      'email': '$email',
+      'activationCode': '$activationCode'
+    });
+    final response = await client.put(activateUrl, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata', (route) => false);
+    } else {
+      DoggoToast.of(context).showToast('Failed to activate user - wrong activation code.');
+      throw Exception('Failed to activate user.\nCode: ${response.statusCode}');
+    }
+  }
+
+  Future _sendVerificationEmail(String email) async {
+    var mailQueryParameters = {'userEmail': '$email'};
+    var mailUri = Uri.https(authority, mailPath, mailQueryParameters);
+
+    final mailResponse = await client.post(mailUri, headers: headers);
+    if (mailResponse.statusCode != 200) {
+      DoggoToast.of(context).showToast('Activation email could not be sent!');
+      throw Exception('Activation email could not be sent!\nCode: ${mailResponse.statusCode}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
+    final String email = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(title: Text('Verify registration')),
@@ -39,11 +84,11 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
               vertical: screenHeight * 0.1, horizontal: screenWidth * 0.025),
           child: Column(
             children: <Widget>[
-                Icon(
-                  Icons.vpn_key,
-                  color: Colors.amber,
-                  size: 128,
-                ),
+              Icon(
+                Icons.vpn_key,
+                color: Colors.amber,
+                size: 128,
+              ),
               Text(
                 'Please pass 6-digit verification code sent to your email:',
                 style: TextStyle(
@@ -81,7 +126,6 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                       return true;
                     },
                     onChanged: (value) {
-                      filled = false;
                       hasError = false;
                       if (double.tryParse(value) == null) {
                         hasError = true;
@@ -95,8 +139,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                         hasError = true;
                         errorController.add(ErrorAnimationType.shake);
                       } else
-                        filled = true;
-                      // TODO: call API (check if verified, if true - and navigate to SetUserDataPage)
+                      verifyUser(email, value);
                       setState(() {
                         currentText = value;
                       });
@@ -109,13 +152,15 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                   textAlign: TextAlign.center,
                   text: TextSpan(
                       text: "Didn't receive the code? ",
-                      style: TextStyle(color: Colors.black54, fontSize: screenWidth * 0.035),
+                      style: TextStyle(
+                          color: Colors.black54, fontSize: screenWidth * 0.035),
                       children: [
                         TextSpan(
                             text: " RESEND",
-                            recognizer: TapGestureRecognizer()..onTap = () {
-                              // TODO: call API (resend verification code)
-                            },
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                _sendVerificationEmail(email);
+                              },
                             style: TextStyle(
                                 color: Colors.orangeAccent,
                                 fontWeight: FontWeight.bold,
@@ -124,22 +169,21 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                 ),
               ),
               Padding(
-                // TODO: switch to error message after API integration
                 padding: EdgeInsets.symmetric(
                     vertical: screenHeight * 0.05,
                     horizontal: screenWidth * 0.02),
                 child: Center(
                   child: Visibility(
                     child: Text(
-                      "Gratulacje typie, udało ci się poprawnie wypełnić kod weryfikacyjny!",
+                      "Verification code must consist of numeric characters only.",
                       style: TextStyle(
-                        color: Colors.green,
-                        fontSize: screenWidth * 0.06,
+                        color: Colors.red,
+                        fontSize: screenWidth * 0.03,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.justify,
                     ),
-                    visible: filled,
+                    visible: hasError,
                   ),
                 ),
               )
