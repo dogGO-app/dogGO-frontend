@@ -7,7 +7,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:toast/toast.dart';
 
 import 'Custom/doggo_toast.dart';
 
@@ -62,7 +61,9 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
     var mailUri = Uri.https(authority, mailPath, mailQueryParameters);
 
     final mailResponse = await client.post(mailUri, headers: headers);
-    if (mailResponse.statusCode != 200) {
+    if (mailResponse.statusCode == 200)
+      DoggoToast.of(context).showToast('Mail sent again to your mailbox.');
+    else {
       DoggoToast.of(context).showToast('Activation email could not be sent!');
       throw Exception('Activation email could not be sent!\nCode: ${mailResponse.statusCode}');
     }
