@@ -1,18 +1,39 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:doggo_frontend/User/edit_user_profile_page.dart';
 import 'package:doggo_frontend/User/http/user_details_response.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 class _UserProfilePageState extends State<UserProfilePage> {
+  Client client;
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profile';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   Future<UserDetailsResponse> userDetails;
 
   @override
   void initState() {
-    super.initState();
     userDetails = fetchUserDetails();
+    super.initState();
+  }
+
+  Future<UserDetailsResponse> fetchUserDetails() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+
+    final response = await client.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      return UserDetailsResponse.fromJson(json.decode(response.body));
+    }
+    else if (response.statusCode == 400)
+      DoggoToast.of(context).showToast('Incorrect details format.');
+    // TODO: log error
+    else {
+      DoggoToast.of(context).showToast('Could not fetch user details!');
+      throw Exception("Could not fetch user details!");
+    }
   }
 
   @override
@@ -208,8 +229,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               Center(
                 child: MaterialButton(
                   onPressed: () async {
-                    final storage = FlutterSecureStorage();
-                    await storage.delete(key: 'token');
                     Navigator.of(context, rootNavigator: true)
                         .pushNamedAndRemoveUntil(
                             '/home', (Route<dynamic> route) => false);
@@ -246,34 +265,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
       ),
     );
-  }
-
-  Future<UserDetailsResponse> fetchUserDetails() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http.get(url, headers: headers);
-    if (response.statusCode == 200) {
-      return UserDetailsResponse.fromJson(json.decode(response.body));
-    } else {
-      showAlertDialogWithMessage('Could not fetch user details!');
-      throw Exception("Could not fetch user details!");
-    }
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
   }
 }
 

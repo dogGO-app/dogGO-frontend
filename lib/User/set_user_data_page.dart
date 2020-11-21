@@ -19,13 +19,8 @@ class SetUserDataState extends State<SetUserDataPage> {
   List<String> dropdownMenuItems =
       List<String>.generate(99, (i) => (i + 1).toString());
 
-  void _getClient() async {
-    client = await OAuth2Client().loadCredentialsFromFile(context);
-  }
-
   @override
   void initState() {
-    _getClient();
     super.initState();
   }
 
@@ -38,6 +33,7 @@ class SetUserDataState extends State<SetUserDataPage> {
   }
 
   Future addUserDetails() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
     final body = jsonEncode({
       'firstName': '${firstNameController.text}',
       'lastName': '${lastNameController.text}',
