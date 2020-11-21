@@ -1,12 +1,10 @@
-
 import 'package:flutter/material.dart';
-import 'package:oauth2/oauth2.dart' as oauth2;
-
+import 'package:oauth2/oauth2.dart';
 import 'Custom/doggo_toast.dart';
 import 'OAuth2/oauth2_client.dart';
 
 class LoginPageState extends State<LoginPage> {
-  oauth2.Client client;
+  Client client;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -22,14 +20,15 @@ class LoginPageState extends State<LoginPage> {
   }
 
   Future _getClient(String email, String password) async {
-    client =
-    await OAuth2Client().getResourceOwnerPasswordGrant(email, password)
+    client ??= await OAuth2Client()
+        .getResourceOwnerPasswordGrant(email, password)
         .catchError((e) {
       if (e.description == 'Account disabled') {
         Navigator.of(context)
             .pushNamed('/verify', arguments: emailController.text);
       } else if (e.description == 'Invalid user credentials') {
-        DoggoToast.of(context).showToast('There is no account with given email/password.');
+        DoggoToast.of(context)
+            .showToast('There is no account with given email/password.');
       }
     });
   }
@@ -37,8 +36,7 @@ class LoginPageState extends State<LoginPage> {
   Future loginUser() async {
     await _getClient(emailController.text, passwordController.text);
 
-    if (client != null)
-      _getUser();
+    if (client != null) _getUser();
   }
 
   Future _getUser() async {
