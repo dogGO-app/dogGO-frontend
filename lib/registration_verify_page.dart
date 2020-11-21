@@ -5,13 +5,13 @@ import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:oauth2/oauth2.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import 'Custom/doggo_toast.dart';
 
 class RegistrationVerifyState extends State<RegistrationVerifyPage> {
-  oauth2.Client client;
+  Client client;
   TextEditingController textEditingController = TextEditingController()
     ..text = "";
   StreamController<ErrorAnimationType> errorController;
@@ -25,14 +25,9 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
 
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
-  void _getClient() async {
-      client = await OAuth2Client().getClientCredentialsGrant();
-  }
-
   @override
   void initState() {
     errorController = StreamController<ErrorAnimationType>();
-    _getClient();
     super.initState();
   }
 
@@ -43,10 +38,12 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
   }
 
   Future verifyUser(String email, String activationCode) async {
+    client ??= await OAuth2Client().getClientCredentialsGrant();
     var body = jsonEncode({
       'email': '$email',
       'activationCode': '$activationCode'
     });
+
     final response = await client.put(activateUrl, headers: headers, body: body);
     if (response.statusCode == 200) {
       Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata', (route) => false);
