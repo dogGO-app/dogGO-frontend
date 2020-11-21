@@ -1,23 +1,28 @@
 import 'dart:convert';
 
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
-class SetDogDataPage extends StatefulWidget {
-  @override
-  _SetDogDataPageState createState() => _SetDogDataPageState();
-}
+import 'package:oauth2/oauth2.dart';
 
 class _SetDogDataPageState extends State<SetDogDataPage> {
+  Client client;
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   final nameController = TextEditingController();
   final breedController = TextEditingController();
   final colorController = TextEditingController();
   final descriptionController = TextEditingController();
   final vaccinationDateController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -29,51 +34,36 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
     super.dispose();
   }
 
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
-
   Future setDogData() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogs';
-    var reqBody = jsonEncode({
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    var body = jsonEncode({
       'name': '${nameController.text}',
       'breed': '${breedController.text}',
       'color': '${colorController.text}',
       'description': '${descriptionController.text}',
       'lastVaccinationDate': '${vaccinationDateController.text}'
     });
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
 
-    final getResponse = await http.get(url, headers: headers);
+    final getResponse = await client.get(url, headers: headers);
     if (getResponse.statusCode == 200) {
       List jsonResponse = jsonDecode(getResponse.body);
       bool hasDogs =
           jsonResponse.map((dog) => Dog.fromJson(dog)).toList().isNotEmpty;
-      final pushResponse =
-          await http.post(url, body: reqBody, headers: headers);
-      if (pushResponse.statusCode == 200) {
+
+      final postResponse =
+          await client.post(url, body: body, headers: headers);
+      if (postResponse.statusCode == 201) {
         if (hasDogs)
           Navigator.of(context).pop();
         else
           Navigator.of(context).pushNamedAndRemoveUntil(
               '/userhomescreen', (Route<dynamic> route) => false);
       } else {
-        showAlertDialogWithMessage('Could not set dog data!');
+        DoggoToast.of(context).showToast('Could not set dog data!');
         throw Exception('Could not set dog data');
       }
     } else {
-      showAlertDialogWithMessage('Could not get dog data!');
+      DoggoToast.of(context).showToast('Could not set dog data!');
       throw Exception('Could not get dog data');
     }
   }
@@ -179,8 +169,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                       child: MaterialButton(
                         onPressed: () {
                           if (vaccinationDateController.text == "") {
-                            showAlertDialogWithMessage(
-                                'Last vaccination date has to be filled!');
+                            DoggoToast.of(context).showToast('Last vaccination date has to be filled!');
                             throw Exception(
                                 'Last vaccination date has to be filled!');
                           } else
@@ -225,4 +214,9 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
       ),
     );
   }
+}
+
+class SetDogDataPage extends StatefulWidget {
+  @override
+  _SetDogDataPageState createState() => _SetDogDataPageState();
 }

@@ -1,45 +1,38 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Dog/edit_dog_data_page.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:doggo_frontend/Dog/set_dog_data_page.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
-class DogsListPage extends StatefulWidget {
-  @override
-  _DogsListPageState createState() => _DogsListPageState();
-}
+import 'package:oauth2/oauth2.dart';
 
 class _DogsListPageState extends State<DogsListPage> {
+  Client client;
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   Future<List<Dog>> _dogs;
 
   @override
   void initState() {
-    super.initState();
     setState(() {
       _dogs = _fetchDogs();
     });
+    super.initState();
   }
 
   Future<List<Dog>> _fetchDogs() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
 
-    final url = 'https://doggo-app-server.herokuapp.com/api/dogs';
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http.get(url, headers: headers);
+    final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
       return jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
     } else {
+      DoggoToast.of(context).showToast('Failed to load dogs.');
       throw Exception('Failed to load dogs from API');
     }
   }
@@ -150,4 +143,9 @@ class _DogsListPageState extends State<DogsListPage> {
       ),
     );
   }
+}
+
+class DogsListPage extends StatefulWidget {
+  @override
+  _DogsListPageState createState() => _DogsListPageState();
 }

@@ -1,37 +1,23 @@
 import 'dart:convert';
 
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
-class EditDogDataPage extends StatefulWidget {
-  final Dog dogData;
-
-  const EditDogDataPage({Key key, this.dogData}) : super(key: key);
-
-  @override
-  _EditDogDataPageState createState() => _EditDogDataPageState();
-}
+import 'package:oauth2/oauth2.dart';
 
 class _EditDogDataPageState extends State<EditDogDataPage> {
+  Client client;
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   final nameController = TextEditingController();
   final breedController = TextEditingController();
   final colorController = TextEditingController();
   final descriptionController = TextEditingController();
   final vaccinationDateController = TextEditingController();
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    breedController.dispose();
-    colorController.dispose();
-    descriptionController.dispose();
-    vaccinationDateController.dispose();
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -46,40 +32,34 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
     super.initState();
   }
 
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
+  @override
+  void dispose() {
+    nameController.dispose();
+    breedController.dispose();
+    colorController.dispose();
+    descriptionController.dispose();
+    vaccinationDateController.dispose();
+    super.dispose();
   }
 
   Future editDogData() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogs';
-    var reqBody = jsonEncode({
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final body = jsonEncode({
       'name': '${nameController.text}',
       'breed': '${breedController.text}',
       'color': '${colorController.text}',
       'description': '${descriptionController.text}',
       'lastVaccinationDate': '${vaccinationDateController.text}'
     });
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-    final response = await http.put(url, body: reqBody, headers: headers);
-    print(response.statusCode);
+
+    final response = await client.put(url, body: body, headers: headers);
     if (response.statusCode == 200) {
+      DoggoToast.of(context).showToast('Dog details updated correctly.');
       Navigator.of(context).pop();
     } else {
-      showAlertDialogWithMessage('Could not set dog data!');
+      DoggoToast.of(context).showToast('Could not set dog data.');
       throw Exception('Could not set dog data');
     }
-    print(response.body);
   }
 
   @override
@@ -183,8 +163,7 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
                       child: MaterialButton(
                         onPressed: () {
                           if (vaccinationDateController.text == "") {
-                            showAlertDialogWithMessage(
-                                'Last vaccination date has to be filled!');
+                            DoggoToast.of(context).showToast('Last vaccination date has to be filled.');
                             throw Exception(
                                 'Last vaccination date has to be filled!');
                           } else
@@ -229,4 +208,13 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
       ),
     );
   }
+}
+
+class EditDogDataPage extends StatefulWidget {
+  final Dog dogData;
+
+  const EditDogDataPage({Key key, this.dogData}) : super(key: key);
+
+  @override
+  _EditDogDataPageState createState() => _EditDogDataPageState();
 }
