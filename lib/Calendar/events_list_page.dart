@@ -4,10 +4,10 @@ import 'package:doggo_frontend/Calendar/add_event_page.dart';
 import 'package:doggo_frontend/Calendar/edit_event_page.dart';
 import 'package:doggo_frontend/Calendar/http/event_data.dart';
 import 'package:doggo_frontend/Custom/extensions.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:oauth2/oauth2.dart';
 
 class EventListPage extends StatefulWidget {
   @override
@@ -15,29 +15,24 @@ class EventListPage extends StatefulWidget {
 }
 
 class _EventListPageState extends State<EventListPage> {
+  Client client;
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/userCalendarEvents';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   Future<List<Event>> _events;
-  final storage = FlutterSecureStorage();
 
   @override
   void initState() {
-    super.initState();
     setState(() {
       _events = _fetchEvents();
     });
+    super.initState();
   }
 
   Future<List<Event>> _fetchEvents() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
 
-    final url = 'https://doggo-app-server.herokuapp.com/api/userCalendarEvents';
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http.get(url, headers: headers);
+    final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
@@ -115,8 +110,6 @@ class _EventListPageState extends State<EventListPage> {
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        storage.write(
-                            key: 'eventId', value: events[index].eventId);
                         Navigator.of(context)
                             .push(
                               MaterialPageRoute(

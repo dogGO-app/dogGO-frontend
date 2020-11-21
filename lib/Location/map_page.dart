@@ -1,24 +1,25 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Location/add_location_bottom_sheet_widget.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
+import 'package:oauth2/oauth2.dart';
 
 const double _cameraZoom = 16;
 
-class MapPage extends StatefulWidget {
-  @override
-  _MapPageState createState() => _MapPageState();
-}
-
 class _MapPageState extends State<MapPage> {
+  Client client;
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/mapMarkers';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   GoogleMapController mapController;
   LocationData _currentLocation;
   LocationData _previousLocation;
@@ -53,14 +54,14 @@ class _MapPageState extends State<MapPage> {
 
       if (_isNavigating &&
           ((_previousLocation.latitude - _currentLocation.latitude).abs() >
-              0.00002 ||
+                  0.00002 ||
               (_previousLocation.longitude - _currentLocation.longitude).abs() >
                   0.00002) &&
           _destination != null) {
         double latDistance =
-        (_destination.latitude - _currentLocation.latitude).abs();
+            (_destination.latitude - _currentLocation.latitude).abs();
         double lngDistance =
-        (_destination.longitude - _currentLocation.longitude).abs();
+            (_destination.longitude - _currentLocation.longitude).abs();
         print('latDistance: $latDistance, lngDistance: $lngDistance');
 
         _animateCameraToLocation(
@@ -68,13 +69,10 @@ class _MapPageState extends State<MapPage> {
 
         if (latDistance < 0.0004 || lngDistance < 0.0004) {
           _atLocation();
-        }
-        else
-        if ((latDistance >= 0.0004 || lngDistance >= 0.0004) && _nearLocation) {
+        } else if ((latDistance >= 0.0004 || lngDistance >= 0.0004) &&
+            _nearLocation) {
           _awayFromLocation();
-        }
-        
-        else {
+        } else {
           _clearPolylines();
           _setPolylines(_destination);
         }
@@ -125,23 +123,16 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<List<LocationMarker>> _fetchLocationMarkers() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
 
-    final url = 'https://doggo-app-server.herokuapp.com/api/mapMarkers';
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http.get(url, headers: headers);
+    final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(utf8.decode(response.bodyBytes));
       return jsonResponse
           .map((location) => LocationMarker.fromJson(location))
           .toList();
     } else {
+      DoggoToast.of(context).showToast('Failed to load location markers data.');
       throw Exception('Failed to load location markers data from API');
     }
   }
@@ -405,7 +396,7 @@ class _MapPageState extends State<MapPage> {
   void _atLocation() async {
     _nearLocation = true;
     _clearPolylines();
-    Timer(Duration(seconds: 3), (){
+    Timer(Duration(seconds: 3), () {
       _flushbarAtLocationAppeared = true;
     });
   }
@@ -421,7 +412,7 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void _callTimer(){
+  void _callTimer() {
     Timer(Duration(seconds: 3), () {
       setState(() {
         _leavingLocation = false;
@@ -435,93 +426,101 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          backgroundColor: Colors.orangeAccent,
-          title: Text('Map'),
-          centerTitle: true,
-        ),
-        body: _isLoading
-            ? Center(
-          child: CircularProgressIndicator(),
-        )
-            : Stack(
-          alignment: Alignment.bottomCenter,
-          children: <Widget>[
-          GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: _center,
-          myLocationEnabled: true,
-          markers: Set<Marker>.of(_markers.values),
-          polylines: _polylines,
-          onLongPress: (latLng) async {
-            await mapController.animateCamera(
-              CameraUpdate.newLatLngZoom(latLng, _cameraZoom),
-            );
-            return showModalBottomSheet(
-              context: context,
-              barrierColor: Colors.black12,
-              backgroundColor: Colors.transparent,
-              builder: (BuildContext context) {
-                return AddLocationBottomSheetWidget(
-                  latLng: latLng,
-                  addMarkerToMapCallback: addMarkerToMap,
-                );
-              },
-            );
-          },
-        ),
-        _isNavigating && !_nearLocation
-            ? MaterialButton(
-          onPressed: () {
-            _navigationOff();
-          },
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)),
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 65),
-          child: Ink(
-            decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.orangeAccent,
-                      blurRadius: 20,
-                      offset: Offset(0, 4)),
-                ],
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.orangeAccent,
-                    Color.fromRGBO(200, 100, 20, .85)
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Colors.orangeAccent,
+        title: Text('Map'),
+        centerTitle: true,
+      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: _center,
+                  myLocationEnabled: true,
+                  markers: Set<Marker>.of(_markers.values),
+                  polylines: _polylines,
+                  onLongPress: (latLng) async {
+                    await mapController.animateCamera(
+                      CameraUpdate.newLatLngZoom(latLng, _cameraZoom),
+                    );
+                    return showModalBottomSheet(
+                      context: context,
+                      barrierColor: Colors.black12,
+                      backgroundColor: Colors.transparent,
+                      builder: (BuildContext context) {
+                        return AddLocationBottomSheetWidget(
+                          latLng: latLng,
+                          addMarkerToMapCallback: addMarkerToMap,
+                        );
+                      },
+                    );
+                  },
                 ),
-                borderRadius: BorderRadius.circular(10)),
-            child: Container(
-              constraints: BoxConstraints(
-                  maxWidth: 200.0, maxHeight: 50.0),
-              alignment: Alignment.center,
-              child: Text(
-                "End Navigation",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
-              ),
+                _isNavigating && !_nearLocation
+                    ? MaterialButton(
+                        onPressed: () {
+                          _navigationOff();
+                        },
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 65),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.orangeAccent,
+                                    blurRadius: 20,
+                                    offset: Offset(0, 4)),
+                              ],
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.orangeAccent,
+                                  Color.fromRGBO(200, 100, 20, .85)
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Container(
+                            constraints: BoxConstraints(
+                                maxWidth: 200.0, maxHeight: 50.0),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "End Navigation",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Text(""),
+                _nearLocation && !_flushbarAtLocationAppeared
+                    ? Flushbar(
+                        message: 'You arrived to the ' + _currentLocationName,
+                        backgroundColor: Colors.orangeAccent,
+                      )
+                    : Text(''),
+                _leavingLocation
+                    ? Flushbar(
+                        message: 'You are leaving the ' + _currentLocationName,
+                        backgroundColor: Colors.orangeAccent,
+                        duration: Duration(seconds: 2),
+                      )
+                    : Text('')
+              ],
             ),
-          ),
-        )
-            : Text(""),
-        _nearLocation && !_flushbarAtLocationAppeared ? Flushbar(
-          message: 'You arrived to the ' + _currentLocationName,
-          backgroundColor: Colors.orangeAccent,
-        ) : Text(''),
-            _leavingLocation ? Flushbar(
-              message: 'You are leaving the ' + _currentLocationName,
-              backgroundColor: Colors.orangeAccent,
-              duration: Duration(seconds: 2),
-            ) : Text('')
-    ],
-    ),
     );
   }
+}
+
+class MapPage extends StatefulWidget {
+  @override
+  _MapPageState createState() => _MapPageState();
 }

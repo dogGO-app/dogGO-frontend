@@ -1,21 +1,31 @@
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:http/http.dart' as http;
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'dart:convert';
 
-class AddEventPage extends StatefulWidget {
-  @override
-  _AddEventPageState createState() => _AddEventPageState();
-}
+import 'package:oauth2/oauth2.dart';
 
 class _AddEventPageState extends State<AddEventPage> {
+  Client client;
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   final dateController = TextEditingController();
   final timeController = TextEditingController();
   final descriptionController = TextEditingController();
+
+  String selectedDog;
+  List<dynamic> _dogs = List();
+
+  @override
+  void initState() {
+    _fetchDogs();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -25,21 +35,11 @@ class _AddEventPageState extends State<AddEventPage> {
     super.dispose();
   }
 
-  String selectedDog;
-  List<dynamic> _dogs = List();
-
   void _fetchDogs() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
 
-    final url = 'https://doggo-app-server.herokuapp.com/api/dogs';
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http.get(url, headers: headers);
+    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs';
+    final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
       var temp = jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
@@ -47,65 +47,44 @@ class _AddEventPageState extends State<AddEventPage> {
         _dogs = temp;
       });
     } else {
+      DoggoToast.of(context).showToast('Failed to load dogs details.');
       throw Exception('Failed to load dogs from API');
     }
   }
 
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
-
   Future addEventData() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
 
-    var url = 'https://doggo-app-server.herokuapp.com/api/userCalendarEvents';
-    var reqBody = jsonEncode({
+    var url = 'https://doggo-service.herokuapp.com/api/dog-lover/userCalendarEvents';
+    var body = jsonEncode({
       'date': '${dateController.text}',
       'time': '${timeController.text}',
       'description': '${descriptionController.text}',
       'dogName': '$selectedDog'
     });
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
 
-    final pushResponse = await http.post(url, body: reqBody, headers: headers);
-    if (pushResponse.statusCode == 200) {
+    final response = await client.post(url, body: body, headers: headers);
+    if (response.statusCode == 201) {
       Navigator.of(context).pop();
     } else {
-      switch (pushResponse.statusCode) {
+      switch (response.statusCode) {
         case 400:
           {
-            showAlertDialogWithMessage(
-                'We cannot go back in time! Change the time you set and try again');
+            DoggoToast.of(context).showToast('We cannot go back in time! Change the time you set and try again');
             throw Exception('Could not add event bc its set in the past');
           }
         case 409:
           {
-            showAlertDialogWithMessage(
-                'Two events cannot take place at the same time! Change date or time and try again');
+            DoggoToast.of(context).showToast('Two events cannot take place at the same time! Change date or time and try again');
             throw Exception('Could not add second event at the same time');
           }
         default:
           {
-            showAlertDialogWithMessage('Could not add calendar event!');
+            DoggoToast.of(context).showToast('Could not add calendar event!');
             throw Exception('Could not add calendar event');
           }
       }
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchDogs();
   }
 
   @override
@@ -202,8 +181,7 @@ class _AddEventPageState extends State<AddEventPage> {
                       child: MaterialButton(
                         onPressed: () {
                           if (dateController.text == "") {
-                            showAlertDialogWithMessage(
-                                'Date and time has to be filled!');
+                            DoggoToast.of(context).showToast('Date and time has to be filled!');
                             throw Exception('Date and time are empty');
                           } else {
                             addEventData();
@@ -246,4 +224,9 @@ class _AddEventPageState extends State<AddEventPage> {
       ),
     );
   }
+}
+
+class AddEventPage extends StatefulWidget {
+  @override
+  _AddEventPageState createState() => _AddEventPageState();
 }

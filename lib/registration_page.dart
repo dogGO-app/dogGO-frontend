@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
-import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:oauth2/oauth2.dart';
 
 import 'Custom/doggo_toast.dart';
 
 class RegistrationPageState extends State<RegistrationPage> {
-  oauth2.Client client;
+  Client client;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
@@ -21,26 +21,20 @@ class RegistrationPageState extends State<RegistrationPage> {
 
   @override
   void initState() {
-    _getClient();
     super.initState();
   }
 
-  void _getClient() async {
-    while (client == null) {
-      client = await OAuth2Client().getClientCredentialsGrant();
-    }
-  }
-
   Future addUser() async {
+    client ??= await OAuth2Client().getClientCredentialsGrant();
     var body = jsonEncode({
       'email': '${emailController.text}',
       'password': '${passwordController.text}'
     });
+
     final signUpResponse =
         await client.post(signUpUrl, headers: headers, body: body);
-
     if (signUpResponse.statusCode == 201) {
-      _sendVerificationEmail();
+      // _sendVerificationEmail();
       DoggoToast.of(context).showToast('Registration completed. Welcome!');
       Navigator.of(context).pop();
     } else if (signUpResponse.statusCode == 400) {
@@ -48,10 +42,11 @@ class RegistrationPageState extends State<RegistrationPage> {
     } else if (signUpResponse.statusCode == 409) {
       DoggoToast.of(context)
           .showToast('Account with given email already exists!');
-    } else
-      DoggoToast.of(context)
-          .showToast('Failed to create user.');
-    throw Exception('Failed to create user.\nCode: ${signUpResponse.statusCode}');
+    } else {
+      DoggoToast.of(context).showToast('Failed to create user.');
+      throw Exception(
+          'Failed to create user.\nCode: ${signUpResponse.statusCode}');
+    }
   }
 
   Future _sendVerificationEmail() async {

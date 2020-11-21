@@ -1,13 +1,28 @@
 import 'dart:convert';
+
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
+import 'package:oauth2/oauth2.dart';
 
 class SetUserDataState extends State<SetUserDataPage> {
+  Client client;
+
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profile';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final hobbyController = TextEditingController();
+
+  String dropdownValue;
+  List<String> dropdownMenuItems =
+      List<String>.generate(99, (i) => (i + 1).toString());
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -17,9 +32,30 @@ class SetUserDataState extends State<SetUserDataPage> {
     super.dispose();
   }
 
+  Future addUserDetails() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final body = jsonEncode({
+      'firstName': '${firstNameController.text}',
+      'lastName': '${lastNameController.text}',
+      'age': '$dropdownValue',
+      'hobby': '${hobbyController.text}'
+    });
+
+    final response = await client.put(url, body: body, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/adddogdata', (Route<dynamic> route) => false);
+    } else if (response.statusCode == 400)
+      DoggoToast.of(context).showToast('Incorrect details format.');
+      // TODO: log error
+    else {
+      DoggoToast.of(context).showToast('Could not set user data.');
+      // TODO: log error
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Set Your Details'),
@@ -154,41 +190,6 @@ class SetUserDataState extends State<SetUserDataPage> {
       ),
     );
   }
-
-  Future addUserDetails() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
-    var body = jsonEncode({
-      'firstName': '${firstNameController.text}',
-      'lastName': '${lastNameController.text}',
-      'age': '$dropdownValue',
-      'hobby': '${hobbyController.text}'
-    });
-    var headers = {'Content-Type': 'application/json', 'Accept': '*/*', 'Authorization': 'Bearer $token'};
-
-    final response = await http.put(url, body: body, headers: headers);
-    if (response.statusCode == 200) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/adddogdata', (Route<dynamic> route) => false
-      );
-    } else
-      showAlertDialogWithMessage('Could not set user data!');
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
-
-  String dropdownValue;
-
-  List<String> dropdownMenuItems =
-      List<String>.generate(99, (i) => (i + 1).toString());
 }
 
 class SetUserDataPage extends StatefulWidget {

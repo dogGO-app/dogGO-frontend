@@ -1,35 +1,22 @@
 import 'dart:convert';
 
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:doggo_frontend/User/http/user_details_response.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-
-class EditUserDataPage extends StatefulWidget {
-  final UserDetailsResponse userData;
-
-  const EditUserDataPage({Key key, this.userData}) : super(key: key);
-
-  @override
-  _EditUserDataPageState createState() => _EditUserDataPageState();
-}
+import 'package:http/http.dart';
 
 class _EditUserDataPageState extends State<EditUserDataPage> {
-  String dropdownValue;
+  Client client;
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profile';
+  final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
+  String dropdownValue;
   var dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
 
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final hobbyController = TextEditingController();
-
-  @override
-  void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    hobbyController.dispose();
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -42,36 +29,33 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
     super.initState();
   }
 
-  Future addUserDetails() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    hobbyController.dispose();
+    super.dispose();
+  }
 
-    var url = 'https://doggo-app-server.herokuapp.com/api/dogLover';
-    var body = jsonEncode({
+  Future addUserDetails() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final body = jsonEncode({
       'firstName': '${firstNameController.text}',
       'lastName': '${lastNameController.text}',
       'age': '$dropdownValue',
       'hobby': '${hobbyController.text}'
     });
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
 
-    final response = await http.put(url, body: body, headers: headers);
+    final response = await client.put(url, body: body, headers: headers);
     if (response.statusCode == 200) {
+      DoggoToast.of(context).showToast('Details updated correctly.');
       Navigator.of(context).pop();
-    } else
-      showAlertDialogWithMessage('Could not edit user data!');
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
+    } else if (response.statusCode == 400)
+      DoggoToast.of(context).showToast('Incorrect details format.');
+    // TODO: log error
+    else
+      DoggoToast.of(context).showToast('Could not edit user data');
+    // TODO: log error
   }
 
   @override
@@ -243,4 +227,13 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
       ),
     ),
   );
+}
+
+class EditUserDataPage extends StatefulWidget {
+  final UserDetailsResponse userData;
+
+  const EditUserDataPage({Key key, this.userData}) : super(key: key);
+
+  @override
+  _EditUserDataPageState createState() => _EditUserDataPageState();
 }
