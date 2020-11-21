@@ -1,99 +1,28 @@
 import 'dart:convert';
 
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Custom/extensions.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:oauth2/oauth2.dart';
 
 import 'http/event_data.dart';
 
-class EditEventPage extends StatefulWidget {
-  final Event eventData;
-
-  const EditEventPage({Key key, this.eventData}) : super(key: key);
-
-  @override
-  _EditEventPageState createState() => _EditEventPageState();
-}
-
 class _EditEventPageState extends State<EditEventPage> {
+  Client client;
+  var headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+
   final dateController = TextEditingController();
   final timeController = TextEditingController();
   final descriptionController = TextEditingController();
 
-  @override
-  void dispose() {
-    dateController.dispose();
-    timeController.dispose();
-    descriptionController.dispose();
-    super.dispose();
-  }
-
   String selectedDog;
   List<dynamic> _dogs = List();
-
-  void _fetchDogs() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-
-    final url = 'https://doggo-app-server.herokuapp.com/api/dogs';
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http.get(url, headers: headers);
-    if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(response.body);
-      var temp = jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
-      setState(() {
-        _dogs = temp;
-      });
-    } else {
-      throw Exception('Failed to load dogs from API');
-    }
-  }
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
-
-  Future editEventData() async {
-    final storage = FlutterSecureStorage();
-    final token = await storage.read(key: 'token');
-    final id = await storage.read(key: 'eventId');
-
-    var url = 'https://doggo-app-server.herokuapp.com/api/userCalendarEvents';
-    var reqBody = jsonEncode({
-      'id': '$id',
-      'date': '${dateController.text}',
-      'time': '${timeController.text}',
-      'description': '${descriptionController.text}',
-      'dogName': '$selectedDog'
-    });
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-
-    final pushResponse = await http.put(url, body: reqBody, headers: headers);
-    if (pushResponse.statusCode == 200) {
-      Navigator.of(context).pop();
-    } else {
-      showAlertDialogWithMessage('Could not edit calendar event!');
-      throw Exception('Could not edit calendar event');
-    }
-  }
 
   @override
   void initState() {
@@ -106,6 +35,51 @@ class _EditEventPageState extends State<EditEventPage> {
     }
     _fetchDogs();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    dateController.dispose();
+    timeController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  void _fetchDogs() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs';
+
+    final response = await client.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      List jsonResponse = jsonDecode(response.body);
+      var temp = jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
+      setState(() {
+        _dogs = temp;
+      });
+    } else {
+      DoggoToast.of(context).showToast('Failed to load dogs details.');
+      throw Exception('Failed to load dogs from API');
+    }
+  }
+
+  Future editEventData() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    var url = 'https://doggo-service.herokuapp.com/api/dog-lover/userCalendarEvents';
+    var body = jsonEncode({
+      'id': '${widget.eventData.eventId}',
+      'date': '${dateController.text}',
+      'time': '${timeController.text}',
+      'description': '${descriptionController.text}',
+      'dogName': '$selectedDog'
+    });
+
+    final response = await client.put(url, body: body, headers: headers);
+    if (response.statusCode == 200) {
+      Navigator.of(context).pop();
+    } else {
+      DoggoToast.of(context).showToast('Could not edit calendar event!');
+      throw Exception('Could not edit calendar event');
+    }
   }
 
   @override
@@ -202,8 +176,7 @@ class _EditEventPageState extends State<EditEventPage> {
                       child: MaterialButton(
                         onPressed: () {
                           if (dateController.text == "") {
-                            showAlertDialogWithMessage(
-                                'Date and time has to be filled!');
+                            DoggoToast.of(context).showToast('Date and time has to be filled!');
                             throw Exception('Date and time are empty');
                           } else {
                             editEventData();
@@ -246,4 +219,13 @@ class _EditEventPageState extends State<EditEventPage> {
       ),
     );
   }
+}
+
+class EditEventPage extends StatefulWidget {
+  final Event eventData;
+
+  const EditEventPage({Key key, this.eventData}) : super(key: key);
+
+  @override
+  _EditEventPageState createState() => _EditEventPageState();
 }
