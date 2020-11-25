@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Dog/edit_dog_data_page.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
