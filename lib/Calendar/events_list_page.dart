@@ -16,7 +16,7 @@ class EventListPage extends StatefulWidget {
 
 class _EventListPageState extends State<EventListPage> {
   Client client;
-  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/userCalendarEvents';
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/user-calendar-events';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   Future<List<Event>> _events;

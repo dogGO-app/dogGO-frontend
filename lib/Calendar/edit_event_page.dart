@@ -64,7 +64,7 @@ class _EditEventPageState extends State<EditEventPage> {
 
   Future editEventData() async {
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    var url = 'https://doggo-service.herokuapp.com/api/dog-lover/userCalendarEvents';
+    var url = 'https://doggo-service.herokuapp.com/api/dog-lover/user-calendar-events';
     var body = jsonEncode({
       'id': '${widget.eventData.eventId}',
       'date': '${dateController.text}',

@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 
 class _EditUserDataPageState extends State<EditUserDataPage> {
   Client client;
-  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profile';
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   String dropdownValue;

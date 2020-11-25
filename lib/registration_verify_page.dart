@@ -18,10 +18,10 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
   var hasError = false;
   var currentText = '';
 
-  final activateUrl = 'https://doggo-service.herokuapp.com/api/auth/user/activate';
+  final activateUrl = 'https://doggo-service.herokuapp.com/api/auth/users/activate';
 
   final authority = 'doggo-service.herokuapp.com';
-  final mailPath = '/api/auth/user/send-activation-mail';
+  final mailPath = '/api/auth/users/send-activation-mail';
 
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 

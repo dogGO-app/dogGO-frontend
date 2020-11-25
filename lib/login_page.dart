@@ -9,7 +9,7 @@ class LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   final getUserUrl =
-      'https://doggo-service.herokuapp.com/api/dog-lover/profile';
+      'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   @override
