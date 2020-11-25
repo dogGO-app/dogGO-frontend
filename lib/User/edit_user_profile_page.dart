@@ -17,6 +17,7 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final hobbyController = TextEditingController();
+  final nicknameController = TextEditingController();
 
   @override
   void initState() {
@@ -25,6 +26,7 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
       lastNameController.text = widget.userData.lastName;
       dropdownValue = widget.userData.age.toString();
       hobbyController.text = widget.userData.hobby;
+      nicknameController.text = widget.userData.nickname;
     }
     super.initState();
   }
@@ -43,7 +45,8 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
       'firstName': '${firstNameController.text}',
       'lastName': '${lastNameController.text}',
       'age': '$dropdownValue',
-      'hobby': '${hobbyController.text}'
+      'hobby': '${hobbyController.text}',
+      'nickname': '${nicknameController.text}'
     });
 
     final response = await client.put(url, body: body, headers: headers);
@@ -140,6 +143,19 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
                                 border: InputBorder.none,
                                 hintText: "Hobby",
                                 hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                          Divider(color: Colors.grey),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: nicknameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Nickname",
+                                hintStyle: TextStyle(color: Colors.grey),
+                                enabled: false
                               ),
                             ),
                           ),
