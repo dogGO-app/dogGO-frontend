@@ -8,7 +8,7 @@ import 'package:oauth2/oauth2.dart';
 class SetUserDataState extends State<SetUserDataPage> {
   Client client;
 
-  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profile';
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   final firstNameController = TextEditingController();

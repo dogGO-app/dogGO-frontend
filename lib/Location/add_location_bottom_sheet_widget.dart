@@ -14,7 +14,7 @@ typedef AddMarkerToMapCallback = void Function(LocationMarker locationMarker);
 class _AddLocationBottomSheetWidgetState
     extends State<AddLocationBottomSheetWidget> {
   Client client;
-  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/mapMarkers';
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/map-markers';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   final nameController = TextEditingController();

@@ -12,10 +12,10 @@ class RegistrationPageState extends State<RegistrationPage> {
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
 
-  final signUpUrl = 'https://doggo-service.herokuapp.com/api/auth/user/sign-up';
+  final signUpUrl = 'https://doggo-service.herokuapp.com/api/auth/users/sign-up';
 
   final authority = 'doggo-service.herokuapp.com';
-  final mailPath = '/api/auth/user/send-activation-mail';
+  final mailPath = '/api/auth/users/send-activation-mail';
 
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 

@@ -9,7 +9,7 @@ import 'package:http/http.dart';
 
 class _UserProfilePageState extends State<UserProfilePage> {
   Client client;
-  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profile';
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   Future<UserDetailsResponse> userDetails;

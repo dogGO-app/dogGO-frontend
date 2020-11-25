@@ -17,7 +17,7 @@ const double _cameraZoom = 16;
 
 class _MapPageState extends State<MapPage> {
   Client client;
-  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/mapMarkers';
+  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/map-markers';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   GoogleMapController mapController;
