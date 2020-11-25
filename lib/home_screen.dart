@@ -8,12 +8,12 @@ import 'package:flutter/material.dart';
 import 'Calendar/events_list_page.dart';
 import 'Location/map_page.dart';
 
-class UserHomeScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  _UserHomeScreenState createState() => _UserHomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _UserHomeScreenState extends State<UserHomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   int _currentlySelectedIndex = 0;
 
   final List<AppFlow> appFlows = [

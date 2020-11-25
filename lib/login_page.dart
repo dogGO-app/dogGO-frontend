@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart';
+
 import 'Custom/doggo_toast.dart';
 import 'OAuth2/oauth2_client.dart';
 
@@ -43,7 +44,7 @@ class LoginPageState extends State<LoginPage> {
     final getUserResponse = await client.get(getUserUrl, headers: headers);
 
     if (getUserResponse.statusCode == 200) {
-      Navigator.of(context).pushNamed('/userhomescreen');
+      Navigator.of(context).pushNamed('/homescreen');
     } else if (getUserResponse.statusCode == 404) {
       Navigator.of(context).pushNamedAndRemoveUntil(
           '/adduserdata', (Route<dynamic> route) => false);

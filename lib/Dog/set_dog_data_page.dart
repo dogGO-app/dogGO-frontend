@@ -57,7 +57,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
           Navigator.of(context).pop();
         else
           Navigator.of(context).pushNamedAndRemoveUntil(
-              '/userhomescreen', (Route<dynamic> route) => false);
+              '/homescreen', (Route<dynamic> route) => false);
       } else {
         DoggoToast.of(context).showToast('Could not set dog data!');
         throw Exception('Could not set dog data');
