@@ -4,7 +4,7 @@ import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart';
 
-import 'Custom/doggo_toast.dart';
+import '../Custom/doggo_toast.dart';
 
 class RegistrationPageState extends State<RegistrationPage> {
   Client client;

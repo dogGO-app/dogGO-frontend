@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart';
 
-import 'Custom/doggo_toast.dart';
-import 'OAuth2/oauth2_client.dart';
+import '../Custom/doggo_toast.dart';
+import '../OAuth2/oauth2_client.dart';
 
 class LoginPageState extends State<LoginPage> {
   Client client;

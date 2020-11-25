@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import 'Custom/doggo_toast.dart';
+import '../Custom/doggo_toast.dart';
 
 class RegistrationVerifyState extends State<RegistrationVerifyPage> {
   Client client;

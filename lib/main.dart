@@ -1,12 +1,12 @@
+import 'package:doggo_frontend/Authorization/registration_page.dart';
+import 'package:doggo_frontend/Authorization/registration_verify_page.dart';
 import 'package:doggo_frontend/home_screen.dart';
-import 'package:doggo_frontend/registration_page.dart';
-import 'package:doggo_frontend/registration_verify_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'Authorization/login_page.dart';
 import 'Dog/set_dog_data_page.dart';
 import 'User/set_user_data_page.dart';
-import 'login_page.dart';
 
 void main() => runApp(MyApp());
 
