@@ -165,6 +165,34 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   },
                 ),
               ),
+              SizedBox(height: 8.0),
+              Text(
+                'NICKNAME',
+                style: TextStyle(
+                  letterSpacing: 1.5,
+                  fontSize: 14.0,
+                ),
+              ),
+              SizedBox(height: 8.0),
+              Container(
+                child: FutureBuilder<UserDetailsResponse>(
+                  future: userDetails,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData)
+                      return Text(
+                        snapshot.data.nickname,
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5),
+                      );
+                    else if (snapshot.hasError)
+                      return Text('Could not read hobby');
+                    else
+                      return CircularProgressIndicator();
+                  },
+                ),
+              ),
               SizedBox(height: 45.0),
               Center(
                 child: MaterialButton(

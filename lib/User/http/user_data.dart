@@ -3,14 +3,17 @@ class User {
   final String lastName;
   final int age;
   final String hobby;
+  final String nickname;
 
-  User({this.firstName, this.lastName, this.age, this.hobby});
+  User(
+      {this.firstName, this.lastName, this.age, this.hobby, this.nickname});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
         firstName: json['firstName'],
         lastName: json['lastName'],
         age: json['age'],
-        hobby: json['hobby']);
+        hobby: json['hobby'],
+        nickname: json['nickname']);
   }
 }

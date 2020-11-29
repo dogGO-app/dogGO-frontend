@@ -16,6 +16,6 @@ class DoggoToast {
     Toast.show(msg, context,
         duration: 3,
         backgroundColor: Colors.orange,
-        border: Border.all(color: Colors.black, width: 3.0));
+        border: Border.all(color: Colors.amberAccent, width: 3.0));
   }
 }
