@@ -175,7 +175,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               SizedBox(height: 8.0),
               Container(
-                child: FutureBuilder<UserDetailsResponse>(
+                child: FutureBuilder<User>(
                   future: userDetails,
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
