@@ -22,7 +22,7 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
   Client client;
   final url = 'https://doggo-service.herokuapp.com/api/dog-lover/walks/dog-lovers-in-location/';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
-
+  Timer timer;
   Future<List<UserAndDogsInLocation>> _usersanddogs;
 
   @override
@@ -33,11 +33,27 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
     super.initState();
   }
 
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  void _callApiTimer(){
+    Timer.periodic(Duration(seconds: 30), (timer) {
+      setState(() {
+        _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
+      });
+    });
+  }
+
   Future<List<UserAndDogsInLocation>> _fetchUsersAndDogsInLocation(String markerId) async {
     var jsonString = rootBundle.loadString('doggos.json');
     List jsonResponse = jsonDecode(await jsonString);
+    _callApiTimer();
     return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
     // client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    // _callApiTimer();
     // String newUrl = url + markerId;
     // final response = await client.get(newUrl, headers: headers);
     // if(response.statusCode == 200){
@@ -48,9 +64,11 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
     //   throw Exception('Failed to load users and dogs from API');
     // }
 
-
   }
 
+  void _likeUser(String uID, int likeCount){
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +100,25 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
                       fontSize: 20,
                     ),
                   ),
-                  subtitle: Text(usersanddogs[index].name),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        usersanddogs[index].name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 14
+                        ),
+                      ),
+                      Text(
+                        "Likes: ${usersanddogs[index].likesCount}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 15
+                      ),
+                      ),
+                    ],
+                  ),
                   leading: Icon(
                     Icons.account_circle,
                     color: Colors.orangeAccent,
@@ -131,6 +167,8 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
                           ),
                           textColor: Colors.white,
                           onPressed: (){
+                            _likeUser(usersanddogs[index].userId,
+                            usersanddogs[index].likesCount);
                           }
                         ),
                         FlatButton.icon(
