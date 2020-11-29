@@ -14,6 +14,7 @@ class SetUserDataState extends State<SetUserDataPage> {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final hobbyController = TextEditingController();
+  final nicknameController = TextEditingController();
 
   String dropdownValue;
   List<String> dropdownMenuItems =
@@ -29,6 +30,7 @@ class SetUserDataState extends State<SetUserDataPage> {
     firstNameController.dispose();
     lastNameController.dispose();
     hobbyController.dispose();
+    nicknameController.dispose();
     super.dispose();
   }
 
@@ -38,7 +40,8 @@ class SetUserDataState extends State<SetUserDataPage> {
       'firstName': '${firstNameController.text}',
       'lastName': '${lastNameController.text}',
       'age': '$dropdownValue',
-      'hobby': '${hobbyController.text}'
+      'hobby': '${hobbyController.text}',
+      'nickname': '${nicknameController.text}'
     });
 
     final response = await client.put(url, body: body, headers: headers);
@@ -47,7 +50,7 @@ class SetUserDataState extends State<SetUserDataPage> {
           '/adddogdata', (Route<dynamic> route) => false);
     } else if (response.statusCode == 400)
       DoggoToast.of(context).showToast('Incorrect details format.');
-      // TODO: log error
+    // TODO: log error
     else {
       DoggoToast.of(context).showToast('Could not set user data.');
       // TODO: log error
@@ -109,23 +112,29 @@ class SetUserDataState extends State<SetUserDataPage> {
                           Divider(color: Colors.grey),
                           Container(
                               padding: EdgeInsets.all(8),
-                              child: DropdownButton(
-                                value: dropdownValue,
-                                icon: Icon(Icons.arrow_downward),
-                                iconSize: 16,
-                                hint: Text("Age"),
-                                style: TextStyle(color: Colors.orangeAccent),
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                  });
-                                },
-                                items: dropdownMenuItems.map((String value) {
-                                  return DropdownMenuItem(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  value: dropdownValue,
+                                  icon: Icon(Icons.arrow_downward),
+                                  iconSize: 16,
+                                  isExpanded: true,
+                                  hint: Text("Age"),
+                                  style: TextStyle(color: Colors.orangeAccent),
+                                  onChanged: (String newValue) {
+                                    setState(() {
+                                      dropdownValue = newValue;
+                                    });
+                                  },
+                                  items: dropdownMenuItems.map((String value) {
+                                    return DropdownMenuItem(
+                                      value: value,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 4),
+                                        child: Text(value),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               )),
                           Divider(color: Colors.grey),
                           Container(
@@ -135,6 +144,18 @@ class SetUserDataState extends State<SetUserDataPage> {
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Hobby",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                          Divider(color: Colors.grey),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: nicknameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Nickname",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),

@@ -17,6 +17,7 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final hobbyController = TextEditingController();
+  final nicknameController = TextEditingController();
 
   @override
   void initState() {
@@ -25,6 +26,7 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
       lastNameController.text = widget.userData.lastName;
       dropdownValue = widget.userData.age.toString();
       hobbyController.text = widget.userData.hobby;
+      nicknameController.text = widget.userData.nickname;
     }
     super.initState();
   }
@@ -43,7 +45,8 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
       'firstName': '${firstNameController.text}',
       'lastName': '${lastNameController.text}',
       'age': '$dropdownValue',
-      'hobby': '${hobbyController.text}'
+      'hobby': '${hobbyController.text}',
+      'nickname': '${nicknameController.text}'
     });
 
     final response = await client.put(url, body: body, headers: headers);
@@ -113,23 +116,29 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
                           Divider(color: Colors.grey),
                           Container(
                               padding: EdgeInsets.all(8),
-                              child: DropdownButton(
-                                value: dropdownValue,
-                                icon: Icon(Icons.arrow_downward),
-                                iconSize: 16,
-                                hint: Text("Age"),
-                                style: TextStyle(color: Colors.orangeAccent),
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                  });
-                                },
-                                items: dropdownMenuItems.map((String value) {
-                                  return DropdownMenuItem(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  value: dropdownValue,
+                                  icon: Icon(Icons.arrow_downward),
+                                  iconSize: 16,
+                                  isExpanded: true,
+                                  hint: Text("Age"),
+                                  style: TextStyle(color: Colors.orangeAccent),
+                                  onChanged: (String newValue) {
+                                    setState(() {
+                                      dropdownValue = newValue;
+                                    });
+                                  },
+                                  items: dropdownMenuItems.map((String value) {
+                                    return DropdownMenuItem(
+                                      value: value,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 4),
+                                        child: Text(value),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               )),
                           Divider(color: Colors.grey),
                           Container(
@@ -141,6 +150,18 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
                                 hintText: "Hobby",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
+                            ),
+                          ),
+                          Divider(color: Colors.grey),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: nicknameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                              enabled: false,
+                              style: TextStyle(color: Colors.grey),
                             ),
                           ),
                         ],

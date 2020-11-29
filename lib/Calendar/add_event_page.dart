@@ -1,13 +1,12 @@
+import 'dart:convert';
+
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:http/http.dart' as http;
-import 'package:doggo_frontend/Dog/http/dog_data.dart';
-import 'dart:convert';
-
 import 'package:oauth2/oauth2.dart';
 
 class _AddEventPageState extends State<AddEventPage> {
@@ -55,7 +54,8 @@ class _AddEventPageState extends State<AddEventPage> {
   Future addEventData() async {
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
 
-    var url = 'https://doggo-service.herokuapp.com/api/dog-lover/user-calendar-events';
+    var url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/user-calendar-events';
     var body = jsonEncode({
       'date': '${dateController.text}',
       'time': '${timeController.text}',
@@ -70,12 +70,14 @@ class _AddEventPageState extends State<AddEventPage> {
       switch (response.statusCode) {
         case 400:
           {
-            DoggoToast.of(context).showToast('We cannot go back in time! Change the time you set and try again');
+            DoggoToast.of(context).showToast(
+                'We cannot go back in time! Change the time you set and try again');
             throw Exception('Could not add event bc its set in the past');
           }
         case 409:
           {
-            DoggoToast.of(context).showToast('Two events cannot take place at the same time! Change date or time and try again');
+            DoggoToast.of(context).showToast(
+                'Two events cannot take place at the same time! Change date or time and try again');
             throw Exception('Could not add second event at the same time');
           }
         default:
@@ -157,20 +159,26 @@ class _AddEventPageState extends State<AddEventPage> {
                             ),
                           ),
                           Divider(color: Colors.grey),
-                          DropdownButton(
-                            hint: Text("Select your dog"),
-                            value: selectedDog,
-                            items: _dogs.map((doggo) {
-                              return DropdownMenuItem(
-                                child: Text(doggo.name),
-                                value: doggo.name,
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedDog = value;
-                              });
-                            },
+                          DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              isExpanded: true,
+                              hint: Text("Select your dog"),
+                              value: selectedDog,
+                              items: _dogs.map((doggo) {
+                                return DropdownMenuItem(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 7),
+                                    child: Text(doggo.name),
+                                  ),
+                                  value: doggo.name,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedDog = value;
+                                });
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -181,7 +189,8 @@ class _AddEventPageState extends State<AddEventPage> {
                       child: MaterialButton(
                         onPressed: () {
                           if (dateController.text == "") {
-                            DoggoToast.of(context).showToast('Date and time has to be filled!');
+                            DoggoToast.of(context)
+                                .showToast('Date and time has to be filled!');
                             throw Exception('Date and time are empty');
                           } else {
                             addEventData();
