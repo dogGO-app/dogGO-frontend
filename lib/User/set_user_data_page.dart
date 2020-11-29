@@ -50,7 +50,7 @@ class SetUserDataState extends State<SetUserDataPage> {
           '/adddogdata', (Route<dynamic> route) => false);
     } else if (response.statusCode == 400)
       DoggoToast.of(context).showToast('Incorrect details format.');
-      // TODO: log error
+    // TODO: log error
     else {
       DoggoToast.of(context).showToast('Could not set user data.');
       // TODO: log error
@@ -112,23 +112,29 @@ class SetUserDataState extends State<SetUserDataPage> {
                           Divider(color: Colors.grey),
                           Container(
                               padding: EdgeInsets.all(8),
-                              child: DropdownButton(
-                                value: dropdownValue,
-                                icon: Icon(Icons.arrow_downward),
-                                iconSize: 16,
-                                hint: Text("Age"),
-                                style: TextStyle(color: Colors.orangeAccent),
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                  });
-                                },
-                                items: dropdownMenuItems.map((String value) {
-                                  return DropdownMenuItem(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  value: dropdownValue,
+                                  icon: Icon(Icons.arrow_downward),
+                                  iconSize: 16,
+                                  isExpanded: true,
+                                  hint: Text("Age"),
+                                  style: TextStyle(color: Colors.orangeAccent),
+                                  onChanged: (String newValue) {
+                                    setState(() {
+                                      dropdownValue = newValue;
+                                    });
+                                  },
+                                  items: dropdownMenuItems.map((String value) {
+                                    return DropdownMenuItem(
+                                      value: value,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 4),
+                                        child: Text(value),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               )),
                           Divider(color: Colors.grey),
                           Container(

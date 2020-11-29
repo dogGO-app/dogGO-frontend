@@ -116,23 +116,29 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
                           Divider(color: Colors.grey),
                           Container(
                               padding: EdgeInsets.all(8),
-                              child: DropdownButton(
-                                value: dropdownValue,
-                                icon: Icon(Icons.arrow_downward),
-                                iconSize: 16,
-                                hint: Text("Age"),
-                                style: TextStyle(color: Colors.orangeAccent),
-                                onChanged: (String newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                  });
-                                },
-                                items: dropdownMenuItems.map((String value) {
-                                  return DropdownMenuItem(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  value: dropdownValue,
+                                  icon: Icon(Icons.arrow_downward),
+                                  iconSize: 16,
+                                  isExpanded: true,
+                                  hint: Text("Age"),
+                                  style: TextStyle(color: Colors.orangeAccent),
+                                  onChanged: (String newValue) {
+                                    setState(() {
+                                      dropdownValue = newValue;
+                                    });
+                                  },
+                                  items: dropdownMenuItems.map((String value) {
+                                    return DropdownMenuItem(
+                                      value: value,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 4),
+                                        child: Text(value),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               )),
                           Divider(color: Colors.grey),
                           Container(
@@ -153,10 +159,9 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
                               controller: nicknameController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Nickname",
-                                hintStyle: TextStyle(color: Colors.grey),
-                                enabled: false
                               ),
+                              enabled: false,
+                              style: TextStyle(color: Colors.grey),
                             ),
                           ),
                         ],
