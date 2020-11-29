@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:oauth2/oauth2.dart';
@@ -48,26 +46,31 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
   }
 
   Future<List<UserAndDogsInLocation>> _fetchUsersAndDogsInLocation(String markerId) async {
-    var jsonString = rootBundle.loadString('doggos.json');
-    List jsonResponse = jsonDecode(await jsonString);
-    _callApiTimer();
-    return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
-    // client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    // var jsonString = rootBundle.loadString('doggos.json');
+    // List jsonResponse = jsonDecode(await jsonString);
     // _callApiTimer();
-    // String newUrl = url + markerId;
-    // final response = await client.get(newUrl, headers: headers);
-    // if(response.statusCode == 200){
-    //   List jsonResponse = jsonDecode(response.body);
-    //   return jsonResponse.map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs)).toList();
-    // } else {
-    //   DoggoToast.of(context).showToast('Failed to load users and dogs in given location ${response.statusCode}');
-    //   throw Exception('Failed to load users and dogs from API');
-    // }
+    // return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    _callApiTimer();
+    String newUrl = url + markerId;
+    final response = await client.get(newUrl, headers: headers);
+    if(response.statusCode == 200){
+      List jsonResponse = jsonDecode(response.body);
+      return jsonResponse.map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs)).toList();
+    } else {
+      DoggoToast.of(context).showToast('Failed to load users and dogs in given location ${response.statusCode}');
+      throw Exception('Failed to load users and dogs from API');
+    }
 
   }
 
   void _likeUser(String uID, int likeCount){
+  }
 
+  void _followUser(String uID){
+  }
+
+  void _blockUser(String uID){
   }
 
   @override
@@ -189,6 +192,7 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
                             'Follow'
                           ),
                           onPressed: (){
+                            _followUser(usersanddogs[index].userId);
                           }
                         ),
                         FlatButton.icon(
@@ -209,6 +213,7 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
                                 'Block'
                             ),
                             onPressed: (){
+                              _blockUser(usersanddogs[index].userId);
                             }
                         ),
                       ],
