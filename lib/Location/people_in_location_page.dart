@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
-import 'package:intl/intl.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:oauth2/oauth2.dart';
 import 'package:doggo_frontend/Location/http/useranddogs.dart';
@@ -28,14 +31,20 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
       _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
     });
     super.initState();
+    Timer.periodic(Duration(seconds: 10), (timer) {
+      setState(() {
+        _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
+      });
+    });
   }
 
   Future<List<UserAndDogsInLocation>> _fetchUsersAndDogsInLocation(String markerId) async {
+    // var jsonString = rootBundle.loadString('doggos.json');
+    // List jsonResponse = jsonDecode(await jsonString);
+    // return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    String new_url = url + markerId;
-    print(new_url);
-    print(markerId);
-    final response = await client.get(new_url, headers: headers);
+    String newUrl = url + markerId;
+    final response = await client.get(newUrl, headers: headers);
     if(response.statusCode == 200){
       List jsonResponse = jsonDecode(response.body);
       return jsonResponse.map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs)).toList();
@@ -43,6 +52,8 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
       DoggoToast.of(context).showToast('Failed to load users and dogs in given location ${response.statusCode}');
       throw Exception('Failed to load users and dogs from API');
     }
+
+
   }
 
 
@@ -67,15 +78,47 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
               itemBuilder: (context, index) {
                 return ExpansionTile(
                   title: Text(
-                    usersanddogs[index].firstName,
+                    usersanddogs[index].nickname,
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 20,
                     ),
                   ),
-                  leading: Icon(Icons.account_circle),
+                  subtitle: Text(usersanddogs[index].name),
+                  leading: Icon(
+                    Icons.account_circle,
+                    color: Colors.orangeAccent,
+                  ),
                   children: [
-                    ListTile(
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: usersanddogs[index].dogs.length,
+                      itemBuilder: (context, index2){
+                        return ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: screenHeight*0.005,
+                            horizontal: screenWidth*0.17
+                          ),
+                          leading: Icon(
+                            Icons.pets,
+                            color: Colors.orangeAccent,
+                          ),
+                          title: Text(
+                            usersanddogs[index].dogs[index2].name
+                          ),
+                          subtitle: Text(
+                              usersanddogs[index].dogs[index2].breed
+                          ),
+                        );
+                      }
+                    ),
+                    RaisedButton(
+                      onPressed: () {
+
+                      },
+                      child: Text(
+                        'Add friend'
+                      ),
                     )
                   ],
                 );
