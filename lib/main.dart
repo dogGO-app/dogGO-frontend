@@ -1,5 +1,6 @@
 import 'package:doggo_frontend/Authorization/registration_page.dart';
 import 'package:doggo_frontend/Authorization/registration_verify_page.dart';
+import 'package:doggo_frontend/FollowedBlocked/add_followed_blocked_page.dart';
 import 'package:doggo_frontend/FollowedBlocked/followed_blocked_list_page.dart';
 import 'package:doggo_frontend/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
         '/adduserdata': (context) => SetUserDataPage(),
         '/adddogdata': (context) => SetDogDataPage(),
         '/verify': (context) => RegistrationVerifyPage(),
-        '/followedblocked': (context) => FollowedBlockedListPage()
+        '/followedblocked': (context) => FollowedBlockedListPage(),
+        '/addfollowedblocked': (context) => AddFollowedBlockedPage()
       },
     );
   }
