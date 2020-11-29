@@ -31,27 +31,22 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
       _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
     });
     super.initState();
-    Timer.periodic(Duration(seconds: 10), (timer) {
-      setState(() {
-        _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
-      });
-    });
   }
 
   Future<List<UserAndDogsInLocation>> _fetchUsersAndDogsInLocation(String markerId) async {
-    // var jsonString = rootBundle.loadString('doggos.json');
-    // List jsonResponse = jsonDecode(await jsonString);
-    // return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
-    client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    String newUrl = url + markerId;
-    final response = await client.get(newUrl, headers: headers);
-    if(response.statusCode == 200){
-      List jsonResponse = jsonDecode(response.body);
-      return jsonResponse.map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs)).toList();
-    } else {
-      DoggoToast.of(context).showToast('Failed to load users and dogs in given location ${response.statusCode}');
-      throw Exception('Failed to load users and dogs from API');
-    }
+    var jsonString = rootBundle.loadString('doggos.json');
+    List jsonResponse = jsonDecode(await jsonString);
+    return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
+    // client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    // String newUrl = url + markerId;
+    // final response = await client.get(newUrl, headers: headers);
+    // if(response.statusCode == 200){
+    //   List jsonResponse = jsonDecode(response.body);
+    //   return jsonResponse.map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs)).toList();
+    // } else {
+    //   DoggoToast.of(context).showToast('Failed to load users and dogs in given location ${response.statusCode}');
+    //   throw Exception('Failed to load users and dogs from API');
+    // }
 
 
   }
@@ -61,6 +56,9 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
+    double buttonsHeight = screenHeight * 0.01;
+    double buttonsWidth = screenWidth * 0.05;
     
     return Scaffold(
       appBar: AppBar(
@@ -112,13 +110,70 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
                         );
                       }
                     ),
-                    RaisedButton(
-                      onPressed: () {
-
-                      },
-                      child: Text(
-                        'Add friend'
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FlatButton.icon(
+                          icon: Icon(
+                            Icons.thumb_up,
+                            color: Colors.white,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7.0)
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: buttonsHeight,
+                              horizontal: buttonsWidth
+                          ),
+                          color: Colors.orangeAccent,
+                          label: Text(
+                            'Like'
+                          ),
+                          textColor: Colors.white,
+                          onPressed: (){
+                          }
+                        ),
+                        FlatButton.icon(
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7.0)
+                          ),
+                          color: Colors.orange,
+                          textColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: buttonsHeight,
+                              horizontal: buttonsWidth
+                          ),
+                          label: Text(
+                            'Follow'
+                          ),
+                          onPressed: (){
+                          }
+                        ),
+                        FlatButton.icon(
+                            icon: Icon(
+                              Icons.block,
+                              color: Colors.white,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7.0)
+                            ),
+                            color: Colors.orange[900],
+                            textColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                                vertical: buttonsHeight,
+                                horizontal: buttonsWidth
+                            ),
+                            label: Text(
+                                'Block'
+                            ),
+                            onPressed: (){
+                            }
+                        ),
+                      ],
                     )
                   ],
                 );
