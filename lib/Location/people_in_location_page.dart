@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
+import 'package:flutter/services.dart';
 import 'package:oauth2/oauth2.dart';
 import 'package:doggo_frontend/Location/http/useranddogs.dart';
 
@@ -143,9 +144,17 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
                           title: Text(
                             usersanddogs[index].dogs[index2].name
                           ),
-                          subtitle: Text(
-                              usersanddogs[index].dogs[index2].breed
-                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                usersanddogs[index].dogs[index2].breed
+                              ),
+                              Text(
+                                  usersanddogs[index].dogs[index2].color
+                              )
+                            ],
+                          )
                         );
                       }
                     ),
