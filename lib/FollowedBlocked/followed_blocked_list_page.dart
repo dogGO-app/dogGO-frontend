@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:doggo_frontend/FollowedBlocked/add_followed_blocked_page.dart';
 import 'package:doggo_frontend/FollowedBlocked/http/dog_lover_data.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:oauth2/oauth2.dart';
 
 class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
@@ -13,65 +13,6 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   Future<List<DogLover>> _followedBlocked;
-
-  // List<DogLover> _followedBlocked = [
-  //   DogLover(
-  //     user: User(firstName: 'Michu', lastName: 'Najbo', age: 23, hobby: 'Dogs'),
-  //     dogs: [
-  //       Dog(
-  //           name: 'Tina',
-  //           breed: 'Jamnik',
-  //           color: 'Black',
-  //           description: 'Likes sniffing',
-  //           vaccinationDate: DateTime.now()),
-  //       Dog(
-  //           name: 'Max',
-  //           breed: 'Labladol',
-  //           color: 'White',
-  //           description: 'Likes pooping',
-  //           vaccinationDate: DateTime.now()),
-  //       Dog(
-  //           name: 'George',
-  //           breed: 'Mops',
-  //           color: 'Brown',
-  //           description: 'Likes eating',
-  //           vaccinationDate: DateTime.now()),
-  //     ],
-  //     status: DogLoverStatus.FOLLOWED,
-  //   ),
-  //   DogLover(
-  //     user:
-  //         User(firstName: 'Adziu', lastName: 'Glapi', age: 23, hobby: 'Soccer'),
-  //     dogs: [
-  //       Dog(
-  //           name: 'Rex',
-  //           breed: 'Owczarek',
-  //           color: 'Black-yellow',
-  //           description: 'Likes barking',
-  //           vaccinationDate: DateTime.now()),
-  //       Dog(
-  //           name: 'Edek',
-  //           breed: 'Chiwaua',
-  //           color: 'Yellow',
-  //           description: 'Likes peeing',
-  //           vaccinationDate: DateTime.now()),
-  //     ],
-  //     status: DogLoverStatus.FOLLOWED,
-  //   ),
-  //   DogLover(
-  //     user: User(
-  //         firstName: 'Solid', lastName: 'Martha', age: 23, hobby: 'Soccer'),
-  //     dogs: [
-  //       Dog(
-  //           name: 'Kora',
-  //           breed: 'Pudel',
-  //           color: 'Silver',
-  //           description: 'Likes being seen',
-  //           vaccinationDate: DateTime.now()),
-  //     ],
-  //     status: DogLoverStatus.BLOCKED,
-  //   ),
-  // ];
 
   @override
   void initState() {
@@ -83,14 +24,20 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
 
   Future<List<DogLover>> _fetchFollowedBlocked() async {
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/relationships';
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/relationships';
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
       List jsonList = jsonDecode(response.body);
-      return jsonList.map((e) => DogLover.fromJson(e)).toList();
+      List<DogLover> followedBlocked =
+          jsonList.map((e) => DogLover.fromFollowedBlockedJson(e)).toList();
+      followedBlocked.sort((a, b) => a.status.index.compareTo(b.status.index));
+      return followedBlocked;
     } else {
-      DoggoToast.of(context).showToast('Could not fetch FOLLOWED/BLOCKED list.');
+      DoggoToast.of(context)
+          .showToast('Could not fetch FOLLOWED/BLOCKED list.');
+      return Future.error('Could not fetch FOLLOWED/BLOCKED list.');
     }
   }
 
@@ -101,20 +48,25 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
 
     final response = await client.delete(url, headers: headers);
     switch (response.statusCode) {
-      case 200: {
-        setState(() {
-          _followedBlocked = _fetchFollowedBlocked();
-        });
-        break;
-      }
-      case 404: {
-        DoggoToast.of(context).showToast('Person with given nickname doesn\'t exist.');
-        break;
-      }
-      default: {
-        DoggoToast.of(context).showToast('Could remove person from FOLLOWED or BLOCKED.');
-        break;
-      }
+      case 200:
+        {
+          setState(() {
+            _followedBlocked = _fetchFollowedBlocked();
+          });
+          break;
+        }
+      case 404:
+        {
+          DoggoToast.of(context)
+              .showToast('Person with given nickname doesn\'t exist.');
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context)
+              .showToast('Could remove person from FOLLOWED or BLOCKED.');
+          break;
+        }
     }
   }
 
@@ -146,19 +98,34 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
     ]);
   }
 
-  Card _createFollowedBlockedCard(
-      List<DogLover> followedBlocked, int userIndex, double screenHeight, double screenWidth) {
+  Card _createFollowedBlockedCard(List<DogLover> followedBlocked, int userIndex,
+      double screenHeight, double screenWidth) {
     return Card(
       child: Dismissible(
-        background: Container(color: Colors.redAccent),
+        background: Stack(
+          children: [
+            Container(color: Colors.redAccent),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: EdgeInsets.only(right: screenWidth * 0.05),
+                child: Icon(
+                  Icons.delete,
+                  color: Colors.white70,
+                ),
+              ),
+            ),
+          ],
+        ),
         direction: DismissDirection.endToStart,
         key: ValueKey(followedBlocked[userIndex]),
         onDismissed: (direction) {
           _removeFollowedBlocked(followedBlocked[userIndex].user.nickname);
+          followedBlocked.removeAt(userIndex);
         },
         child: ExpansionTile(
             title: Text(
-              '${followedBlocked[userIndex].user.firstName} ${followedBlocked[userIndex].user.lastName}',
+              followedBlocked[userIndex].user.nickname,
               style: TextStyle(
                   fontWeight: FontWeight.w500, fontSize: screenHeight * 0.035),
             ),
@@ -189,16 +156,6 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
                             child: Text(
                                 "Color: ${followedBlocked[userIndex].dogs[dogIndex].color}"),
                           ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "Description: ${followedBlocked[userIndex].dogs[dogIndex].description}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "Last vaccination date: ${DateFormat("dd-MM-yyy").format(followedBlocked[userIndex].dogs[dogIndex].vaccinationDate)}"),
-                          )
                         ],
                       ),
                       leading: Icon(
@@ -216,9 +173,16 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
     );
   }
 
-  bool _hasStatusChanged(List<DogLover> followedBlocked, int userIndex) {
-    return followedBlocked[userIndex - 1].status == DogLoverStatus.FOLLOWED &&
-        followedBlocked[userIndex].status == DogLoverStatus.BLOCKED;
+  bool _isFollowedSection(List<DogLover> followedBlocked, int userIndex) {
+    return userIndex == 0 &&
+        followedBlocked[userIndex].status == DogLoverStatus.FOLLOWED;
+  }
+
+  bool _isBlockedSection(List<DogLover> followedBlocked, int userIndex) {
+    return userIndex == 0 &&
+            followedBlocked[userIndex].status == DogLoverStatus.BLOCKED ||
+        (followedBlocked[userIndex - 1].status == DogLoverStatus.FOLLOWED &&
+            followedBlocked[userIndex].status == DogLoverStatus.BLOCKED);
   }
 
   @override
@@ -227,57 +191,80 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Followed and Blocked'),
-        centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed('/addfollowedblocked');
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.orangeAccent,
-        splashColor: Colors.orange,
-      ),
-      body: FutureBuilder<List<DogLover>>(
-        future: _followedBlocked,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<DogLover> followedBlocked = snapshot.data;
-            return ListView.builder(
-              itemCount: followedBlocked.length,
-              itemBuilder: (context, userIndex) {
-                if (userIndex == 0)
-                  return Column(
-                    children: [
-                      _createTypeDivider(DogLoverStatus.FOLLOWED, screenWidth),
-                      _createFollowedBlockedCard(followedBlocked, userIndex, screenHeight, screenWidth)
-                    ],
-                  );
-                else if (_hasStatusChanged(followedBlocked, userIndex))
-                  return Column(
-                    children: [
-                      _createTypeDivider(DogLoverStatus.BLOCKED, screenWidth),
-                      _createFollowedBlockedCard(followedBlocked, userIndex, screenHeight, screenWidth)
-                    ],
-                  );
-                else
-                  return _createFollowedBlockedCard(
-                     followedBlocked, userIndex, screenHeight, screenWidth);
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Text('${snapshot.error}');
-          }
-          return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.orangeAccent,
-            )
-          );
-        },
-      )
-    );
+        appBar: AppBar(
+          title: Text('Followed and Blocked'),
+          centerTitle: true,
+          backgroundColor: Colors.orangeAccent,
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(
+                    builder: (context) => AddFollowedBlockedPage()))
+                .whenComplete(() => {
+                      setState(() {
+                        _followedBlocked = _fetchFollowedBlocked();
+                      })
+                    });
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.orangeAccent,
+          splashColor: Colors.orange,
+        ),
+        body: FutureBuilder<List<DogLover>>(
+          future: _followedBlocked,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<DogLover> followedBlocked = snapshot.data;
+              if (followedBlocked.isNotEmpty) {
+                return ListView.builder(
+                  itemCount: followedBlocked.length,
+                  itemBuilder: (context, userIndex) {
+                    if (_isFollowedSection(followedBlocked, userIndex))
+                      return Column(
+                        children: [
+                          _createTypeDivider(
+                              DogLoverStatus.FOLLOWED, screenWidth),
+                          _createFollowedBlockedCard(followedBlocked, userIndex,
+                              screenHeight, screenWidth)
+                        ],
+                      );
+                    else if (_isBlockedSection(followedBlocked, userIndex))
+                      return Column(
+                        children: [
+                          _createTypeDivider(
+                              DogLoverStatus.BLOCKED, screenWidth),
+                          _createFollowedBlockedCard(followedBlocked, userIndex,
+                              screenHeight, screenWidth)
+                        ],
+                      );
+                    else
+                      return _createFollowedBlockedCard(followedBlocked,
+                          userIndex, screenHeight, screenWidth);
+                  },
+                );
+              }
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.orangeAccent,
+                ),
+              );
+            }
+            return Center(
+                child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: Text('You don\'t follow nor block anyone yet.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenHeight * 0.04)),
+            ));
+          },
+        ));
   }
 }
 

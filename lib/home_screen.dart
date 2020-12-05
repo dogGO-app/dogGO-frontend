@@ -2,6 +2,7 @@ import 'package:doggo_frontend/Custom/app_flow.dart';
 import 'package:doggo_frontend/Custom/bottom_navigation_tab.dart';
 import 'package:doggo_frontend/Custom/material_bottom_navigation_scaffold.dart';
 import 'package:doggo_frontend/Dog/dogs_list_page.dart';
+import 'package:doggo_frontend/FollowedBlocked/followed_blocked_list_page.dart';
 import 'package:doggo_frontend/User/user_profile_page.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<AppFlow> appFlows = [
     AppFlow(
       page: UserProfilePage(),
-      title: 'Your profile',
+      title: 'Profile',
       iconData: Icons.person,
       navigatorKey: GlobalKey<NavigatorState>(),
     ),
@@ -31,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     AppFlow(
       page: DogsListPage(),
-      title: 'Your dogs',
+      title: 'Dogs',
       iconData: Icons.pets,
       navigatorKey: GlobalKey<NavigatorState>(),
     ),
@@ -41,6 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
       iconData: Icons.calendar_today,
       navigatorKey: GlobalKey<NavigatorState>(),
     ),
+    AppFlow(
+      page: FollowedBlockedListPage(),
+      title: 'Relations',
+      iconData: Icons.person_add,
+      navigatorKey: GlobalKey<NavigatorState>(),
+    )
   ];
 
   @override
