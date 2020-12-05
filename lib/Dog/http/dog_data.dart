@@ -21,4 +21,13 @@ class Dog {
       vaccinationDate: DateTime.parse(json['lastVaccinationDate']),
     );
   }
+
+  factory Dog.fromFollowedBlockedJson(Map<String, dynamic> json) {
+    return Dog(
+        name: json['name'],
+        breed: json['breed'],
+        color: json['color'],
+        description: null,
+        vaccinationDate: null);
+  }
 }

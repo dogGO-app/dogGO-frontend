@@ -5,8 +5,7 @@ class User {
   final String hobby;
   final String nickname;
 
-  User(
-      {this.firstName, this.lastName, this.age, this.hobby, this.nickname});
+  User({this.firstName, this.lastName, this.age, this.hobby, this.nickname});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -15,5 +14,14 @@ class User {
         age: json['age'],
         hobby: json['hobby'],
         nickname: json['nickname']);
+  }
+
+  factory User.fromFollowedBlockedJson(Map<String, dynamic> json) {
+    return User(
+        firstName: null,
+        lastName: null,
+        age: null,
+        hobby: null,
+        nickname: json['receiverDogLoverNickname']);
   }
 }

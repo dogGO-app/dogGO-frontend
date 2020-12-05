@@ -11,8 +11,17 @@ class DogLover {
   factory DogLover.fromJson(Map<String, dynamic> json) {
     return DogLover(
         user: User.fromJson(json['user']),
-        dogs: List<Dog>.from(json['dogs']),
+        dogs: (json['dogs'] as List).map((e) => Dog.fromFollowedBlockedJson(e)).toList(),
         status: json['status']);
+  }
+
+  factory DogLover.fromFollowedBlockedJson(Map<String, dynamic> json) {
+    return DogLover(
+        user: User.fromFollowedBlockedJson(json),
+        dogs: (json['receiverDogLoverDogs'] as List).map((e) => Dog.fromFollowedBlockedJson(e)).toList(),
+        status: json['relationshipStatus'] == 'FOLLOWS'
+            ? DogLoverStatus.FOLLOWED
+            : DogLoverStatus.BLOCKED);
   }
 }
 
