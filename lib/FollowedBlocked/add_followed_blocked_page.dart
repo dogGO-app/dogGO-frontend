@@ -14,6 +14,8 @@ class AddFollowedBlockedPageState extends State<AddFollowedBlockedPage> {
   String dropdownValue;
   List<String> dropdownMenuItems = List<String>.of(['FOLLOW', 'BLOCK']);
 
+
+
   @override
   void dispose() {
     nicknameController.dispose();
@@ -32,7 +34,7 @@ class AddFollowedBlockedPageState extends State<AddFollowedBlockedPage> {
       case 201:
         {
           DoggoToast.of(context)
-              .showToast('Person added to $dropdownValue successfully.');
+              .showToast('Person added to ${dropdownValue}ED successfully.');
           Navigator.of(context).pop();
           break;
         }
@@ -45,7 +47,7 @@ class AddFollowedBlockedPageState extends State<AddFollowedBlockedPage> {
       case 409:
         {
           DoggoToast.of(context).showToast(
-              'Person with given nickname is already $dropdownValue.');
+              'Person with given nickname is already ${dropdownValue}ED.');
           break;
         }
       default:
@@ -132,10 +134,10 @@ class AddFollowedBlockedPageState extends State<AddFollowedBlockedPage> {
                       ),
                     ),
                     SizedBox(
-                      height: screenHeight * 0.2,
+                      height: screenHeight * 0.15,
                     ),
                     Container(
-                      height: screenHeight * 0.15,
+                      height: screenHeight * 0.08,
                       child: MaterialButton(
                         onPressed: () {
                           _addFollowedBlocked();
