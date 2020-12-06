@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
-import 'package:flutter/services.dart';
 import 'package:oauth2/oauth2.dart';
 import 'package:doggo_frontend/Location/http/useranddogs.dart';
 
@@ -26,6 +25,9 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
 
   @override
   void initState(){
+    timer = new Timer.periodic(Duration(seconds: 30), (Timer timer) {
+        _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
+    });
     setState(() {
       _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
     });
@@ -38,13 +40,6 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
     super.dispose();
   }
 
-  void _callApiTimer(){
-    Timer.periodic(Duration(seconds: 30), (timer) {
-      setState(() {
-        _usersanddogs = _fetchUsersAndDogsInLocation(widget.markerId);
-      });
-    });
-  }
 
   Future<List<UserAndDogsInLocation>> _fetchUsersAndDogsInLocation(String markerId) async {
     // var jsonString = rootBundle.loadString('doggos.json');
@@ -52,7 +47,6 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
     // _callApiTimer();
     // return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    _callApiTimer();
     String newUrl = url + markerId;
     final response = await client.get(newUrl, headers: headers);
     if(response.statusCode == 200){
@@ -60,7 +54,7 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
       return jsonResponse.map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs)).toList();
     } else {
       DoggoToast.of(context).showToast('Failed to load users and dogs in given location ${response.statusCode}');
-      throw Exception('Failed to load users and dogs from API');
+      // throw Exception('Failed to load users and dogs from API');
     }
 
   }

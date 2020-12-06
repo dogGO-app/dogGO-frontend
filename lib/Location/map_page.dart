@@ -64,7 +64,7 @@ class _MapPageState extends State<MapPage> {
             (_destination.latitude - _currentLocation.latitude).abs();
         double lngDistance =
             (_destination.longitude - _currentLocation.longitude).abs();
-        print('latDistance: $latDistance, lngDistance: $lngDistance');
+        // print('latDistance: $latDistance, lngDistance: $lngDistance');
 
         _animateCameraToLocation(
             LatLng(_currentLocation.latitude, _currentLocation.longitude));

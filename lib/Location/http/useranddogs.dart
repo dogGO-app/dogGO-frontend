@@ -1,11 +1,11 @@
-import 'package:doggo_frontend/Location/http/simpledog.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 
 class UserAndDogsInLocation{
   String userId;
   String nickname;
   String name;
   int likesCount;
-  List<SimpleDog> dogs;
+  List<Dog> dogs;
 
   UserAndDogsInLocation({this.userId, this.nickname, this.name,
     this.likesCount, this.dogs});
@@ -13,8 +13,8 @@ class UserAndDogsInLocation{
   factory UserAndDogsInLocation.fromJson(Map<String, dynamic> json){
 
     var doggoslist = json['dogs'] as List;
-    List<SimpleDog> dogsList =
-      doggoslist.map((d) => SimpleDog.fromJson(d)).toList();
+    List<Dog> dogsList =
+      doggoslist.map((d) => Dog.fromJsonInLocation(d)).toList();
 
     return UserAndDogsInLocation(
       userId: json["id"],
