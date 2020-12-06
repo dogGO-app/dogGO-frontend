@@ -64,7 +64,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
       default:
         {
           DoggoToast.of(context)
-              .showToast('Could remove person from FOLLOWED or BLOCKED.');
+              .showToast('Couldn\'t remove person from FOLLOWED or BLOCKED.');
           break;
         }
     }
