@@ -42,10 +42,6 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
 
 
   Future<List<UserAndDogsInLocation>> _fetchUsersAndDogsInLocation(String markerId) async {
-    // var jsonString = rootBundle.loadString('doggos.json');
-    // List jsonResponse = jsonDecode(await jsonString);
-    // _callApiTimer();
-    // return jsonResponse.map((e) => UserAndDogsInLocation.fromJson(e)).toList();
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
     String newUrl = url + markerId;
     final response = await client.get(newUrl, headers: headers);
@@ -54,7 +50,7 @@ class _PeopleAndDogsInLocationPageState extends State<PeopleAndDogsInLocationPag
       return jsonResponse.map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs)).toList();
     } else {
       DoggoToast.of(context).showToast('Failed to load users and dogs in given location ${response.statusCode}');
-      // throw Exception('Failed to load users and dogs from API');
+      //TODO: log error
     }
 
   }
