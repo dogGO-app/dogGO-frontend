@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Location/add_location_bottom_sheet_widget.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
+import 'package:doggo_frontend/Location/people_in_location_page.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,6 +34,7 @@ class _MapPageState extends State<MapPage> {
   bool _flushbarAtLocationAppeared = false;
   bool _leavingLocation = false;
   String _currentLocationName = "";
+  String _currentLocationId = "";
   LatLng _destination;
   Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
@@ -62,7 +64,7 @@ class _MapPageState extends State<MapPage> {
             (_destination.latitude - _currentLocation.latitude).abs();
         double lngDistance =
             (_destination.longitude - _currentLocation.longitude).abs();
-        print('latDistance: $latDistance, lngDistance: $lngDistance');
+        // print('latDistance: $latDistance, lngDistance: $lngDistance');
 
         _animateCameraToLocation(
             LatLng(_currentLocation.latitude, _currentLocation.longitude));
@@ -145,6 +147,7 @@ class _MapPageState extends State<MapPage> {
         position: LatLng(locationMarker.latitude, locationMarker.longitude),
         onTap: () {
           _currentLocationName = locationMarker.name;
+          _currentLocationId = locationMarker.id;
           showModalBottomSheet(
               context: context,
               barrierColor: Colors.black12,
@@ -426,6 +429,9 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -507,6 +513,27 @@ class _MapPageState extends State<MapPage> {
                         backgroundColor: Colors.orangeAccent,
                       )
                     : Text(''),
+                _nearLocation ?
+                    Container(
+                      alignment: Alignment.topLeft,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth*0.01,
+                          vertical: screenHeight*0.01),
+                      child: FloatingActionButton(
+                          backgroundColor: Colors.orangeAccent,
+                          child: Icon(Icons.account_circle),
+                          onPressed: (){
+                            Navigator.of(context)
+                                .push(
+                              MaterialPageRoute(
+                                builder: (context) => PeopleAndDogsInLocationPage(
+                                  markerId: _currentLocationId,
+                                ),
+                              ),
+                            );
+                          }),
+                    )
+                : Container(),
                 _leavingLocation
                     ? Flushbar(
                         message: 'You are leaving the ' + _currentLocationName,
