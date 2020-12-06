@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:doggo_frontend/User/edit_user_profile_page.dart';
-import 'package:doggo_frontend/User/http/user_details_response.dart';
+import 'package:doggo_frontend/User/http/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -12,7 +12,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
-  Future<UserDetailsResponse> userDetails;
+  Future<User> userDetails;
 
   @override
   void initState() {
@@ -20,12 +20,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
     super.initState();
   }
 
-  Future<UserDetailsResponse> fetchUserDetails() async {
+  Future<User> fetchUserDetails() async {
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      return UserDetailsResponse.fromJson(json.decode(response.body));
+      return User.fromJson(json.decode(response.body));
     }
     else if (response.statusCode == 400)
       DoggoToast.of(context).showToast('Incorrect details format.');
@@ -61,7 +61,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               SizedBox(height: 8.0),
               Container(
-                child: FutureBuilder<UserDetailsResponse>(
+                child: FutureBuilder<User>(
                   future: userDetails,
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
@@ -89,7 +89,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               SizedBox(height: 8.0),
               Container(
-                child: FutureBuilder<UserDetailsResponse>(
+                child: FutureBuilder<User>(
                   future: userDetails,
                   // ignore: missing_return
                   builder: (context, snapshot) {
@@ -118,7 +118,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               SizedBox(height: 8.0),
               Container(
-                child: FutureBuilder<UserDetailsResponse>(
+                child: FutureBuilder<User>(
                   future: userDetails,
                   // ignore: missing_return
                   builder: (context, snapshot) {
@@ -147,7 +147,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               SizedBox(height: 8.0),
               Container(
-                child: FutureBuilder<UserDetailsResponse>(
+                child: FutureBuilder<User>(
                   future: userDetails,
                   builder: (context, snapshot) {
                     if (snapshot.hasData)
@@ -175,7 +175,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               SizedBox(height: 8.0),
               Container(
-                child: FutureBuilder<UserDetailsResponse>(
+                child: FutureBuilder<User>(
                   future: userDetails,
                   builder: (context, snapshot) {
                     if (snapshot.hasData)

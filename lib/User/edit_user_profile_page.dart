@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
-import 'package:doggo_frontend/User/http/user_details_response.dart';
+import 'package:doggo_frontend/User/http/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -251,7 +251,7 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
 }
 
 class EditUserDataPage extends StatefulWidget {
-  final UserDetailsResponse userData;
+  final User userData;
 
   const EditUserDataPage({Key key, this.userData}) : super(key: key);
 

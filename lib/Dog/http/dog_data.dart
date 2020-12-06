@@ -8,7 +8,7 @@ class Dog {
 
   Dog(
       {this.id,
-        this.name,
+      this.name,
       this.breed,
       this.color,
       this.description,
@@ -24,12 +24,20 @@ class Dog {
     );
   }
 
-  factory Dog.fromJsonInLocation(Map<String, dynamic> json){
+  factory Dog.fromJsonInLocation(Map<String, dynamic> json) {
     return Dog(
-      id: json['id'],
-      name: json['name'],
-      breed: json['breed'],
-      color: json['color']
-    );
+        id: json['id'],
+        name: json['name'],
+        breed: json['breed'],
+        color: json['color']);
+  }
+
+  factory Dog.fromFollowedBlockedJson(Map<String, dynamic> json) {
+    return Dog(
+        name: json['name'],
+        breed: json['breed'],
+        color: json['color'],
+        description: null,
+        vaccinationDate: null);
   }
 }

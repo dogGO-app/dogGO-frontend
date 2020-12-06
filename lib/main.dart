@@ -1,12 +1,14 @@
-import 'package:doggo_frontend/registration_page.dart';
-import 'package:doggo_frontend/registration_verify_page.dart';
-import 'package:doggo_frontend/user_home_screen.dart';
+import 'package:doggo_frontend/Authorization/registration_page.dart';
+import 'package:doggo_frontend/Authorization/registration_verify_page.dart';
+import 'package:doggo_frontend/FollowedBlocked/add_followed_blocked_page.dart';
+import 'package:doggo_frontend/FollowedBlocked/followed_blocked_list_page.dart';
+import 'package:doggo_frontend/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'Authorization/login_page.dart';
 import 'Dog/set_dog_data_page.dart';
 import 'User/set_user_data_page.dart';
-import 'login_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,10 +26,12 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => LoginPage(),
         '/register': (context) => RegistrationPage(),
-        '/userhomescreen': (context) => UserHomeScreen(),
+        '/homescreen': (context) => HomeScreen(),
         '/adduserdata': (context) => SetUserDataPage(),
         '/adddogdata': (context) => SetDogDataPage(),
         '/verify': (context) => RegistrationVerifyPage(),
+        '/followedblocked': (context) => FollowedBlockedListPage(),
+        '/addfollowedblocked': (context) => AddFollowedBlockedPage()
       },
     );
   }

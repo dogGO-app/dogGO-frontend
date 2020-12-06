@@ -1,55 +1,63 @@
+import 'dart:convert';
+
+import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart';
-import 'Custom/doggo_toast.dart';
-import 'OAuth2/oauth2_client.dart';
 
-class LoginPageState extends State<LoginPage> {
+import '../Custom/doggo_toast.dart';
+
+class RegistrationPageState extends State<RegistrationPage> {
   Client client;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final repeatPasswordController = TextEditingController();
 
-  final getUserUrl =
-      'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
+  final signUpUrl = 'https://doggo-service.herokuapp.com/api/auth/users/sign-up';
+
+  final authority = 'doggo-service.herokuapp.com';
+  final mailPath = '/api/auth/users/send-activation-mail';
+
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
   }
 
-  Future _getClient(String email, String password) async {
-    client ??= await OAuth2Client()
-        .getResourceOwnerPasswordGrant(email, password)
-        .catchError((e) {
-      if (e.description == 'Account disabled') {
-        Navigator.of(context)
-            .pushNamed('/verify', arguments: emailController.text);
-      } else if (e.description == 'Invalid user credentials') {
-        DoggoToast.of(context)
-            .showToast('There is no account with given email/password.');
-      }
+  Future addUser() async {
+    client ??= await OAuth2Client().getClientCredentialsGrant();
+    var body = jsonEncode({
+      'email': '${emailController.text}',
+      'password': '${passwordController.text}'
     });
-  }
 
-  Future loginUser() async {
-    await _getClient(emailController.text, passwordController.text);
-
-    if (client != null) _getUser();
-  }
-
-  Future _getUser() async {
-    final getUserResponse = await client.get(getUserUrl, headers: headers);
-
-    if (getUserResponse.statusCode == 200) {
-      Navigator.of(context).pushNamed('/userhomescreen');
-    } else if (getUserResponse.statusCode == 404) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/adduserdata', (Route<dynamic> route) => false);
+    final signUpResponse =
+        await client.post(signUpUrl, headers: headers, body: body);
+    if (signUpResponse.statusCode == 201) {
+      // _sendVerificationEmail();
+      DoggoToast.of(context).showToast('Registration completed. Welcome!');
+      Navigator.of(context).pop();
+    } else if (signUpResponse.statusCode == 400) {
+      DoggoToast.of(context).showToast('You have to provide a valid email!');
+    } else if (signUpResponse.statusCode == 409) {
+      DoggoToast.of(context)
+          .showToast('Account with given email already exists!');
     } else {
-      DoggoToast.of(context).showToast('Could not log in.');
-      throw Exception('Could not log in.\nCode: ${getUserResponse.statusCode}');
+      DoggoToast.of(context).showToast('Failed to create user.');
+      throw Exception(
+          'Failed to create user.\nCode: ${signUpResponse.statusCode}');
+    }
+  }
+
+  Future _sendVerificationEmail() async {
+    var mailQueryParameters = {'userEmail': '${emailController.text}'};
+    var mailUri = Uri.https(authority, mailPath, mailQueryParameters);
+
+    final mailResponse = await client.post(mailUri, headers: headers);
+    if (mailResponse.statusCode != 200) {
+      DoggoToast.of(context).showToast('Activation email could not be sent!');
+      throw Exception(
+          'Activation email could not be sent!\nCode: ${mailResponse.statusCode}');
     }
   }
 
@@ -57,7 +65,7 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login to DogGO'),
+        title: Text('Sign Up'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -65,7 +73,6 @@ class LoginPageState extends State<LoginPage> {
           margin: EdgeInsets.only(top: 30),
           child: Column(
             children: <Widget>[
-              doggoPicture,
               Padding(
                 padding: EdgeInsets.all(30),
                 child: Column(
@@ -108,6 +115,19 @@ class LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
+                          Divider(color: Colors.grey),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: TextField(
+                              controller: repeatPasswordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Repeat password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -117,8 +137,24 @@ class LoginPageState extends State<LoginPage> {
                     Container(
                       height: 50.0,
                       child: MaterialButton(
+                        // ignore: missing_return
                         onPressed: () {
-                          loginUser();
+                          if (emailController.text.isEmpty)
+                            DoggoToast.of(context)
+                                .showToast('Email field must be filled!');
+                          else if (passwordController.text.isEmpty ||
+                              repeatPasswordController.text.isEmpty)
+                            DoggoToast.of(context).showToast(
+                                'Both Password and Repeat password fields must be filled!');
+                          else if (passwordController.text.length < 8)
+                            DoggoToast.of(context).showToast(
+                                'Password must be at least 8 characters long!');
+                          else if (passwordController.text !=
+                              repeatPasswordController.text)
+                            DoggoToast.of(context)
+                                .showToast('Passwords must match!');
+                          else
+                            addUser();
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -139,7 +175,7 @@ class LoginPageState extends State<LoginPage> {
                                 maxWidth: 300.0, minHeight: 50.0),
                             alignment: Alignment.center,
                             child: Text(
-                              "Login",
+                              "Sign Up",
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white),
                             ),
@@ -150,55 +186,18 @@ class LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    InkWell(
-                      child: Text(
-                        'Or Sign Up',
-                        style: TextStyle(
-                            color: Colors.orangeAccent,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      onTap: () {
-                        Navigator.of(context).pushNamed('/register');
-                      },
-                    ),
                   ],
                 ),
-              ),
+              )
             ],
           ),
         ),
       ),
     );
   }
-
-  final doggoPicture = Container(
-    alignment: Alignment.center,
-    height: 200,
-    width: 200,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      border: Border.all(width: 1.5, color: Colors.orangeAccent),
-      boxShadow: [
-        BoxShadow(
-            color: Colors.orangeAccent, blurRadius: 20, offset: Offset(0, 10))
-      ],
-      image: DecorationImage(
-        fit: BoxFit.fill,
-        image: AssetImage('images/doggo.jpg'),
-      ),
-    ),
-  );
-
-  Future showAlertDialogWithMessage(String message) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(message));
-        });
-  }
 }
 
-class LoginPage extends StatefulWidget {
+class RegistrationPage extends StatefulWidget {
   @override
-  LoginPageState createState() => LoginPageState();
+  RegistrationPageState createState() => RegistrationPageState();
 }

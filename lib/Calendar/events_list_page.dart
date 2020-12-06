@@ -16,7 +16,8 @@ class EventListPage extends StatefulWidget {
 
 class _EventListPageState extends State<EventListPage> {
   Client client;
-  final url = 'https://doggo-service.herokuapp.com/api/dog-lover/user-calendar-events';
+  final url =
+      'https://doggo-service.herokuapp.com/api/dog-lover/user-calendar-events';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   Future<List<Event>> _events;
@@ -35,7 +36,6 @@ class _EventListPageState extends State<EventListPage> {
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
       List jsonResponse = jsonDecode(response.body);
-      print(jsonResponse);
       return jsonResponse.map((event) => Event.fromJson(event)).toList();
     } else {
       throw Exception('Failed to load events from API');
@@ -44,6 +44,8 @@ class _EventListPageState extends State<EventListPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Your calendar'),
@@ -136,12 +138,23 @@ class _EventListPageState extends State<EventListPage> {
             );
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.orangeAccent,
+              ),
+            );
           }
           return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.orangeAccent,
-            ),
-          );
+              child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30),
+            child: Text('You don\'t any events planned yet.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold,
+                    fontSize: screenHeight * 0.04)),
+          ));
         },
       ),
     );
