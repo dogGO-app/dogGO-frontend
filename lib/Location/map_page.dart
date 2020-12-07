@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:doggo_frontend/Location/add_location_bottom_sheet_widget.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
 import 'package:doggo_frontend/Location/people_in_location_page.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
+import 'package:doggo_frontend/User/http/user_data.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +14,20 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:oauth2/oauth2.dart';
+import 'package:doggo_frontend/Location/choose_dogs_dialog_widget.dart';
 
 const double _cameraZoom = 16;
+enum walk_status {
+  ONGOING,
+  ARRIVED_AT_DESTINATION,
+  LEFT_DESTINATION,
+  CANCELED
+}
 
 class _MapPageState extends State<MapPage> {
   Client client;
   final url = 'https://doggo-service.herokuapp.com/api/dog-lover/map-markers';
+  final walkUrl = 'https://doggo-service.herokuapp.com/api/dog-lover/walks';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   GoogleMapController mapController;
@@ -39,6 +48,10 @@ class _MapPageState extends State<MapPage> {
   Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
+  List<Dog> _selectedDogs;
+  String _walkId;
+  String _uid;
+  var _walkStatus;
 
   String googleApiKey = "AIzaSyAOEF4ZeRSes_MnWz1XCMu5tay_ob5KdUU";
 
@@ -47,6 +60,7 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
+    _fetchUserId();
     _location = new Location();
     _getLocation();
 
@@ -139,6 +153,20 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  Future _fetchUserId() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    String profileUrl =
+        'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
+    final response = await client.get(profileUrl, headers: headers);
+    if(response.statusCode == 200){
+      User currentUser = User.fromJsonWalkVersion(json.decode(response.body));
+      _uid = currentUser.id;
+    }
+    else {
+      DoggoToast.of(context).showToast('Couldn\'t fetch current user data');
+    }
+  }
+
   Future<void> _showMarkersOnMap() async {
     final locationMarkers = await _fetchLocationMarkers();
     locationMarkers.forEach((locationMarker) {
@@ -197,7 +225,13 @@ class _MapPageState extends State<MapPage> {
                               height: 20,
                             ),
                             MaterialButton(
-                              onPressed: () {
+                              onPressed: () async {
+                                _selectedDogs = await showDialog(
+                                    context: context,
+                                  builder: (context) {
+                                    return ChooseDogDialog();
+                                  });
+                                _startWalk();
                                 _navigationOn();
                                 _clearPolylines();
                                 _setPolylines(LatLng(locationMarker.latitude,
@@ -373,6 +407,77 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  Future _startWalk() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    var dogNames = [];
+    for (final el in _selectedDogs) {
+      dogNames.add(el.name);
+    }
+    var body = jsonEncode({
+      'id' : '$_uid',
+      'dogNames' : dogNames,
+      'mapMarker' : '$_currentLocationId',
+      'walkStatus' : 'ONGOING'
+    });
+    final response = await client.post(walkUrl, headers: headers, body: body);
+    switch (response.statusCode){
+      case 201:
+        {
+          var decodedJson = jsonDecode(response.body);
+          _walkId = decodedJson['id'];
+          _walkStatus = walk_status.ONGOING;
+          break;
+        }
+      case 404:
+        {
+          DoggoToast.of(context).
+          showToast('User, dog or map marker doesn\'t exist');
+          break;
+        }
+      case 409:
+        {
+          DoggoToast.of(context).showToast('You are already on a walk');
+          break;
+        }
+    }
+  }
+
+  Future _changeWalkStatus(walk_status currentStatus) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    String _currentWalkUrl = walkUrl + '/$_walkId';
+    _walkStatus = currentStatus;
+    String _status = currentStatus.toString();
+    String _trimStatus = _status.substring(
+      _status.indexOf('.') + 1
+    );
+    _currentWalkUrl += '?walkStatus=$_trimStatus';
+
+    final response = await client.put(_currentWalkUrl, headers: headers);
+    switch (response.statusCode){
+      case 200:
+        {
+          print('Change status response body:');
+          print(response.body);
+          break;
+        }
+      case 403:
+        {
+          DoggoToast.of(context).showToast('New walk status is forbidden');
+          break;
+        }
+      case 404:
+        {
+          DoggoToast.of(context).
+          showToast('User or walk doesn\'t exist');
+          break;
+        }
+      default:
+        {
+          print("ERROR: ${response.statusCode}");
+        }
+    }
+  }
+
   void _animateCameraToLocation(LatLng location) {
     mapController.animateCamera(CameraUpdate.newLatLng(location));
   }
@@ -402,6 +507,9 @@ class _MapPageState extends State<MapPage> {
     Timer(Duration(seconds: 3), () {
       _flushbarAtLocationAppeared = true;
     });
+    if(_walkStatus == walk_status.ONGOING){
+      _changeWalkStatus(walk_status.ARRIVED_AT_DESTINATION);
+    }
   }
 
   void _awayFromLocation() {
@@ -411,6 +519,9 @@ class _MapPageState extends State<MapPage> {
       _destination = null;
       _flushbarAtLocationAppeared = false;
       _leavingLocation = true;
+      if(_walkStatus == walk_status.ARRIVED_AT_DESTINATION){
+        _changeWalkStatus(walk_status.LEFT_DESTINATION);
+      }
       _callTimer();
     });
   }
@@ -473,6 +584,7 @@ class _MapPageState extends State<MapPage> {
                     ? MaterialButton(
                         onPressed: () {
                           _navigationOff();
+                          _changeWalkStatus(walk_status.CANCELED);
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
