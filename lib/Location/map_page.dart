@@ -456,8 +456,6 @@ class _MapPageState extends State<MapPage> {
     switch (response.statusCode){
       case 200:
         {
-          print('Change status response body:');
-          print(response.body);
           break;
         }
       case 403:
@@ -473,7 +471,7 @@ class _MapPageState extends State<MapPage> {
         }
       default:
         {
-          print("ERROR: ${response.statusCode}");
+          DoggoToast.of(context).showToast('ERROR: ${response.statusCode}');
         }
     }
   }
