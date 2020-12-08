@@ -47,7 +47,7 @@ class AddFollowedBlockedPageState extends State<AddFollowedBlockedPage> {
       case 409:
         {
           DoggoToast.of(context).showToast(
-              'Person with given nickname is already ${dropdownValue}ED.');
+              'This person is already in relation with you. Delete relation in Relations list.');
           break;
         }
       default:
