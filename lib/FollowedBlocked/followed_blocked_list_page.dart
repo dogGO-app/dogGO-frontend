@@ -70,7 +70,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
     }
   }
 
-  Row _createTypeDivider(DogLoverStatus type, double screenWidth) {
+  Row _createTypeDivider(RelationStatus type, double screenWidth) {
     return Row(children: <Widget>[
       Expanded(
         child: new Container(
@@ -81,7 +81,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
               height: 52,
             )),
       ),
-      type == DogLoverStatus.FOLLOWED
+      type == RelationStatus.FOLLOWED
           ? Text('FOLLOWED',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
           : Text('BLOCKED',
@@ -175,14 +175,14 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
 
   bool _isFollowedSection(List<DogLover> followedBlocked, int userIndex) {
     return userIndex == 0 &&
-        followedBlocked[userIndex].status == DogLoverStatus.FOLLOWED;
+        followedBlocked[userIndex].status == RelationStatus.FOLLOWED;
   }
 
   bool _isBlockedSection(List<DogLover> followedBlocked, int userIndex) {
     return userIndex == 0 &&
-            followedBlocked[userIndex].status == DogLoverStatus.BLOCKED ||
-        (followedBlocked[userIndex - 1].status == DogLoverStatus.FOLLOWED &&
-            followedBlocked[userIndex].status == DogLoverStatus.BLOCKED);
+            followedBlocked[userIndex].status == RelationStatus.BLOCKED ||
+        (followedBlocked[userIndex - 1].status == RelationStatus.FOLLOWED &&
+            followedBlocked[userIndex].status == RelationStatus.BLOCKED);
   }
 
   @override
@@ -224,7 +224,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
                       return Column(
                         children: [
                           _createTypeDivider(
-                              DogLoverStatus.FOLLOWED, screenWidth),
+                              RelationStatus.FOLLOWED, screenWidth),
                           _createFollowedBlockedCard(followedBlocked, userIndex,
                               screenHeight, screenWidth)
                         ],
@@ -233,7 +233,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
                       return Column(
                         children: [
                           _createTypeDivider(
-                              DogLoverStatus.BLOCKED, screenWidth),
+                              RelationStatus.BLOCKED, screenWidth),
                           _createFollowedBlockedCard(followedBlocked, userIndex,
                               screenHeight, screenWidth)
                         ],

@@ -4,7 +4,7 @@ import 'package:doggo_frontend/User/http/user_data.dart';
 class DogLover {
   final User user;
   final List<Dog> dogs;
-  final DogLoverStatus status;
+  final RelationStatus status;
 
   DogLover({this.user, this.dogs, this.status});
 
@@ -20,9 +20,9 @@ class DogLover {
         user: User.fromFollowedBlockedJson(json),
         dogs: (json['receiverDogLoverDogs'] as List).map((e) => Dog.fromFollowedBlockedJson(e)).toList(),
         status: json['relationshipStatus'] == 'FOLLOWS'
-            ? DogLoverStatus.FOLLOWED
-            : DogLoverStatus.BLOCKED);
+            ? RelationStatus.FOLLOWED
+            : RelationStatus.BLOCKED);
   }
 }
 
-enum DogLoverStatus { FOLLOWED, BLOCKED }
+enum RelationStatus { FOLLOWED, BLOCKED }
