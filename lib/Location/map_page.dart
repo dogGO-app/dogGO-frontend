@@ -552,8 +552,6 @@ class _MapPageState extends State<MapPage> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.orangeAccent,
-        title: Text('Map'),
-        centerTitle: true,
       ),
       body: _isLoading
           ? Center(

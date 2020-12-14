@@ -93,8 +93,6 @@ class _AddEventPageState extends State<AddEventPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('Add Event To Your Calendar'),
-          centerTitle: true,
           backgroundColor: Colors.orangeAccent),
       body: SingleChildScrollView(
         child: Container(

@@ -65,7 +65,7 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Your Details'),
+        backgroundColor: Colors.orangeAccent,
       ),
       body: SingleChildScrollView(
         child: Container(

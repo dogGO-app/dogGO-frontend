@@ -48,8 +48,6 @@ class _EventListPageState extends State<EventListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your calendar'),
-        centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),
       floatingActionButton: FloatingActionButton(

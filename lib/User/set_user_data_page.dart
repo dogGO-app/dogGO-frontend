@@ -61,7 +61,7 @@ class SetUserDataState extends State<SetUserDataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Set Your Details'),
+        backgroundColor: Colors.orangeAccent,
       ),
       body: SingleChildScrollView(
         child: Container(

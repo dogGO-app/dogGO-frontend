@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:doggo_frontend/Ads/ad_manager.dart';
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oauth2/oauth2.dart';
@@ -19,8 +21,39 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
   final descriptionController = TextEditingController();
   final vaccinationDateController = TextEditingController();
 
+  InterstitialAd _interstitialAd;
+  bool _isInterstitialAdReady;
+
+  void _loadInterstitialAd() {
+    _interstitialAd.load();
+  }
+
+  void _onInterstitialAdEvent(MobileAdEvent event) {
+    switch (event) {
+      case MobileAdEvent.loaded:
+        _isInterstitialAdReady = true;
+        break;
+      case MobileAdEvent.failedToLoad:
+        _isInterstitialAdReady = false;
+        print('Failed to load an interstitial ad');
+        break;
+      case MobileAdEvent.closed:
+        Navigator.of(context).pop();
+        break;
+      default:
+      // do nothing
+    }
+  }
+
   @override
   void initState() {
+    _isInterstitialAdReady = false;
+    _interstitialAd = InterstitialAd(
+      adUnitId: AdManager.interstitialAdUnitId,
+      listener: _onInterstitialAdEvent,
+    );
+    _loadInterstitialAd();
+
     super.initState();
   }
 
@@ -31,6 +64,9 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
     colorController.dispose();
     descriptionController.dispose();
     vaccinationDateController.dispose();
+
+    _interstitialAd?.dispose();
+
     super.dispose();
   }
 
@@ -50,14 +86,20 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
       bool hasDogs =
           jsonResponse.map((dog) => Dog.fromJson(dog)).toList().isNotEmpty;
 
-      final postResponse =
-          await client.post(url, body: body, headers: headers);
+      final postResponse = await client.post(url, body: body, headers: headers);
       if (postResponse.statusCode == 201) {
-        if (hasDogs)
+        if (hasDogs) {
+          if (_isInterstitialAdReady) {
+            _interstitialAd.show();
+          }
           Navigator.of(context).pop();
-        else
+        } else {
+          if (_isInterstitialAdReady) {
+            _interstitialAd.show();
+          }
           Navigator.of(context).pushNamedAndRemoveUntil(
               '/homescreen', (Route<dynamic> route) => false);
+        }
       } else {
         DoggoToast.of(context).showToast('Could not set dog data!');
         throw Exception('Could not set dog data');
@@ -72,7 +114,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Set Dog\'s Details'),
+        backgroundColor: Colors.orangeAccent,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -169,7 +211,8 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                       child: MaterialButton(
                         onPressed: () {
                           if (vaccinationDateController.text == "") {
-                            DoggoToast.of(context).showToast('Last vaccination date has to be filled!');
+                            DoggoToast.of(context).showToast(
+                                'Last vaccination date has to be filled!');
                             throw Exception(
                                 'Last vaccination date has to be filled!');
                           } else

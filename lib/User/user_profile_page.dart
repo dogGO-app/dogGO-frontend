@@ -42,8 +42,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.orangeAccent,
-        title: Text('Your dogGO Profile'),
-        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Padding(

@@ -86,8 +86,6 @@ class _EditEventPageState extends State<EditEventPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('Edit Event In Your Calendar'),
-          centerTitle: true,
           backgroundColor: Colors.orangeAccent),
       body: SingleChildScrollView(
         child: Container(

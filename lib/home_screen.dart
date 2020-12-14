@@ -4,8 +4,10 @@ import 'package:doggo_frontend/Custom/material_bottom_navigation_scaffold.dart';
 import 'package:doggo_frontend/Dog/dogs_list_page.dart';
 import 'package:doggo_frontend/FollowedBlocked/followed_blocked_list_page.dart';
 import 'package:doggo_frontend/User/user_profile_page.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 
+import 'Ads/ad_manager.dart';
 import 'Calendar/events_list_page.dart';
 import 'Location/map_page.dart';
 
@@ -16,6 +18,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentlySelectedIndex = 0;
+
+  BannerAd _bannerAd;
 
   final List<AppFlow> appFlows = [
     AppFlow(
@@ -49,6 +53,34 @@ class _HomeScreenState extends State<HomeScreen> {
       navigatorKey: GlobalKey<NavigatorState>(),
     )
   ];
+
+  void _initAdMob() async {
+    await FirebaseAdMob.instance.initialize(appId: AdManager.appId);
+  }
+
+  void _loadBannerAd() {
+    _bannerAd
+      ..load()
+      ..show(anchorType: AnchorType.top);
+  }
+
+  @override
+  void initState() {
+    _bannerAd = BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.banner,
+    );
+
+    _loadBannerAd();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

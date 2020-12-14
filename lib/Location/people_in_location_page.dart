@@ -216,8 +216,7 @@ class _PeopleAndDogsInLocationPageState
               onPressed: () => Navigator.pop(context, _usersLiked),
             ),
             backgroundColor: Colors.orangeAccent,
-            centerTitle: true,
-            title: Text('People in current location')),
+        ),
         body: FutureBuilder<List<UserAndDogsInLocation>>(
             future: _usersanddogs,
             builder: (context, snapshot) {

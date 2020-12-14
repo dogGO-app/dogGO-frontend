@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "751556897826",
+    "project_id": "still-entity-274521",
+    "storage_bucket": "still-entity-274521.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751556897826:android:74e2092ad40cc444422e7b",
+        "android_client_info": {
+          "package_name": "com.example.doggo_frontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "751556897826-p467ro6naivo8m8tjq5r0g8kbcap0fou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbmtmjIrww-HVSk2AikrKiUn_4th8wQWg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "751556897826-p467ro6naivo8m8tjq5r0g8kbcap0fou.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "751556897826-2vrh8de43nfk2qiqb5n96gekquv0sibl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.doggoFrontend"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

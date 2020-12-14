@@ -40,8 +40,6 @@ class _DogsListPageState extends State<DogsListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your dogs'),
-        centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),
       floatingActionButton: FloatingActionButton(

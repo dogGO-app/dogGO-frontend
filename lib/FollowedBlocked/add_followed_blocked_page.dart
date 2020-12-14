@@ -65,8 +65,6 @@ class AddFollowedBlockedPageState extends State<AddFollowedBlockedPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Follow or Block'),
-        centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),
       body: SingleChildScrollView(

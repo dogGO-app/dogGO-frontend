@@ -192,8 +192,6 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('Followed and Blocked'),
-          centerTitle: true,
           backgroundColor: Colors.orangeAccent,
         ),
         floatingActionButton: FloatingActionButton(
