@@ -60,10 +60,10 @@ class _RecommendedLocationsDialogState
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return SimpleDialog(
+    return AlertDialog(
       title: Text('Recommended Locations For You:'),
-      children: [
-        FutureBuilder<List<RecommendedLocation>>(
+      content: SingleChildScrollView(
+        child: FutureBuilder<List<RecommendedLocation>>(
             future: _recommendedLocations,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -77,42 +77,43 @@ class _RecommendedLocationsDialogState
                           shrinkWrap: true,
                           itemCount: locations.length,
                           itemBuilder: (context, index) {
-                            return ExpansionTile(
-                              leading: Icon(
-                                Icons.location_pin,
-                                color: Colors.orangeAccent,
-                              ),
-                              title: Text(
-                                "${locations[index].marker.name}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500, fontSize: 17),
-                              ),
-                              subtitle: Text("${locations[index].marker.description}"),
+                            return Column(
                               children: [
+                                ListTile(
+                                  leading: Icon(
+                                    Icons.location_pin,
+                                    color: Colors.orangeAccent,
+                                  ),
+                                  title: Text(
+                                    locations[index].marker.name,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  subtitle: Text(
+                                      locations[index].marker.description),),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Text(
-                                        "Rating: ${locations[index].rating}"
+                                        'Distance'
+                                    ),
+                                    FlatButton(
+                                      onPressed: (){},
+                                      color: Colors.orangeAccent,
+                                      child: Text(
+                                        'Navigate',
+                                        style: TextStyle(
+
+                                        ),
                                       ),
-                                    Text(
-                                      "Distance: ${locations[index].marker.distanceInMeters}m"
-                                    )
+                                    ),
                                   ],
                                 ),
-                                FlatButton.icon(
-                                  onPressed: (){
-                                  },
-                                  icon: Icon(
-                                    Icons.navigation,
-                                    color: Colors.white,
-                                  ),
-                                  color: Colors.orangeAccent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0)
-                                  ),
-                                  textColor: Colors.white,
-                                  label: Text('Navigate'),
+                                ExpansionTile(
+                                  title: Text("PEOPLE IN LOCATION"),
+                                  children: [
+                                    Text("haha")
+                                  ],
                                 )
                               ],
                             );
@@ -145,7 +146,7 @@ class _RecommendedLocationsDialogState
                 ),
               );
             }),
-      ],
+      ),
     );
   }
 }
