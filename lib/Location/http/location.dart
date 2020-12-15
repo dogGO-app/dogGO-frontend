@@ -12,14 +12,13 @@ class LocationMarker {
     @required this.id,
     @required this.name,
     this.description,
+    this.distanceInMeters,
     @required this.latitude,
     @required this.longitude,
-    this.distanceInMeters,
   })  : assert(id != null),
         assert(name != null),
         assert(latitude != null),
-        assert(longitude != null),
-        assert(distanceInMeters != null);
+        assert(longitude != null);
 
   factory LocationMarker.fromJson(Map<String, dynamic> json) {
     return LocationMarker(
@@ -28,6 +27,7 @@ class LocationMarker {
       description: json['description'],
       latitude: json['latitude'],
       longitude: json['longitude'],
+      distanceInMeters: 0
     );
   }
 

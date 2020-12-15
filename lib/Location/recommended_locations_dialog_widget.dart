@@ -4,6 +4,7 @@ import 'package:doggo_frontend/Location/http/recomended_location_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
+import 'package:flutter/services.dart';
 import 'package:oauth2/oauth2.dart';
 
 class RecommendedLocationsDialog extends StatefulWidget {
@@ -33,26 +34,32 @@ class _RecommendedLocationsDialogState
   }
 
   Future<List<RecommendedLocation>> _fetchRecommendedLocations() async {
-    client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    final authority = 'doggo-service.herokuapp.com';
-    final path = '/api/dog-lover/location-recommendations';
-    final queryParameters = {
-      'dogLoverLongitude': '${widget.long}',
-      'dogLoverLatitude': '${widget.lat}'
-    };
-
-    final url = Uri.https(authority, path, queryParameters);
-    final response = await client.get(url, headers: headers);
-    if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(response.body);
-      print("RESPONSE:\n");
-      print(jsonResponse);
-      return jsonResponse
+    var jsonData = await rootBundle.loadString('recommended.json');
+    List jsonResponse = jsonDecode(jsonData);
+    return jsonResponse
           .map((recLocation) => RecommendedLocation.fromJson(recLocation))
           .toList();
-    } else {
-      DoggoToast.of(context).showToast('ERROR: ${response.statusCode}');
-    }
+
+    // client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    // final authority = 'doggo-service.herokuapp.com';
+    // final path = '/api/dog-lover/location-recommendations';
+    // final queryParameters = {
+    //   'dogLoverLongitude': '${widget.long}',
+    //   'dogLoverLatitude': '${widget.lat}'
+    // };
+    //
+    // final url = Uri.https(authority, path, queryParameters);
+    // final response = await client.get(url, headers: headers);
+    // if (response.statusCode == 200) {
+    //   List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+    //   print("RESPONSE:\n");
+    //   print(jsonResponse);
+    //   return jsonResponse
+    //       .map((recLocation) => RecommendedLocation.fromJson(recLocation))
+    //       .toList();
+    // } else {
+    //   DoggoToast.of(context).showToast('ERROR: ${response.statusCode}');
+    // }
   }
 
   @override
@@ -61,7 +68,7 @@ class _RecommendedLocationsDialogState
     double screenHeight = MediaQuery.of(context).size.height;
 
     return SimpleDialog(
-      title: Text("Uga buga", style: TextStyle(fontSize: 16)),
+      title: Text("Recommended Locations", style: TextStyle(fontSize: 18)),
       children: [
         SingleChildScrollView(
           child: FutureBuilder<List<RecommendedLocation>>(
@@ -94,29 +101,91 @@ class _RecommendedLocationsDialogState
                                     subtitle: Text(
                                         locations[index].marker.description),),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       Text(
-                                          'Distance'
+                                          'Distance: ${locations[index].marker.distanceInMeters}m'
                                       ),
                                       FlatButton(
                                         onPressed: (){},
                                         color: Colors.orangeAccent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0)
+                                        ),
                                         child: Text(
                                           'Navigate',
                                           style: TextStyle(
-
+                                            color: Colors.white,
+                                            fontSize: 14
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
                                   ExpansionTile(
-                                    title: Text("PEOPLE IN LOCATION"),
+                                    title: Text(
+                                      "\tPeople In ${locations[index].marker.name}",
+                                    ),
                                     children: [
-                                      Text("hahaksdmfksdmfkdmfksmdkfsmddddddssssssmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: locations[index].usersanddogs.length,
+                                        itemBuilder: (context, index2) {
+                                          return ExpansionTile(
+                                            leading: Icon(
+                                              Icons.account_circle,
+                                              color: Colors.orangeAccent,
+                                            ),
+                                            title: Text(
+                                              locations[index].usersanddogs[index2].nickname,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 15
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              locations[index].usersanddogs[index2].name,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14
+                                              ),
+                                            ),
+                                            children: [
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: locations[index].usersanddogs[index2].dogs.length,
+                                                itemBuilder: (context, index3) {
+                                                  return ListTile(
+                                                    contentPadding: EdgeInsets.symmetric(
+                                                      vertical: screenHeight*0.005,
+                                                      horizontal: screenWidth*0.17
+                                                    ),
+                                                    leading: Icon(
+                                                      Icons.pets,
+                                                      color: Colors.orangeAccent,
+                                                    ),
+                                                    title: Text(
+                                                        locations[index].usersanddogs[index2].dogs[index3].name,
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.w300,
+                                                            fontSize: 14
+                                                        ),
+                                                    ),
+                                                    subtitle: Text(
+                                                        locations[index].usersanddogs[index2].dogs[index3].breed,
+                                                    ),
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          );
+                                        },
+                                      )
                                     ],
-                                  )
+                                  ),
+                                  Divider(
+                                    color: Colors.orange,
+                                  ),
                                 ],
                               );
                             }),
