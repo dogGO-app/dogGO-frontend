@@ -60,93 +60,96 @@ class _RecommendedLocationsDialogState
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return AlertDialog(
-      title: Text('Recommended Locations For You:'),
-      content: SingleChildScrollView(
-        child: FutureBuilder<List<RecommendedLocation>>(
-            future: _recommendedLocations,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List<RecommendedLocation> locations = snapshot.data;
-                return Container(
-                  width: double.maxFinite,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: locations.length,
-                          itemBuilder: (context, index) {
-                            return Column(
-                              children: [
-                                ListTile(
-                                  leading: Icon(
-                                    Icons.location_pin,
-                                    color: Colors.orangeAccent,
-                                  ),
-                                  title: Text(
-                                    locations[index].marker.name,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  subtitle: Text(
-                                      locations[index].marker.description),),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text(
-                                        'Distance'
-                                    ),
-                                    FlatButton(
-                                      onPressed: (){},
+    return SimpleDialog(
+      title: Text("Uga buga", style: TextStyle(fontSize: 16)),
+      children: [
+        SingleChildScrollView(
+          child: FutureBuilder<List<RecommendedLocation>>(
+              future: _recommendedLocations,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<RecommendedLocation> locations = snapshot.data;
+                  return Container(
+                    width: double.maxFinite,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: locations.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.location_pin,
                                       color: Colors.orangeAccent,
-                                      child: Text(
-                                        'Navigate',
-                                        style: TextStyle(
+                                    ),
+                                    title: Text(
+                                      locations[index].marker.name,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    subtitle: Text(
+                                        locations[index].marker.description),),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                          'Distance'
+                                      ),
+                                      FlatButton(
+                                        onPressed: (){},
+                                        color: Colors.orangeAccent,
+                                        child: Text(
+                                          'Navigate',
+                                          style: TextStyle(
 
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                ExpansionTile(
-                                  title: Text("PEOPLE IN LOCATION"),
-                                  children: [
-                                    Text("haha")
-                                  ],
-                                )
-                              ],
-                            );
-                          }),
-                    ],
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.hasError}");
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                                    ],
+                                  ),
+                                  ExpansionTile(
+                                    title: Text("PEOPLE IN LOCATION"),
+                                    children: [
+                                      Text("hahaksdmfksdmfkdmfksmdkfsmddddddssssssmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+                                    ],
+                                  )
+                                ],
+                              );
+                            }),
+                      ],
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.hasError}");
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.orangeAccent,
+                    ),
+                  );
+                }
                 return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.orangeAccent,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.1,
+                        vertical: screenHeight * 0.1),
+                    child: Text(
+                      "Failed to load recommended locations.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
                   ),
                 );
-              }
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.1,
-                      vertical: screenHeight * 0.1),
-                  child: Text(
-                    "Failed to load recommended locations.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ),
-                ),
-              );
-            }),
-      ),
+              }),
+        ),
+      ],
     );
   }
 }
