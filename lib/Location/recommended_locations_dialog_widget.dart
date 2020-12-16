@@ -158,7 +158,7 @@ class _RecommendedLocationsDialogState
                                                   return ListTile(
                                                     contentPadding: EdgeInsets.symmetric(
                                                       vertical: screenHeight*0.005,
-                                                      horizontal: screenWidth*0.17
+                                                      horizontal: screenWidth*0.15
                                                     ),
                                                     leading: Icon(
                                                       Icons.pets,
@@ -167,12 +167,28 @@ class _RecommendedLocationsDialogState
                                                     title: Text(
                                                         locations[index].usersanddogs[index2].dogs[index3].name,
                                                         style: TextStyle(
-                                                            fontWeight: FontWeight.w300,
+                                                            fontWeight: FontWeight.w400,
                                                             fontSize: 14
                                                         ),
                                                     ),
-                                                    subtitle: Text(
-                                                        locations[index].usersanddogs[index2].dogs[index3].breed,
+                                                    subtitle: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          locations[index].usersanddogs[index2].dogs[index3].breed,
+                                                          style: TextStyle(
+                                                              fontWeight: FontWeight.w300,
+                                                              fontSize: 13
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          locations[index].usersanddogs[index2].dogs[index3].color,
+                                                          style: TextStyle(
+                                                              fontWeight: FontWeight.w300,
+                                                              fontSize: 12
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   );
                                                 },
