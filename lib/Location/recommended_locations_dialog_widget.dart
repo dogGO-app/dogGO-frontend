@@ -4,7 +4,6 @@ import 'package:doggo_frontend/Location/http/recomended_location_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
-import 'package:flutter/services.dart';
 import 'package:oauth2/oauth2.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
 
@@ -39,32 +38,24 @@ class _RecommendedLocationsDialogState
   }
 
   Future<List<RecommendedLocation>> _fetchRecommendedLocations() async {
-    var jsonData = await rootBundle.loadString('recommended.json');
-    List jsonResponse = jsonDecode(jsonData);
-    return jsonResponse
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final authority = 'doggo-service.herokuapp.com';
+    final path = '/api/dog-lover/location-recommendations';
+    final queryParameters = {
+      'dogLoverLongitude': '${widget.long}',
+      'dogLoverLatitude': '${widget.lat}'
+    };
+
+    final url = Uri.https(authority, path, queryParameters);
+    final response = await client.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+      return jsonResponse
           .map((recLocation) => RecommendedLocation.fromJson(recLocation))
           .toList();
-
-    // client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    // final authority = 'doggo-service.herokuapp.com';
-    // final path = '/api/dog-lover/location-recommendations';
-    // final queryParameters = {
-    //   'dogLoverLongitude': '${widget.long}',
-    //   'dogLoverLatitude': '${widget.lat}'
-    // };
-    //
-    // final url = Uri.https(authority, path, queryParameters);
-    // final response = await client.get(url, headers: headers);
-    // if (response.statusCode == 200) {
-    //   List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
-    //   print("RESPONSE:\n");
-    //   print(jsonResponse);
-    //   return jsonResponse
-    //       .map((recLocation) => RecommendedLocation.fromJson(recLocation))
-    //       .toList();
-    // } else {
-    //   DoggoToast.of(context).showToast('ERROR: ${response.statusCode}');
-    // }
+    } else {
+      DoggoToast.of(context).showToast('ERROR: ${response.statusCode}');
+    }
   }
 
   @override
