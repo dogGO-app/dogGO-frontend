@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/services.dart';
 import 'package:oauth2/oauth2.dart';
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
+
+import 'choose_dogs_dialog_widget.dart';
 
 class RecommendedLocationsDialog extends StatefulWidget {
   final double long;
@@ -24,6 +27,8 @@ class _RecommendedLocationsDialogState
   Client client;
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
   Future<List<RecommendedLocation>> _recommendedLocations;
+  List<Dog> _selectedDogs;
+  List<dynamic> _markerAndDogs = [];
 
   @override
   void initState() {
@@ -107,7 +112,16 @@ class _RecommendedLocationsDialogState
                                           'Distance: ${locations[index].marker.distanceInMeters}m'
                                       ),
                                       FlatButton(
-                                        onPressed: (){},
+                                        onPressed: () async {
+                                          _selectedDogs = await showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return ChooseDogDialog();
+                                              });
+                                          _markerAndDogs.add(locations[index].marker);
+                                          _markerAndDogs.add(_selectedDogs);
+                                          Navigator.of(context).pop(_markerAndDogs);
+                                        },
                                         color: Colors.orangeAccent,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(8.0)
@@ -178,7 +192,7 @@ class _RecommendedLocationsDialogState
                                                           locations[index].usersanddogs[index2].dogs[index3].breed,
                                                           style: TextStyle(
                                                               fontWeight: FontWeight.w300,
-                                                              fontSize: 13
+                                                              fontSize: 12
                                                           ),
                                                         ),
                                                         Text(

@@ -47,6 +47,7 @@ class _MapPageState extends State<MapPage> {
   List<LatLng> _polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
   List<Dog> _selectedDogs;
+  List<dynamic> _recommended;
   String _walkId;
   String _uid;
   var _walkStatus;
@@ -593,9 +594,9 @@ class _MapPageState extends State<MapPage> {
                             vertical: screenHeight * 0.01),
                         child: FloatingActionButton(
                             backgroundColor: Colors.orangeAccent,
-                            child: Icon(Icons.map),
-                            onPressed: () {
-                              showDialog(
+                            child: Icon(Icons.location_pin),
+                            onPressed: () async {
+                              _recommended = await showDialog(
                                   context: context,
                                   builder: (context) {
                                     return RecommendedLocationsDialog(
@@ -603,6 +604,16 @@ class _MapPageState extends State<MapPage> {
                                       lat: _currentLocation.latitude,
                                     );
                                   });
+                              _currentLocationId = _recommended[0].id;
+                              _currentLocationName = _recommended[0].name;
+                              _selectedDogs = _recommended[1];
+                              _startWalk();
+                              _navigationOn();
+                              _clearPolylines();
+                              _setPolylines(LatLng(
+                                _recommended[0].latitude,
+                                _recommended[0].longitude
+                              ));
                             }),
                       )
                     : Container(),
