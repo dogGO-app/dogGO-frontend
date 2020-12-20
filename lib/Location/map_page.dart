@@ -16,7 +16,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:oauth2/oauth2.dart';
-
+import 'package:doggo_frontend/Location/recommended_locations_dialog_widget.dart';
 import 'fdto/UserLiked.dart';
 import 'http/useranddogs.dart';
 
@@ -47,6 +47,7 @@ class _MapPageState extends State<MapPage> {
   List<LatLng> _polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
   List<Dog> _selectedDogs;
+  List<dynamic> _recommended;
   String _walkId;
   String _uid;
   var _walkStatus;
@@ -585,6 +586,37 @@ class _MapPageState extends State<MapPage> {
                     );
                   },
                 ),
+                !_isNavigating
+                    ? Container(
+                        alignment: Alignment.topLeft,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.01,
+                            vertical: screenHeight * 0.01),
+                        child: FloatingActionButton(
+                            backgroundColor: Colors.orangeAccent,
+                            child: Icon(Icons.location_pin),
+                            onPressed: () async {
+                              _recommended = await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return RecommendedLocationsDialog(
+                                      long: _currentLocation.longitude,
+                                      lat: _currentLocation.latitude,
+                                    );
+                                  });
+                              _currentLocationId = _recommended[0].id;
+                              _currentLocationName = _recommended[0].name;
+                              _selectedDogs = _recommended[1];
+                              _startWalk();
+                              _navigationOn();
+                              _clearPolylines();
+                              _setPolylines(LatLng(
+                                _recommended[0].latitude,
+                                _recommended[0].longitude
+                              ));
+                            }),
+                      )
+                    : Container(),
                 _isNavigating && !_nearLocation
                     ? MaterialButton(
                         onPressed: () {
