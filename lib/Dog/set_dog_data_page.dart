@@ -46,7 +46,7 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
 
     final getResponse = await client.get(url, headers: headers);
     if (getResponse.statusCode == 200) {
-      List jsonResponse = jsonDecode(getResponse.body);
+      List jsonResponse = jsonDecode(utf8.decode(getResponse.bodyBytes));
       bool hasDogs =
           jsonResponse.map((dog) => Dog.fromJson(dog)).toList().isNotEmpty;
 

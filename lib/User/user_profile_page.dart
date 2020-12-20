@@ -25,7 +25,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
+      return User.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     else if (response.statusCode == 400)
       DoggoToast.of(context).showToast('Incorrect details format.');

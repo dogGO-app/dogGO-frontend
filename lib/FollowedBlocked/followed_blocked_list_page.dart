@@ -29,7 +29,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonList = jsonDecode(response.body);
+      List jsonList = jsonDecode(utf8.decode(response.bodyBytes));
       List<DogLover> followedBlocked =
           jsonList.map((e) => DogLover.fromFollowedBlockedJson(e)).toList();
       followedBlocked.sort((a, b) => a.status.index.compareTo(b.status.index));

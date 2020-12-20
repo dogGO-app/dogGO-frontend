@@ -40,7 +40,7 @@ class _AddEventPageState extends State<AddEventPage> {
     final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs';
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(response.body);
+      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
       var temp = jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
       setState(() {
         _dogs = temp;

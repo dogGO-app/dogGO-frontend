@@ -28,7 +28,7 @@ class _DogsListPageState extends State<DogsListPage> {
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(response.body);
+      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));;
       return jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
     } else {
       DoggoToast.of(context).showToast('Failed to load dogs.');

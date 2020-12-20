@@ -50,7 +50,7 @@ class _EditEventPageState extends State<EditEventPage> {
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(response.body);
+      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
       var temp = jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
       setState(() {
         _dogs = temp;
