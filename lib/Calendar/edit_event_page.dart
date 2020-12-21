@@ -27,8 +27,8 @@ class _EditEventPageState extends State<EditEventPage> {
   void initState() {
     if (widget.eventData != null) {
       dateController.text =
-          DateFormat('yyyy-MM-dd').format(widget.eventData.eventDate);
-      timeController.text = widget.eventData.eventTime.parse();
+          DateFormat('yyyy-MM-dd').format(widget.eventData.eventDateTime);
+      timeController.text = TimeOfDay.fromDateTime(widget.eventData.eventDateTime).toString();
       descriptionController.text = widget.eventData.description;
       selectedDog = widget.eventData.dogName;
     }
