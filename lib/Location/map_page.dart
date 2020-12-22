@@ -96,7 +96,7 @@ class _MapPageState extends State<MapPage> {
       }
     });
 
-    _walkTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+    _walkTimer = Timer.periodic(Duration(minutes: 30), (timer) {
       if ((_walkStatus == WalkStatus.ONGOING || _walkStatus == WalkStatus.ARRIVED_AT_DESTINATION) && _walkId != null) {
         _refreshWalk();
       }
