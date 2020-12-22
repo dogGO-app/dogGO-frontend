@@ -27,8 +27,8 @@ class _EditEventPageState extends State<EditEventPage> {
   void initState() {
     if (widget.eventData != null) {
       dateController.text =
-          DateFormat('yyyy-MM-dd').format(widget.eventData.eventDate);
-      timeController.text = widget.eventData.eventTime.parse();
+          DateFormat('yyyy-MM-dd').format(widget.eventData.eventDateTime);
+      timeController.text = TimeOfDay.fromDateTime(widget.eventData.eventDateTime).toString();
       descriptionController.text = widget.eventData.description;
       selectedDog = widget.eventData.dogName;
     }
@@ -50,7 +50,7 @@ class _EditEventPageState extends State<EditEventPage> {
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(response.body);
+      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
       var temp = jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
       setState(() {
         _dogs = temp;

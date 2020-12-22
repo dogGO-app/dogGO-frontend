@@ -158,7 +158,7 @@ class _MapPageState extends State<MapPage> {
         'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
     final response = await client.get(profileUrl, headers: headers);
     if (response.statusCode == 200) {
-      User currentUser = User.fromJsonWalkVersion(json.decode(response.body));
+      User currentUser = User.fromJsonWalkVersion(jsonDecode(utf8.decode((response.bodyBytes))));
       _uid = currentUser.id;
     } else {
       DoggoToast.of(context).showToast('Couldn\'t fetch current user data');
@@ -421,7 +421,7 @@ class _MapPageState extends State<MapPage> {
     switch (response.statusCode) {
       case 201:
         {
-          var decodedJson = jsonDecode(response.body);
+          var decodedJson = jsonDecode(utf8.decode(response.bodyBytes));;
           _walkId = decodedJson['id'];
           _walkStatus = WalkStatus.ONGOING;
           _usersLiked = [];
