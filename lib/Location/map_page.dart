@@ -53,6 +53,8 @@ class _MapPageState extends State<MapPage> {
   var _walkStatus;
   List<UserLiked> _usersLiked = [];
 
+  Timer _walkTimer;
+
   String googleApiKey = "AIzaSyAOEF4ZeRSes_MnWz1XCMu5tay_ob5KdUU";
 
   final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
@@ -91,6 +93,12 @@ class _MapPageState extends State<MapPage> {
           _clearPolylines();
           _setPolylines(_destination);
         }
+      }
+    });
+
+    _walkTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      if ((_walkStatus == WalkStatus.ONGOING || _walkStatus == WalkStatus.ARRIVED_AT_DESTINATION) && _walkId != null) {
+        _refreshWalk();
       }
     });
   }
@@ -492,6 +500,8 @@ class _MapPageState extends State<MapPage> {
   void _navigationOff() {
     _isNavigating = false;
     _destination = null;
+    _walkId = null;
+    _changeWalkStatus(WalkStatus.CANCELED);
     _clearPolylines();
   }
 
@@ -514,6 +524,7 @@ class _MapPageState extends State<MapPage> {
       _flushbarAtLocationAppeared = false;
       _leavingLocation = true;
       _usersLiked = [];
+      _walkId = null;
       if (_walkStatus == WalkStatus.ARRIVED_AT_DESTINATION) {
         _changeWalkStatus(WalkStatus.LEFT_DESTINATION);
       }
@@ -527,6 +538,22 @@ class _MapPageState extends State<MapPage> {
         _leavingLocation = false;
       });
     });
+  }
+
+  void _refreshWalk() async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/walks/active';
+
+    final response = await client.put(url, headers: headers);
+    switch (response.statusCode) {
+      case 200: {
+        break;
+      }
+      case 404: {
+        DoggoToast.of(context).showToast('Active walk not found.');
+        break;
+      }
+    }
   }
 
   void _navigateAndSetUsersLiked(BuildContext context) async {
@@ -621,7 +648,6 @@ class _MapPageState extends State<MapPage> {
                     ? MaterialButton(
                         onPressed: () {
                           _navigationOff();
-                          _changeWalkStatus(WalkStatus.CANCELED);
                         },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
