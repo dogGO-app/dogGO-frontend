@@ -17,15 +17,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<User> _userDetails;
 
-  AppState state;
   File _image;
-  File _tempImage;
   final picker = ImagePicker();
 
   @override
   void initState() {
     _userDetails = fetchUserDetails();
-    state = AppState.free;
     super.initState();
   }
 
@@ -50,7 +47,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        state = AppState.picked;
       } else {
         print('No image selected.');
       }
@@ -63,7 +59,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        state = AppState.picked;
       } else {
         print('No image selected.');
       }
@@ -102,19 +97,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
           title: 'Cropper',
         ));
     if (croppedFile != null) {
-      _image = croppedFile;
       setState(() {
-        state = AppState.cropped;
+        _image = croppedFile;
       });
     }
-  }
-
-  void _clearImage() {
-    _tempImage = _image;
-    _image = null;
-    setState(() {
-      state = AppState.free;
-    });
   }
 
   void _showPicker(context) {
@@ -174,14 +160,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          if (state == AppState.cropped) {
-                            _clearImage();
-                          }
                           _showPicker(context);
-                          if (_image == null) {
-                            _image = _tempImage;
-                            _tempImage = null;
-                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.only(bottom: screenHeight * 0.02),
@@ -399,7 +378,7 @@ class UserProfilePage extends StatefulWidget {
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-enum AppState {
+enum ImageState {
   free,
   picked,
   cropped,
