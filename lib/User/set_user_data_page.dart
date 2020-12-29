@@ -13,12 +13,7 @@ class SetUserDataState extends State<SetUserDataPage> {
 
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
-  final hobbyController = TextEditingController();
   final nicknameController = TextEditingController();
-
-  String dropdownValue;
-  List<String> dropdownMenuItems =
-      List<String>.generate(99, (i) => (i + 1).toString());
 
   @override
   void initState() {
@@ -29,7 +24,6 @@ class SetUserDataState extends State<SetUserDataPage> {
   void dispose() {
     firstNameController.dispose();
     lastNameController.dispose();
-    hobbyController.dispose();
     nicknameController.dispose();
     super.dispose();
   }
@@ -39,8 +33,8 @@ class SetUserDataState extends State<SetUserDataPage> {
     final body = jsonEncode({
       'firstName': '${firstNameController.text}',
       'lastName': '${lastNameController.text}',
-      'age': '$dropdownValue',
-      'hobby': '${hobbyController.text}',
+      'age': null,
+      'hobby': null,
       'nickname': '${nicknameController.text}'
     });
 
@@ -105,45 +99,6 @@ class SetUserDataState extends State<SetUserDataPage> {
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Last name",
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          Divider(color: Colors.grey),
-                          Container(
-                              padding: EdgeInsets.all(8),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton(
-                                  value: dropdownValue,
-                                  icon: Icon(Icons.arrow_downward),
-                                  iconSize: 16,
-                                  isExpanded: true,
-                                  hint: Text("Age"),
-                                  style: TextStyle(color: Colors.orangeAccent),
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      dropdownValue = newValue;
-                                    });
-                                  },
-                                  items: dropdownMenuItems.map((String value) {
-                                    return DropdownMenuItem(
-                                      value: value,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(left: 4),
-                                        child: Text(value),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              )),
-                          Divider(color: Colors.grey),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            child: TextField(
-                              controller: hobbyController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Hobby",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
