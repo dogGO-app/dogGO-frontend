@@ -8,6 +8,7 @@ import 'package:doggo_frontend/Location/add_location_bottom_sheet_widget.dart';
 import 'package:doggo_frontend/Location/choose_dogs_dialog_widget.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
 import 'package:doggo_frontend/Location/people_in_location_page.dart';
+import 'package:doggo_frontend/Location/walk_history_page.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:doggo_frontend/User/http/user_data.dart';
 import 'package:flushbar/flushbar.dart';
@@ -576,6 +577,14 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  void _navigateToWalkHistory(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WalkHistoryPage()
+      )
+    );
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -647,6 +656,20 @@ class _MapPageState extends State<MapPage> {
                       },
                     );
                   },
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth*0.01,
+                    vertical: screenHeight*0.11
+                  ),
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.orangeAccent,
+                    child: Icon(Icons.directions_walk),
+                    onPressed: () {
+                      _navigateToWalkHistory(context);
+                    },
+                  ),
                 ),
                 !_isNavigating
                     ? Container(
