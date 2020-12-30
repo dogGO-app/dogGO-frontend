@@ -76,7 +76,7 @@ class _PeopleAndDogsInLocationPageState
         'https://doggo-service.herokuapp.com/api/dog-lover/walks/dog-lovers-in-location/$markerId';
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));;
+      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
       return jsonResponse
           .map((useranddogs) => UserAndDogsInLocation.fromJson(useranddogs))
           .toList();
