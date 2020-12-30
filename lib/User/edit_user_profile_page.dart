@@ -11,12 +11,8 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
   final url = 'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
-  String dropdownValue;
-  var dropdownMenuItems = List<String>.generate(99, (i) => (i + 1).toString());
-
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
-  final hobbyController = TextEditingController();
   final nicknameController = TextEditingController();
 
   @override
@@ -24,8 +20,6 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
     if (widget.userData != null) {
       firstNameController.text = widget.userData.firstName;
       lastNameController.text = widget.userData.lastName;
-      dropdownValue = widget.userData.age.toString();
-      hobbyController.text = widget.userData.hobby;
       nicknameController.text = widget.userData.nickname;
     }
     super.initState();
@@ -35,7 +29,6 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
   void dispose() {
     firstNameController.dispose();
     lastNameController.dispose();
-    hobbyController.dispose();
     super.dispose();
   }
 
@@ -44,8 +37,8 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
     final body = jsonEncode({
       'firstName': '${firstNameController.text}',
       'lastName': '${lastNameController.text}',
-      'age': '$dropdownValue',
-      'hobby': '${hobbyController.text}',
+      'age': null,
+      'hobby': null,
       'nickname': '${nicknameController.text}'
     });
 
@@ -109,45 +102,6 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Last name",
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          Divider(color: Colors.grey),
-                          Container(
-                              padding: EdgeInsets.all(8),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton(
-                                  value: dropdownValue,
-                                  icon: Icon(Icons.arrow_downward),
-                                  iconSize: 16,
-                                  isExpanded: true,
-                                  hint: Text("Age"),
-                                  style: TextStyle(color: Colors.orangeAccent),
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      dropdownValue = newValue;
-                                    });
-                                  },
-                                  items: dropdownMenuItems.map((String value) {
-                                    return DropdownMenuItem(
-                                      value: value,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(left: 4),
-                                        child: Text(value),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              )),
-                          Divider(color: Colors.grey),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            child: TextField(
-                              controller: hobbyController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Hobby",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
@@ -233,17 +187,6 @@ class _EditUserDataPageState extends State<EditUserDataPage> {
       decoration: InputDecoration(
         border: InputBorder.none,
         hintText: "Last name",
-        hintStyle: TextStyle(color: Colors.grey),
-      ),
-    ),
-  );
-
-  final hobbyTextField = Container(
-    padding: EdgeInsets.all(8),
-    child: TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: "Hobby",
         hintStyle: TextStyle(color: Colors.grey),
       ),
     ),

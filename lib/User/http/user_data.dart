@@ -5,13 +5,16 @@ class User {
   final int age;
   final String hobby;
   final String nickname;
+  final int likes;
 
-  User({this.id,
-        this.firstName,
-        this.lastName,
-        this.age,
-        this.hobby,
-        this.nickname});
+  User(
+      {this.id,
+      this.firstName,
+      this.lastName,
+      this.age,
+      this.hobby,
+      this.nickname,
+      this.likes});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -19,7 +22,8 @@ class User {
         lastName: json['lastName'],
         age: json['age'],
         hobby: json['hobby'],
-        nickname: json['nickname']);
+        nickname: json['nickname'],
+        likes: json['likesCount']);
   }
 
   factory User.fromFollowedBlockedJson(Map<String, dynamic> json) {
@@ -29,17 +33,18 @@ class User {
         lastName: null,
         age: null,
         hobby: null,
-        nickname: json['receiverDogLoverNickname']);
+        nickname: json['receiverDogLoverNickname'],
+        likes: null);
   }
 
-  factory User.fromJsonWalkVersion(Map<String, dynamic> json){
+  factory User.fromJsonWalkVersion(Map<String, dynamic> json) {
     return User(
         id: json['id'],
         firstName: null,
         lastName: null,
         age: null,
         hobby: null,
-        nickname: null
-    );
+        nickname: null,
+        likes: null);
   }
 }
