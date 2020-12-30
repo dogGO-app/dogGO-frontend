@@ -53,6 +53,7 @@ class _MapPageState extends State<MapPage> {
   var _walkStatus;
   List<UserLiked> _usersLiked = [];
 
+  Timer _markersTimer;
   Timer _walkTimer;
 
   String googleApiKey = "AIzaSyAOEF4ZeRSes_MnWz1XCMu5tay_ob5KdUU";
@@ -94,6 +95,10 @@ class _MapPageState extends State<MapPage> {
           _setPolylines(_destination);
         }
       }
+    });
+
+    _markersTimer = Timer.periodic(Duration(minutes: 2), (timer) {
+      _showMarkersOnMap();
     });
 
     _walkTimer = Timer.periodic(Duration(minutes: 30), (timer) {
