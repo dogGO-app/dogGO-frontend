@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -128,7 +127,6 @@ class _WalkHistoryPageState extends State<WalkHistoryPage> {
             ),
           );
         },
-
       ),
     );
   }
