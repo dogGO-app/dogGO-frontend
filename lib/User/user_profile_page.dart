@@ -168,15 +168,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         child: Padding(
                           padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                           child: CircleAvatar(
-                            radius: 55,
+                            radius: screenHeight * 0.1,
                             backgroundColor: Colors.grey[200],
                             child: _image != null
                                 ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
+                                    borderRadius: BorderRadius.circular(screenHeight * 0.9),
                                     child: Image.file(
                                       _image,
-                                      width: 100,
-                                      height: 100,
+                                      width: screenHeight * 0.18,
+                                      height: screenHeight * 0.18,
                                       fit: BoxFit.fitHeight,
                                     ),
                                   )
@@ -274,7 +274,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      vertical: screenHeight * 0.03,
+                                      vertical: screenHeight * 0.02,
                                       horizontal: screenWidth * 0.02),
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
@@ -332,7 +332,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 15.0),
               Center(
                 child: MaterialButton(
                   onPressed: () async {
@@ -342,7 +341,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.all(0.0),
                   child: Ink(
                     decoration: BoxDecoration(
                         gradient: LinearGradient(
