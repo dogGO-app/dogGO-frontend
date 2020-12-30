@@ -54,7 +54,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future _getImageFromGallery() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile =
+        await picker.getImage(source: ImageSource.gallery, imageQuality: 90);
 
     setState(() {
       if (pickedFile != null) {
@@ -67,6 +68,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<Null> _cropImage() async {
     File croppedFile = await ImageCropper.cropImage(
+        maxWidth: 500,
+        maxHeight: 500,
         cropStyle: CropStyle.circle,
         sourcePath: _image.path,
         aspectRatioPresets: Platform.isAndroid
@@ -165,15 +168,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         child: Padding(
                           padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                           child: CircleAvatar(
-                            radius: 55,
+                            radius: screenHeight * 0.1,
                             backgroundColor: Colors.grey[200],
                             child: _image != null
                                 ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
+                                    borderRadius: BorderRadius.circular(screenHeight * 0.9),
                                     child: Image.file(
                                       _image,
-                                      width: 100,
-                                      height: 100,
+                                      width: screenHeight * 0.18,
+                                      height: screenHeight * 0.18,
                                       fit: BoxFit.fitHeight,
                                     ),
                                   )
@@ -181,9 +184,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     decoration: BoxDecoration(
                                         color: Colors.grey[200],
                                         borderRadius:
-                                            BorderRadius.circular(50)),
-                                    width: 100,
-                                    height: 100,
+                                            BorderRadius.circular(screenHeight * 0.9)),
+                                    width: screenHeight * 0.18,
+                                    height: screenHeight * 0.18,
                                     child: Icon(
                                       Icons.camera_alt,
                                       color: Colors.grey[800],
@@ -271,9 +274,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                    vertical: screenHeight * 0.03,
-                                    horizontal: screenWidth * 0.02
-                                  ),
+                                      vertical: screenHeight * 0.02,
+                                      horizontal: screenWidth * 0.02),
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
                                         vertical: screenHeight * 0.02),
@@ -286,8 +288,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                           color: Colors.grey.withOpacity(0.5),
                                           spreadRadius: 5,
                                           blurRadius: 7,
-                                          offset: Offset(
-                                              0, 3), // changes position of shadow
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
                                         ),
                                       ],
                                     ),
@@ -330,7 +332,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 15.0),
               Center(
                 child: MaterialButton(
                   onPressed: () async {
@@ -340,7 +341,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.all(0.0),
                   child: Ink(
                     decoration: BoxDecoration(
                         gradient: LinearGradient(

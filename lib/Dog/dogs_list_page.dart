@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Dog/edit_dog_data_page.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:doggo_frontend/Dog/set_dog_data_page.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:oauth2/oauth2.dart';
 
@@ -14,6 +17,9 @@ class _DogsListPageState extends State<DogsListPage> {
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
 
   Future<List<Dog>> _dogs;
+
+  File _image;
+  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -61,6 +67,100 @@ class _DogsListPageState extends State<DogsListPage> {
           break;
         }
     }
+  }
+
+  Future _getImageFromCamera() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future _getImageFromGallery() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future<Null> _cropImage() async {
+    File croppedFile = await ImageCropper.cropImage(
+        maxWidth: 500,
+        maxHeight: 500,
+        cropStyle: CropStyle.circle,
+        sourcePath: _image.path,
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio16x9
+              ]
+            : [
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio5x3,
+                CropAspectRatioPreset.ratio5x4,
+                CropAspectRatioPreset.ratio7x5,
+                CropAspectRatioPreset.ratio16x9
+              ],
+        androidUiSettings: AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        iosUiSettings: IOSUiSettings(
+          title: 'Cropper',
+        ));
+    if (croppedFile != null) {
+      setState(() {
+        _image = croppedFile;
+      });
+    }
+  }
+
+  void _showPicker(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: Wrap(
+                children: <Widget>[
+                  ListTile(
+                      leading: Icon(Icons.photo_library),
+                      title: Text('Photo Library'),
+                      onTap: () {
+                        _getImageFromGallery().whenComplete(() => _cropImage());
+                        Navigator.of(context).pop();
+                      }),
+                  new ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text('Camera'),
+                    onTap: () {
+                      _getImageFromCamera().whenComplete(() => _cropImage());
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   @override
@@ -132,59 +232,95 @@ class _DogsListPageState extends State<DogsListPage> {
                     dogs.removeAt(index);
                   },
                   child: Card(
-                    child: ListTile(
-                      title: Text(
-                        dogs[index].name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(screenWidth * 0.02),
+                          child: GestureDetector(
+                            onTap: () {
+                              _showPicker(context);
+                            },
+                            child: CircleAvatar(
+                              radius: screenHeight * 0.07,
+                              backgroundColor: Colors.grey[200],
+                              child: _image != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(55),
+                                      child: Image.file(
+                                        _image,
+                                        width: screenHeight * 0.13,
+                                        height: screenHeight * 0.13,
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    )
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius:
+                                              BorderRadius.circular(55)),
+                                      width: screenHeight * 0.13,
+                                      height: screenHeight * 0.13,
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                            ),
+                          ),
                         ),
-                      ),
-                      subtitle: Column(
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Breed: ${dogs[index].breed}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Color: ${dogs[index].color}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child:
-                                Text("Description: ${dogs[index].description}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"),
-                          )
-                        ],
-                      ),
-                      leading: Icon(
-                        Icons.pets,
-                        color: Colors.orangeAccent,
-                      ),
-                      trailing: IconButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(
-                                builder: (context) => EditDogDataPage(
-                                  dogData: dogs[index],
+                        Flexible(
+                          child: ListTile(
+                            title: Text(
+                              dogs[index].name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                              ),
+                            ),
+                            subtitle: Column(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text("Breed: ${dogs[index].breed}"),
                                 ),
-                              ))
-                              .whenComplete(() => {
-                                    setState(() {
-                                      _dogs = _fetchDogs();
-                                    })
-                                  });
-                        },
-                        icon: Icon(
-                          Icons.edit,
-                          color: Colors.grey,
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text("Color: ${dogs[index].color}"),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                      "Description: ${dogs[index].description}"),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                      "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"),
+                                )
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                                  builder: (context) => EditDogDataPage(
+                                    dogData: dogs[index],
+                                  ),
+                                ))
+                                .whenComplete(() => {
+                                      setState(() {
+                                        _dogs = _fetchDogs();
+                                      })
+                                    });
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                     elevation: 5,
                   ),
