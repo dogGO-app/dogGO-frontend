@@ -54,7 +54,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future _getImageFromGallery() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile =
+        await picker.getImage(source: ImageSource.gallery, imageQuality: 90);
 
     setState(() {
       if (pickedFile != null) {
@@ -67,6 +68,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<Null> _cropImage() async {
     File croppedFile = await ImageCropper.cropImage(
+        maxWidth: 500,
+        maxHeight: 500,
         cropStyle: CropStyle.circle,
         sourcePath: _image.path,
         aspectRatioPresets: Platform.isAndroid
@@ -271,9 +274,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                    vertical: screenHeight * 0.03,
-                                    horizontal: screenWidth * 0.02
-                                  ),
+                                      vertical: screenHeight * 0.03,
+                                      horizontal: screenWidth * 0.02),
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
                                         vertical: screenHeight * 0.02),
@@ -286,8 +288,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                           color: Colors.grey.withOpacity(0.5),
                                           spreadRadius: 5,
                                           blurRadius: 7,
-                                          offset: Offset(
-                                              0, 3), // changes position of shadow
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
                                         ),
                                       ],
                                     ),
