@@ -50,7 +50,7 @@ class _WalkHistoryPageState extends State<WalkHistoryPage> {
         ),
         backgroundColor: Colors.orangeAccent,
         centerTitle: true,
-        title: Text('Walk History'),
+        title: Text('Walks History'),
       ),
       body: FutureBuilder<List<Walk>>(
         future: _walks,
