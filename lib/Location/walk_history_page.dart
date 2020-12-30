@@ -75,7 +75,7 @@ class _WalkHistoryPageState extends State<WalkHistoryPage> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Marker description: " + walksHistory[index].marker.description,
+                            "Location description: " + walksHistory[index].marker.description,
                             style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 14,
