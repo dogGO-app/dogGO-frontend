@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/Dog/http/dog_data.dart';
@@ -12,6 +13,7 @@ import 'package:doggo_frontend/User/http/user_data.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -52,6 +54,7 @@ class _MapPageState extends State<MapPage> {
   String _uid;
   var _walkStatus;
   List<UserLiked> _usersLiked = [];
+  ByteData _customMapMarkerByteData;
 
   Timer _markersTimer;
   Timer _walkTimer;
@@ -63,6 +66,7 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
+    _setCustomMapMarkerByteData();
     _fetchUserId();
     _location = new Location();
     _getLocation();
@@ -100,7 +104,6 @@ class _MapPageState extends State<MapPage> {
     _markersTimer = Timer.periodic(Duration(minutes: 2), (timer) {
       _showMarkersOnMap();
     });
-
     _walkTimer = Timer.periodic(Duration(minutes: 30), (timer) {
       if ((_walkStatus == WalkStatus.ONGOING || _walkStatus == WalkStatus.ARRIVED_AT_DESTINATION) && _walkId != null) {
         _refreshWalk();
@@ -182,6 +185,7 @@ class _MapPageState extends State<MapPage> {
     final locationMarkers = await _fetchLocationMarkers();
     locationMarkers.forEach((locationMarker) {
       final marker = Marker(
+        icon: BitmapDescriptor.fromBytes(_customMapMarkerByteData.buffer.asUint8List()),
         markerId: MarkerId(locationMarker.id),
         position: LatLng(locationMarker.latitude, locationMarker.longitude),
         onTap: () {
@@ -574,6 +578,32 @@ class _MapPageState extends State<MapPage> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  void _setCustomMapMarkerByteData() async {
+    final iconData = Icons.pets;
+    final pictureRecorder = PictureRecorder();
+    final canvas = Canvas(pictureRecorder);
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    final iconStr = String.fromCharCode(iconData.codePoint);
+
+    textPainter.text = TextSpan(
+        text: iconStr,
+        style: TextStyle(
+          letterSpacing: 0.0,
+          fontSize: 64.0,
+          fontFamily: iconData.fontFamily,
+          color: Colors.orangeAccent,
+        )
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, Offset(0.0, 0.0));
+
+    final picture = pictureRecorder.endRecording();
+    final image = await picture.toImage(64, 64);
+    final bytes = await image.toByteData(format: ImageByteFormat.png);
+
+    _customMapMarkerByteData = bytes;
   }
 
   @override
