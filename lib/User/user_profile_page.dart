@@ -184,9 +184,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     decoration: BoxDecoration(
                                         color: Colors.grey[200],
                                         borderRadius:
-                                            BorderRadius.circular(50)),
-                                    width: 100,
-                                    height: 100,
+                                            BorderRadius.circular(screenHeight * 0.9)),
+                                    width: screenHeight * 0.18,
+                                    height: screenHeight * 0.18,
                                     child: Icon(
                                       Icons.camera_alt,
                                       color: Colors.grey[800],
