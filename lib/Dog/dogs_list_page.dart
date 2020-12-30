@@ -34,11 +34,38 @@ class _DogsListPageState extends State<DogsListPage> {
 
     final response = await client.get(url, headers: headers);
     if (response.statusCode == 200) {
-      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));;
+      List jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+      ;
       return jsonResponse.map((dog) => Dog.fromJson(dog)).toList();
     } else {
       DoggoToast.of(context).showToast('Failed to load dogs.');
       throw Exception('Failed to load dogs from API');
+    }
+  }
+
+  Future _removeDog(String name) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs/$name';
+
+    final response = await client.delete(url, headers: headers);
+    switch (response.statusCode) {
+      case 204:
+        {
+          setState(() {
+            _dogs = _fetchDogs();
+          });
+          break;
+        }
+      case 404:
+        {
+          DoggoToast.of(context).showToast('Dog doesn\'t exist.');
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context).showToast('Couldn\'t remove dog.');
+          break;
+        }
     }
   }
 
@@ -172,8 +199,38 @@ class _DogsListPageState extends State<DogsListPage> {
             return ListView.builder(
               itemCount: dogs.length,
               itemBuilder: (context, index) {
-                return Card(
-                  child: Row(
+                return Dismissible(
+                  background: Stack(
+                    children: [
+                      Container(color: Colors.redAccent),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: EdgeInsets.only(right: screenWidth * 0.05),
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  direction: DismissDirection.endToStart,
+                  key: ValueKey(dogs[index]),
+                  confirmDismiss: (direction) async {
+                    if (dogs.length > 1) {
+                      return true;
+                    }
+                    DoggoToast.of(context)
+                        .showToast('You can\'t remove Your only dog.');
+                    return false;
+                  },
+                  onDismissed: (direction) {
+                    _removeDog(dogs[index].name);
+                    dogs.removeAt(index);
+                  },
+                  child: Card(
+                    child: Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(screenWidth * 0.02),
@@ -241,8 +298,8 @@ class _DogsListPageState extends State<DogsListPage> {
                             ],
                           ),
                         ),
-                      ),
-                      IconButton(
+                        ),
+                        IconButton(
                         onPressed: () {
                           Navigator.of(context)
                               .push(MaterialPageRoute(
@@ -258,12 +315,13 @@ class _DogsListPageState extends State<DogsListPage> {
                         },
                         icon: Icon(
                           Icons.edit,
-                          color: Colors.orangeAccent,
+                          color: Colors.grey,
                         ),
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
+                    elevation: 5,
                   ),
-                  elevation: 5,
                 );
               },
             );
