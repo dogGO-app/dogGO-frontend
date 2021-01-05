@@ -97,9 +97,9 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
                               controller: nameController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Name",
-                                hintStyle: TextStyle(color: Colors.grey),
                               ),
+                              enabled: false,
+                              style: TextStyle(color: Colors.grey),
                             ),
                           ),
                           Divider(color: Colors.grey),
