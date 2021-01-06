@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:doggo_frontend/Calendar/add_event_page.dart';
 import 'package:doggo_frontend/Calendar/edit_event_page.dart';
 import 'package:doggo_frontend/Calendar/http/event_data.dart';
-import 'package:doggo_frontend/Custom/extensions.dart';
 import 'package:doggo_frontend/OAuth2/oauth2_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +37,12 @@ class _EventListPageState extends State<EventListPage> {
       _events = _fetchEvents();
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   Future<List<List<Event>>> _fetchEvents() async {
@@ -95,7 +100,7 @@ class _EventListPageState extends State<EventListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your calendar'),
+        title: Text('Your Calendar'),
         centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),

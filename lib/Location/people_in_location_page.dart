@@ -217,7 +217,7 @@ class _PeopleAndDogsInLocationPageState
             ),
             backgroundColor: Colors.orangeAccent,
             centerTitle: true,
-            title: Text('People in current location')),
+            title: Text('People In Current Location')),
         body: FutureBuilder<List<UserAndDogsInLocation>>(
             future: _usersanddogs,
             builder: (context, snapshot) {

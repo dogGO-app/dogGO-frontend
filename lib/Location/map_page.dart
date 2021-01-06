@@ -112,6 +112,13 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  @override
+  void dispose() {
+    _walkTimer.cancel();
+    _markersTimer.cancel();
+    super.dispose();
+  }
+
   void _getLocation() async {
     setState(() {
       _isLoading = true;
