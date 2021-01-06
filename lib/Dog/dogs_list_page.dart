@@ -10,11 +10,14 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:oauth2/oauth2.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class _DogsListPageState extends State<DogsListPage> {
   Client client;
   final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs';
   final headers = {'Content-Type': 'application/json', 'Accept': '*/*'};
+  Directory _dogAvatarsDirectory;
 
   Future<List<Dog>> _dogs;
 
@@ -23,10 +26,19 @@ class _DogsListPageState extends State<DogsListPage> {
 
   @override
   void initState() {
+    _initDocumentsDirectory();
     setState(() {
       _dogs = _fetchDogs();
     });
     super.initState();
+  }
+
+  void _initDocumentsDirectory() async {
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    _dogAvatarsDirectory = Directory('${documentsDirectory.path}/dog_avatars');
+    if (!_dogAvatarsDirectory.existsSync()) {
+      _dogAvatarsDirectory = await _dogAvatarsDirectory.create(recursive: true);
+    }
   }
 
   Future<List<Dog>> _fetchDogs() async {
@@ -42,9 +54,9 @@ class _DogsListPageState extends State<DogsListPage> {
     }
   }
 
-  Future _removeDog(String name) async {
+  Future _removeDog(String id) async {
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs/$name';
+    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/dogs/$id';
 
     final response = await client.delete(url, headers: headers);
     switch (response.statusCode) {
@@ -68,11 +80,106 @@ class _DogsListPageState extends State<DogsListPage> {
     }
   }
 
+  void _sendAvatar(String id) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/dogs/$id/avatar';
+    final uri = Uri.parse(url);
+
+    final request = http.MultipartRequest('PUT', uri)
+      ..headers.addAll(headers)
+      ..files.add(await http.MultipartFile.fromPath(
+          'avatar', '${_dogAvatarsDirectory.path}/$id.jpg'));
+
+    final response = await client.send(request);
+    switch (response.statusCode) {
+      case 200:
+        {
+          break;
+        }
+      case 400:
+        {
+          DoggoToast.of(context)
+              .showToast('Avatar image is not a correct image.');
+          break;
+        }
+      case 404:
+        {
+          DoggoToast.of(context).showToast('Dog not found.');
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context).showToast('Couldn\'t send dog avatar.');
+          break;
+        }
+    }
+  }
+
+  void _fetchAvatar(String id) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/dogs/$id/avatar';
+
+    final response = await client.get(url, headers: headers);
+    switch (response.statusCode) {
+      case 200:
+        {
+          File('${_dogAvatarsDirectory.path}/$id.jpg')
+              .writeAsBytesSync(response.bodyBytes);
+          setState(() {
+            imageCache.clear();
+            imageCache.clearLiveImages();
+            _image = File('${_dogAvatarsDirectory.path}/$id.jpg');
+          });
+          break;
+        }
+      case 404:
+        {
+          DoggoToast.of(context).showToast('Dog or dog\'s avatar not found.');
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context).showToast('Couldn\'t load dog avatar.');
+          break;
+        }
+    }
+  }
+
+  void _saveAvatar(String id) async {
+    File newImage = await _image.copy('${_dogAvatarsDirectory.path}/$id.jpg');
+    setState(() {
+      imageCache.clear();
+      imageCache.clearLiveImages();
+      // _image = newImage;
+    });
+    _sendAvatar(id);
+  }
+
+  void _setAvatar(String id, String avatarChecksum) {
+    if (avatarChecksum != null) {
+      _image = File('${_dogAvatarsDirectory.path}/$id.jpg');
+      if (!_image.existsSync()) {
+        _fetchAvatar(id);
+      }
+    }
+  }
+
+  void _removeDogAvatar(String id) {
+    File file = File('${_dogAvatarsDirectory.path}/$id.jpg');
+    if (file.existsSync()) {
+      file.delete();
+    }
+  }
+
   Future _getImageFromCamera() async {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
 
     setState(() {
       if (pickedFile != null) {
+        imageCache.clear();
+        imageCache.clearLiveImages();
         _image = File(pickedFile.path);
       } else {
         print('No image selected.');
@@ -85,6 +192,8 @@ class _DogsListPageState extends State<DogsListPage> {
 
     setState(() {
       if (pickedFile != null) {
+        imageCache.clear();
+        imageCache.clearLiveImages();
         _image = File(pickedFile.path);
       } else {
         print('No image selected.');
@@ -132,7 +241,7 @@ class _DogsListPageState extends State<DogsListPage> {
     }
   }
 
-  void _showPicker(context) {
+  void _showPicker(context, String id) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
@@ -144,14 +253,16 @@ class _DogsListPageState extends State<DogsListPage> {
                       leading: Icon(Icons.photo_library),
                       title: Text('Photo Library'),
                       onTap: () {
-                        _getImageFromGallery().whenComplete(() => _cropImage());
+                        _getImageFromGallery().whenComplete(() =>
+                            _cropImage().whenComplete(() => _saveAvatar(id)));
                         Navigator.of(context).pop();
                       }),
                   new ListTile(
                     leading: Icon(Icons.photo_camera),
                     title: Text('Camera'),
                     onTap: () {
-                      _getImageFromCamera().whenComplete(() => _cropImage());
+                      _getImageFromCamera().whenComplete(() =>
+                          _cropImage().whenComplete(() => _saveAvatar(id)));
                       Navigator.of(context).pop();
                     },
                   ),
@@ -197,6 +308,8 @@ class _DogsListPageState extends State<DogsListPage> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<Dog> dogs = snapshot.data;
+            dogs.sort((a, b) => a.name.compareTo(b.name));
+            dogs.forEach((element) => _setAvatar(element.id, element.avatarChecksum));
             return ListView.builder(
               itemCount: dogs.length,
               itemBuilder: (context, index) {
@@ -227,7 +340,8 @@ class _DogsListPageState extends State<DogsListPage> {
                     return false;
                   },
                   onDismissed: (direction) {
-                    _removeDog(dogs[index].name);
+                    _removeDog(dogs[index].id);
+                    _removeDogAvatar(dogs[index].id);
                     dogs.removeAt(index);
                   },
                   child: Card(
@@ -237,33 +351,40 @@ class _DogsListPageState extends State<DogsListPage> {
                           padding: EdgeInsets.all(screenWidth * 0.02),
                           child: GestureDetector(
                             onTap: () {
-                              _showPicker(context);
+                              _showPicker(context, dogs[index].id);
                             },
                             child: CircleAvatar(
                               radius: screenHeight * 0.07,
                               backgroundColor: Colors.grey[200],
-                              child: _image != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(55),
-                                      child: Image.file(
-                                        _image,
-                                        width: screenHeight * 0.13,
-                                        height: screenHeight * 0.13,
-                                        fit: BoxFit.fitHeight,
-                                      ),
-                                    )
-                                  : Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey[200],
+                              child:
+                                  File('${_dogAvatarsDirectory.path}/${dogs[index].id}.jpg')
+                                          .existsSync()
+                                      ? ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(55)),
-                                      width: screenHeight * 0.13,
-                                      height: screenHeight * 0.13,
-                                      child: Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.grey[800],
-                                      ),
-                                    ),
+                                              BorderRadius.circular(55),
+                                          child: Image.file(
+                                            File(
+                                                '${_dogAvatarsDirectory.path}/${dogs[index].id}.jpg'),
+                                            key: ValueKey(File(
+                                                    '${_dogAvatarsDirectory.path}/${dogs[index].id}.jpg')
+                                                .lengthSync()),
+                                            width: screenHeight * 0.13,
+                                            height: screenHeight * 0.13,
+                                            fit: BoxFit.fitHeight,
+                                          ),
+                                        )
+                                      : Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(55)),
+                                          width: screenHeight * 0.13,
+                                          height: screenHeight * 0.13,
+                                          child: Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.grey[800],
+                                          ),
+                                        ),
                             ),
                           ),
                         ),
