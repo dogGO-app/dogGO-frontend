@@ -170,7 +170,7 @@ class _DogsListPageState extends State<DogsListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your dogs'),
+        title: Text('Your Dogs'),
         centerTitle: true,
         backgroundColor: Colors.orangeAccent,
       ),
