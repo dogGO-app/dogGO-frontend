@@ -10,6 +10,7 @@ class UserAndDogsInLocation {
   RelationStatus relationStatus;
   WalkStatus walkStatus;
   int likesCount;
+  String avatarChecksum;
 
   UserAndDogsInLocation(
       {this.userId,
@@ -18,7 +19,8 @@ class UserAndDogsInLocation {
       this.dogs,
       this.relationStatus,
       this.walkStatus,
-      this.likesCount});
+      this.likesCount,
+      this.avatarChecksum});
 
   factory UserAndDogsInLocation.fromJson(Map<String, dynamic> json) {
     var doggoslist = json['dogs'] as List;
@@ -35,7 +37,8 @@ class UserAndDogsInLocation {
             : RelationStatus.BLOCKED,
         walkStatus: WalkStatus.values
             .firstWhere((element) => describeEnum(element) == json['walkStatus']),
-        likesCount: json['likesCount']);
+        likesCount: json['likesCount'],
+        avatarChecksum: json['avatarChecksum']);
   }
 }
 
