@@ -129,9 +129,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
     _sendAvatar();
   }
 
-  void _setAvatar() {
+  void _setAvatar(bool avatarInDatabase) {
     _image = File('${_userAvatarDirectory.path}/$_userId.jpg');
-    if (!_image.existsSync()) {
+    if (!_image.existsSync() && avatarInDatabase) {
       _fetchAvatar();
     }
   }
@@ -275,9 +275,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           if (snapshot.hasData) {
                             User user = snapshot.data;
                             _userId = user.id;
-                            if (user.avatarChecksum != null) {
-                              _setAvatar();
-                            }
+                            _setAvatar(user.avatarChecksum != null);
                             return Column(
                               children: [
                                 GestureDetector(
