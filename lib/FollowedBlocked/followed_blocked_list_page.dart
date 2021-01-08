@@ -211,7 +211,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
                       ),
                     ));
               } else {
-                return Icon(Icons.person, color: Colors.orangeAccent);
+                return Icon(Icons.account_circle, color: Colors.orangeAccent);
               }
             },
           ),
@@ -292,6 +292,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
           backgroundColor: Colors.orangeAccent,
         ),
         floatingActionButton: FloatingActionButton(
+          heroTag: "btn3",
           onPressed: () {
             Navigator.of(context)
                 .push(MaterialPageRoute(
