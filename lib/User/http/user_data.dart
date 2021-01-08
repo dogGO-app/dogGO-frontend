@@ -32,7 +32,7 @@ class User {
 
   factory User.fromFollowedBlockedJson(Map<String, dynamic> json) {
     return User(
-        id: null,
+        id: json['receiverDogLoverId'],
         firstName: null,
         lastName: null,
         age: null,

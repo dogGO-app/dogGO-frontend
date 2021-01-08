@@ -106,7 +106,9 @@ class _MapPageState extends State<MapPage> {
       _showMarkersOnMap();
     });
     _walkTimer = Timer.periodic(Duration(minutes: 30), (timer) {
-      if ((_walkStatus == WalkStatus.ONGOING || _walkStatus == WalkStatus.ARRIVED_AT_DESTINATION) && _walkId != null) {
+      if ((_walkStatus == WalkStatus.ONGOING ||
+              _walkStatus == WalkStatus.ARRIVED_AT_DESTINATION) &&
+          _walkId != null) {
         _refreshWalk();
       }
     });
@@ -182,7 +184,8 @@ class _MapPageState extends State<MapPage> {
         'https://doggo-service.herokuapp.com/api/dog-lover/profiles';
     final response = await client.get(profileUrl, headers: headers);
     if (response.statusCode == 200) {
-      User currentUser = User.fromJsonWalkVersion(jsonDecode(utf8.decode((response.bodyBytes))));
+      User currentUser = User.fromJsonWalkVersion(
+          jsonDecode(utf8.decode((response.bodyBytes))));
       _uid = currentUser.id;
     } else {
       DoggoToast.of(context).showToast('Couldn\'t fetch current user data');
@@ -193,7 +196,8 @@ class _MapPageState extends State<MapPage> {
     final locationMarkers = await _fetchLocationMarkers();
     locationMarkers.forEach((locationMarker) {
       final marker = Marker(
-        icon: BitmapDescriptor.fromBytes(_customMapMarkerByteData.buffer.asUint8List()),
+        icon: BitmapDescriptor.fromBytes(
+            _customMapMarkerByteData.buffer.asUint8List()),
         markerId: MarkerId(locationMarker.id),
         position: LatLng(locationMarker.latitude, locationMarker.longitude),
         onTap: () {
@@ -446,7 +450,7 @@ class _MapPageState extends State<MapPage> {
     switch (response.statusCode) {
       case 201:
         {
-          var decodedJson = jsonDecode(utf8.decode(response.bodyBytes));;
+          var decodedJson = jsonDecode(utf8.decode(response.bodyBytes));
           _walkId = decodedJson['id'];
           _walkStatus = WalkStatus.ONGOING;
           _usersLiked = [];
@@ -559,17 +563,20 @@ class _MapPageState extends State<MapPage> {
 
   void _refreshWalk() async {
     client ??= await OAuth2Client().loadCredentialsFromFile(context);
-    final url = 'https://doggo-service.herokuapp.com/api/dog-lover/walks/active';
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/walks/active';
 
     final response = await client.put(url, headers: headers);
     switch (response.statusCode) {
-      case 200: {
-        break;
-      }
-      case 404: {
-        DoggoToast.of(context).showToast('Active walk not found.');
-        break;
-      }
+      case 200:
+        {
+          break;
+        }
+      case 404:
+        {
+          DoggoToast.of(context).showToast('Active walk not found.');
+          break;
+        }
     }
   }
 
@@ -585,11 +592,8 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _navigateToWalkHistory(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => WalkHistoryPage()
-      )
-    );
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => WalkHistoryPage()));
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -610,8 +614,7 @@ class _MapPageState extends State<MapPage> {
           fontSize: 64.0,
           fontFamily: iconData.fontFamily,
           color: Colors.orangeAccent,
-        )
-    );
+        ));
     textPainter.layout();
     textPainter.paint(canvas, Offset(0.0, 0.0));
 
@@ -667,10 +670,10 @@ class _MapPageState extends State<MapPage> {
                 Container(
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth*0.01,
-                    vertical: screenHeight*0.11
-                  ),
+                      horizontal: screenWidth * 0.01,
+                      vertical: screenHeight * 0.11),
                   child: FloatingActionButton(
+                    heroTag: "btn4",
                     backgroundColor: Colors.orangeAccent,
                     child: Icon(Icons.directions_walk),
                     onPressed: () {
@@ -685,6 +688,7 @@ class _MapPageState extends State<MapPage> {
                             horizontal: screenWidth * 0.01,
                             vertical: screenHeight * 0.01),
                         child: FloatingActionButton(
+                          heroTag: "btn5",
                             backgroundColor: Colors.orangeAccent,
                             child: Icon(Icons.location_pin),
                             onPressed: () async {
@@ -702,10 +706,8 @@ class _MapPageState extends State<MapPage> {
                               _startWalk();
                               _navigationOn();
                               _clearPolylines();
-                              _setPolylines(LatLng(
-                                _recommended[0].latitude,
-                                _recommended[0].longitude
-                              ));
+                              _setPolylines(LatLng(_recommended[0].latitude,
+                                  _recommended[0].longitude));
                             }),
                       )
                     : Container(),
@@ -760,6 +762,7 @@ class _MapPageState extends State<MapPage> {
                             horizontal: screenWidth * 0.01,
                             vertical: screenHeight * 0.01),
                         child: FloatingActionButton(
+                          heroTag: "btn6",
                             backgroundColor: Colors.orangeAccent,
                             child: Icon(Icons.account_circle),
                             onPressed: () {

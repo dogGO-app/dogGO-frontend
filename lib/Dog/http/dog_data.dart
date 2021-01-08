@@ -7,24 +7,23 @@ class Dog {
   DateTime vaccinationDate;
   String avatarChecksum;
 
-  Dog(
-      {this.id,
-      this.name,
-      this.breed,
-      this.color,
-      this.description,
-      this.vaccinationDate,
-      this.avatarChecksum});
+  Dog({this.id,
+    this.name,
+    this.breed,
+    this.color,
+    this.description,
+    this.vaccinationDate,
+    this.avatarChecksum});
 
   factory Dog.fromJson(Map<String, dynamic> json) {
     return Dog(
-      id: json['id'],
-      name: json['name'],
-      breed: json['breed'],
-      color: json['color'],
-      description: json['description'],
-      vaccinationDate: DateTime.parse(json['lastVaccinationDate']),
-      avatarChecksum: json['avatarChecksum']
+        id: json['id'],
+        name: json['name'],
+        breed: json['breed'],
+        color: json['color'],
+        description: json['description'],
+        vaccinationDate: DateTime.parse(json['lastVaccinationDate']),
+        avatarChecksum: json['avatarChecksum']
     );
   }
 
@@ -39,6 +38,7 @@ class Dog {
 
   factory Dog.fromFollowedBlockedJson(Map<String, dynamic> json) {
     return Dog(
+        id: json['id'],
         name: json['name'],
         breed: json['breed'],
         color: json['color'],

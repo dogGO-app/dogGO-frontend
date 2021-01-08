@@ -309,7 +309,8 @@ class _DogsListPageState extends State<DogsListPage> {
           if (snapshot.hasData) {
             List<Dog> dogs = snapshot.data;
             dogs.sort((a, b) => a.name.compareTo(b.name));
-            dogs.forEach((element) => _setAvatar(element.id, element.avatarChecksum));
+            dogs.forEach(
+                (element) => _setAvatar(element.id, element.avatarChecksum));
             return ListView.builder(
               itemCount: dogs.length,
               itemBuilder: (context, index) {
@@ -354,14 +355,14 @@ class _DogsListPageState extends State<DogsListPage> {
                               _showPicker(context, dogs[index].id);
                             },
                             child: CircleAvatar(
-                              radius: screenHeight * 0.07,
+                              radius: 48,
                               backgroundColor: Colors.grey[200],
                               child:
                                   File('${_dogAvatarsDirectory.path}/${dogs[index].id}.jpg')
                                           .existsSync()
                                       ? ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(55),
+                                              BorderRadius.circular(50),
                                           child: Image.file(
                                             File(
                                                 '${_dogAvatarsDirectory.path}/${dogs[index].id}.jpg'),
@@ -377,7 +378,7 @@ class _DogsListPageState extends State<DogsListPage> {
                                           decoration: BoxDecoration(
                                               color: Colors.grey[200],
                                               borderRadius:
-                                                  BorderRadius.circular(55)),
+                                                  BorderRadius.circular(50)),
                                           width: screenHeight * 0.13,
                                           height: screenHeight * 0.13,
                                           child: Icon(

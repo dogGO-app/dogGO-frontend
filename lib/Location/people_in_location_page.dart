@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/FollowedBlocked/http/dog_lover_data.dart';
@@ -202,6 +203,53 @@ class _PeopleAndDogsInLocationPageState
     }
   }
 
+  Future<Uint8List> _fetchUserAvatar(String id) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/profiles/$id/avatar';
+
+    final response = await client.get(url, headers: headers);
+    switch (response.statusCode) {
+      case 200:
+        {
+          return response.bodyBytes;
+        }
+      case 404:
+        {
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context)
+              .showToast('Couldn\'t load user (id: $id) avatar.');
+          break;
+        }
+    }
+  }
+
+  Future<Uint8List> _fetchDogAvatar(String id) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/dogs/$id/avatar';
+
+    final response = await client.get(url, headers: headers);
+    switch (response.statusCode) {
+      case 200:
+        {
+          return response.bodyBytes;
+        }
+      case 404:
+        {
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context).showToast('Couldn\'t load dog avatar.');
+          break;
+        }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -225,150 +273,193 @@ class _PeopleAndDogsInLocationPageState
                 List<UserAndDogsInLocation> usersanddogs = snapshot.data;
                 return ListView.builder(
                     itemCount: usersanddogs.length,
-                    itemBuilder: (context, index) {
-                      return ExpansionTile(
-                        title: Text(
-                          usersanddogs[index].nickname,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20,
-                          ),
-                        ),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              usersanddogs[index].name,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 14),
+                    itemBuilder: (context, userIndex) {
+                      return Card(
+                        elevation: 5,
+                        child: ExpansionTile(
+                          title: Text(
+                            usersanddogs[userIndex].nickname,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 20,
                             ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(_usersLiked
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                usersanddogs[userIndex].name,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w300, fontSize: 14),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(_usersLiked
+                                            .firstWhere((element) =>
+                                                element.id ==
+                                                usersanddogs[userIndex].userId)
+                                            .liked
+                                        ? Icons.thumb_up
+                                        : Icons.thumb_up_alt_outlined),
+                                    color: Colors.orangeAccent,
+                                    onPressed: () {
+                                      if (!_usersLiked
                                           .firstWhere((element) =>
                                               element.id ==
-                                              usersanddogs[index].userId)
-                                          .liked
-                                      ? Icons.thumb_up
-                                      : Icons.thumb_up_alt_outlined),
-                                  color: Colors.orangeAccent,
-                                  onPressed: () {
-                                    if (!_usersLiked
+                                              usersanddogs[userIndex].userId)
+                                          .liked) {
+                                        _likeUser(usersanddogs[userIndex].userId);
+                                      } else {
+                                        _undoUserLike(usersanddogs[userIndex].userId);
+                                      }
+                                    },
+                                  ),
+                                  Text(
+                                    _usersLiked
                                         .firstWhere((element) =>
                                             element.id ==
-                                            usersanddogs[index].userId)
-                                        .liked) {
-                                      _likeUser(usersanddogs[index].userId);
-                                    } else {
-                                      _undoUserLike(usersanddogs[index].userId);
-                                    }
-                                  },
-                                ),
-                                Text(
-                                  _usersLiked
-                                      .firstWhere((element) =>
-                                          element.id ==
-                                          usersanddogs[index].userId)
-                                      .likes
-                                      .toString(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orangeAccent,
+                                            usersanddogs[userIndex].userId)
+                                        .likes
+                                        .toString(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orangeAccent,
+                                    ),
                                   ),
-                                ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          leading: FutureBuilder<Uint8List>(
+                            future: _fetchUserAvatar(usersanddogs[userIndex].userId),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                Uint8List bytes = snapshot.data;
+                                return CircleAvatar(
+                                    backgroundColor: Colors.grey[200],
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Image.memory(
+                                        bytes,
+                                        key: ValueKey(bytes.lengthInBytes),
+                                        width: screenHeight * 0.18,
+                                        height: screenHeight * 0.18,
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                    ));
+                              } else {
+                                return Icon(Icons.account_circle, color: Colors.orangeAccent);
+                              }
+                            },
+                          ),
+                          children: [
+                            ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: usersanddogs[userIndex].dogs.length,
+                                itemBuilder: (context, dogIndex) {
+                                  return Card(
+                                    elevation: 5,
+                                    child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: screenHeight * 0.005,
+                                            horizontal: screenWidth * 0.17),
+                                        leading: FutureBuilder<Uint8List>(
+                                          future: _fetchDogAvatar(
+                                              usersanddogs[userIndex].dogs[dogIndex].id),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData) {
+                                              Uint8List bytes = snapshot.data;
+                                              return CircleAvatar(
+                                                  backgroundColor: Colors.grey[200],
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.circular(50),
+                                                    child: Image.memory(
+                                                      bytes,
+                                                      key: ValueKey(bytes.lengthInBytes),
+                                                      width: screenHeight * 0.18,
+                                                      height: screenHeight * 0.18,
+                                                      fit: BoxFit.fitHeight,
+                                                    ),
+                                                  ));
+                                            } else {
+                                              return Icon(Icons.pets, color: Colors.orangeAccent);
+                                            }
+                                          },
+                                        ),
+                                        title: Text(
+                                            usersanddogs[userIndex].dogs[dogIndex].name),
+                                        subtitle: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(usersanddogs[userIndex]
+                                                .dogs[dogIndex]
+                                                .breed),
+                                            Text(usersanddogs[userIndex]
+                                                .dogs[dogIndex]
+                                                .color)
+                                          ],
+                                        )),
+                                  );
+                                }),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                FlatButton.icon(
+                                    icon: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(7.0)),
+                                    color: Colors.orange,
+                                    disabledColor: Colors.white30,
+                                    textColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: buttonsHeight,
+                                        horizontal: buttonsWidth),
+                                    label: Text('Follow'),
+                                    onPressed: () {
+                                      if (usersanddogs[userIndex].relationStatus ==
+                                          RelationStatus.FOLLOWED)
+                                        return null;
+                                      else {
+                                        _addFollowedBlocked(
+                                            usersanddogs[userIndex].nickname,
+                                            'FOLLOW');
+                                        setState(() {
+                                          usersanddogs[userIndex].relationStatus =
+                                              RelationStatus.FOLLOWED;
+                                        });
+                                      }
+                                    }),
+                                FlatButton.icon(
+                                    icon: Icon(
+                                      Icons.block,
+                                      color: Colors.white,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(7.0)),
+                                    color: Colors.orange[900],
+                                    disabledColor: Colors.white30,
+                                    textColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: buttonsHeight,
+                                        horizontal: buttonsWidth),
+                                    label: Text('Block'),
+                                    onPressed: () {
+                                      _addFollowedBlocked(
+                                          usersanddogs[userIndex].nickname, 'BLOCK');
+                                      setState(() {
+                                        usersanddogs[userIndex].relationStatus =
+                                            RelationStatus.BLOCKED;
+                                      });
+                                    }),
                               ],
                             ),
                           ],
                         ),
-                        leading: Icon(
-                          Icons.account_circle,
-                          color: Colors.orangeAccent,
-                        ),
-                        children: [
-                          ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: usersanddogs[index].dogs.length,
-                              itemBuilder: (context, index2) {
-                                return ListTile(
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: screenHeight * 0.005,
-                                        horizontal: screenWidth * 0.17),
-                                    leading: Icon(
-                                      Icons.pets,
-                                      color: Colors.orangeAccent,
-                                    ),
-                                    title: Text(
-                                        usersanddogs[index].dogs[index2].name),
-                                    subtitle: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(usersanddogs[index]
-                                            .dogs[index2]
-                                            .breed),
-                                        Text(usersanddogs[index]
-                                            .dogs[index2]
-                                            .color)
-                                      ],
-                                    ));
-                              }),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              FlatButton.icon(
-                                  icon: Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(7.0)),
-                                  color: Colors.orange,
-                                  disabledColor: Colors.white30,
-                                  textColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: buttonsHeight,
-                                      horizontal: buttonsWidth),
-                                  label: Text('Follow'),
-                                  onPressed: () {
-                                    if (usersanddogs[index].relationStatus ==
-                                        RelationStatus.FOLLOWED)
-                                      return null;
-                                    else {
-                                      _addFollowedBlocked(
-                                          usersanddogs[index].nickname,
-                                          'FOLLOW');
-                                      setState(() {
-                                        usersanddogs[index].relationStatus =
-                                            RelationStatus.FOLLOWED;
-                                      });
-                                    }
-                                  }),
-                              FlatButton.icon(
-                                  icon: Icon(
-                                    Icons.block,
-                                    color: Colors.white,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(7.0)),
-                                  color: Colors.orange[900],
-                                  disabledColor: Colors.white30,
-                                  textColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: buttonsHeight,
-                                      horizontal: buttonsWidth),
-                                  label: Text('Block'),
-                                  onPressed: () {
-                                    _addFollowedBlocked(
-                                        usersanddogs[index].nickname, 'BLOCK');
-                                    setState(() {
-                                      usersanddogs[index].relationStatus =
-                                          RelationStatus.BLOCKED;
-                                    });
-                                  }),
-                            ],
-                          ),
-                        ],
                       );
                     });
               } else if (snapshot.hasError) {
