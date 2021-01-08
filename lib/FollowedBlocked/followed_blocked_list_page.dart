@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:doggo_frontend/Custom/doggo_toast.dart';
 import 'package:doggo_frontend/FollowedBlocked/add_followed_blocked_page.dart';
@@ -100,6 +102,10 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
 
   Card _createFollowedBlockedCard(List<DogLover> followedBlocked, int userIndex,
       double screenHeight, double screenWidth) {
+
+    followedBlocked.sort((a, b) => a.user.nickname.compareTo(b.user.nickname));
+    followedBlocked.forEach((element) => element.dogs.sort((a, b) => a.name.compareTo(b.name)));
+
     return Card(
       child: Dismissible(
         background: Stack(
@@ -124,50 +130,92 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
           followedBlocked.removeAt(userIndex);
         },
         child: ExpansionTile(
-            title: Text(
-              followedBlocked[userIndex].user.nickname,
-              style: TextStyle(
-                  fontWeight: FontWeight.w500, fontSize: screenHeight * 0.035),
-            ),
-            children: [
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: followedBlocked[userIndex].dogs.length,
-                itemBuilder: (context, dogIndex) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(
-                        followedBlocked[userIndex].dogs[dogIndex].name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: screenHeight * 0.025,
-                        ),
-                      ),
-                      subtitle: Column(
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "Breed: ${followedBlocked[userIndex].dogs[dogIndex].breed}"),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "Color: ${followedBlocked[userIndex].dogs[dogIndex].color}"),
-                          ),
-                        ],
-                      ),
-                      leading: Icon(
-                        Icons.pets,
-                        color: Colors.orangeAccent,
+          title: Text(
+            followedBlocked[userIndex].user.nickname,
+            style: TextStyle(
+                fontWeight: FontWeight.w500, fontSize: screenHeight * 0.035),
+          ),
+          children: [
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: followedBlocked[userIndex].dogs.length,
+              itemBuilder: (context, dogIndex) {
+                return Card(
+                  child: ListTile(
+                    title: Text(
+                      followedBlocked[userIndex].dogs[dogIndex].name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: screenHeight * 0.025,
                       ),
                     ),
-                    elevation: 5,
-                  );
-                },
-              )
-            ]),
+                    subtitle: Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              "Breed: ${followedBlocked[userIndex].dogs[dogIndex].breed}"),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                              "Color: ${followedBlocked[userIndex].dogs[dogIndex].color}"),
+                        ),
+                      ],
+                    ),
+                    leading: FutureBuilder<Uint8List>(
+                      future: _fetchDogAvatar(
+                          followedBlocked[userIndex].dogs[dogIndex].id),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          Uint8List bytes = snapshot.data;
+                          return CircleAvatar(
+                              backgroundColor: Colors.grey[200],
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Image.memory(
+                                  bytes,
+                                  key: ValueKey(bytes.lengthInBytes),
+                                  width: screenHeight * 0.18,
+                                  height: screenHeight * 0.18,
+                                  fit: BoxFit.fitHeight,
+                                ),
+                              ));
+                        } else {
+                          return Icon(Icons.pets, color: Colors.orangeAccent);
+                        }
+                      },
+                    ),
+                  ),
+                  elevation: 5,
+                );
+              },
+            )
+          ],
+          leading: FutureBuilder<Uint8List>(
+            future: _fetchUserAvatar(followedBlocked[userIndex].user.id),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                Uint8List bytes = snapshot.data;
+                return CircleAvatar(
+                    backgroundColor: Colors.grey[200],
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: Image.memory(
+                        bytes,
+                        key: ValueKey(bytes.lengthInBytes),
+                        width: screenHeight * 0.18,
+                        height: screenHeight * 0.18,
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ));
+              } else {
+                return Icon(Icons.person, color: Colors.orangeAccent);
+              }
+            },
+          ),
+        ),
       ),
       elevation: 5,
     );
@@ -183,6 +231,53 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
             followedBlocked[userIndex].status == RelationStatus.BLOCKED ||
         (followedBlocked[userIndex - 1].status == RelationStatus.FOLLOWED &&
             followedBlocked[userIndex].status == RelationStatus.BLOCKED);
+  }
+
+  Future<Uint8List> _fetchUserAvatar(String id) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/profiles/$id/avatar';
+
+    final response = await client.get(url, headers: headers);
+    switch (response.statusCode) {
+      case 200:
+        {
+          return response.bodyBytes;
+        }
+      case 404:
+        {
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context)
+              .showToast('Couldn\'t load user (id: $id) avatar.');
+          break;
+        }
+    }
+  }
+
+  Future<Uint8List> _fetchDogAvatar(String id) async {
+    client ??= await OAuth2Client().loadCredentialsFromFile(context);
+    final url =
+        'https://doggo-service.herokuapp.com/api/dog-lover/dogs/$id/avatar';
+
+    final response = await client.get(url, headers: headers);
+    switch (response.statusCode) {
+      case 200:
+        {
+          return response.bodyBytes;
+        }
+      case 404:
+        {
+          break;
+        }
+      default:
+        {
+          DoggoToast.of(context).showToast('Couldn\'t load dog avatar.');
+          break;
+        }
+    }
   }
 
   @override
