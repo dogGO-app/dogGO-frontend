@@ -521,9 +521,9 @@ class _MapPageState extends State<MapPage> {
   void _navigationOff() {
     _isNavigating = false;
     _destination = null;
-    _walkId = null;
     _changeWalkStatus(WalkStatus.CANCELED);
     _clearPolylines();
+    _walkId = null;
   }
 
   void _atLocation() async {
@@ -545,11 +545,11 @@ class _MapPageState extends State<MapPage> {
       _flushbarAtLocationAppeared = false;
       _leavingLocation = true;
       _usersLiked = [];
-      _walkId = null;
       if (_walkStatus == WalkStatus.ARRIVED_AT_DESTINATION) {
         _changeWalkStatus(WalkStatus.LEFT_DESTINATION);
       }
       _callTimer();
+      _walkId = null;
     });
   }
 
