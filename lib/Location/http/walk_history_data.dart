@@ -1,4 +1,5 @@
 
+import 'package:doggo_frontend/Dog/http/dog_data.dart';
 import 'package:doggo_frontend/Location/http/location.dart';
 
 class Walk {
@@ -10,10 +11,15 @@ class Walk {
   Walk({this.walkId, this.walkDateTime, this.dogsNames, this.marker});
 
   factory Walk.fromJson(Map<String, dynamic> json){
+    var doggoslist = json['dogs'] as List;
+    List<Dog> dogsList =
+    doggoslist.map((d) => Dog.fromJsonInLocation(d)).toList();
+    List<String> _doggosnames = [];
+    dogsList.forEach((element) {_doggosnames.add(element.name); });
     return Walk(
       walkId: json['id'],
       walkDateTime: DateTime.parse(json['createdAt']),
-      dogsNames: json['dogNames'].cast<String>(),
+      dogsNames: _doggosnames,
       marker: LocationMarker.fromJson(json['mapMarker'])
     );
   }
