@@ -12,14 +12,12 @@ class Walk {
 
   factory Walk.fromJson(Map<String, dynamic> json){
     var doggoslist = json['dogs'] as List;
-    List<Dog> dogsList =
-    doggoslist.map((d) => Dog.fromJsonInLocation(d)).toList();
-    List<String> _doggosnames = [];
-    dogsList.forEach((element) {_doggosnames.add(element.name); });
+    List<String> dogsList =
+    doggoslist.map((d) => Dog.fromJsonInLocation(d).name).toList();
     return Walk(
       walkId: json['id'],
       walkDateTime: DateTime.parse(json['createdAt']),
-      dogsNames: _doggosnames,
+      dogsNames: dogsList,
       marker: LocationMarker.fromJson(json['mapMarker'])
     );
   }
