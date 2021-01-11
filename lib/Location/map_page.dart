@@ -96,7 +96,6 @@ class _MapPageState extends State<MapPage> {
             _nearLocation) {
           _awayFromLocation();
         } else {
-          _clearPolylines();
           _setPolylines(_destination);
         }
       }
@@ -260,7 +259,6 @@ class _MapPageState extends State<MapPage> {
                                     });
                                 _startWalk();
                                 _navigationOn();
-                                _clearPolylines();
                                 _setPolylines(LatLng(locationMarker.latitude,
                                     locationMarker.longitude));
                                 Navigator.of(context).pop();
@@ -364,7 +362,6 @@ class _MapPageState extends State<MapPage> {
                           MaterialButton(
                             onPressed: () {
                               _navigationOn();
-                              _clearPolylines();
                               _setPolylines(LatLng(locationMarker.latitude,
                                   locationMarker.longitude));
                               Navigator.of(context).pop();
@@ -420,6 +417,8 @@ class _MapPageState extends State<MapPage> {
     );
 
     if (result.status == 'OK') {
+      _polylineCoordinates.clear();
+
       result.points.forEach((PointLatLng point) {
         _polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       });
@@ -430,7 +429,15 @@ class _MapPageState extends State<MapPage> {
           polylineId: PolylineId("poly"),
           color: Colors.orangeAccent,
           points: _polylineCoordinates);
+      _polylines.clear();
       _polylines.add(polyline);
+    });
+  }
+
+  void _clearPolylines() {
+    setState(() {
+      _polylineCoordinates.clear();
+      _polylines.clear();
     });
   }
 
@@ -503,13 +510,6 @@ class _MapPageState extends State<MapPage> {
 
   void _animateCameraToLocation(LatLng location) {
     mapController.animateCamera(CameraUpdate.newLatLng(location));
-  }
-
-  void _clearPolylines() {
-    setState(() {
-      _polylineCoordinates.clear();
-      _polylines.clear();
-    });
   }
 
   void _navigationOn() {
@@ -705,7 +705,6 @@ class _MapPageState extends State<MapPage> {
                               _selectedDogs = _recommended[1];
                               _startWalk();
                               _navigationOn();
-                              _clearPolylines();
                               _setPolylines(LatLng(_recommended[0].latitude,
                                   _recommended[0].longitude));
                             }),
