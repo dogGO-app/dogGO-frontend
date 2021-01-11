@@ -329,7 +329,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 Center(
                                   child: Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.center,
                                     children: [
                                       Spacer(),
                                       Center(
@@ -340,47 +340,49 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      IconButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .push(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  FutureBuilder(
-                                                    future: _userDetails,
-                                                    builder:
-                                                        (context, snapshot) {
-                                                      if (snapshot.hasData) {
-                                                        return EditUserDataPage(
-                                                          userData:
-                                                          snapshot.data,
-                                                        );
-                                                      } else if (snapshot
-                                                          .hasError) {
-                                                        throw Exception(
-                                                          "Couldn't acquire user data!",
-                                                        );
-                                                      } else {
-                                                        return Center(
-                                                          child:
-                                                          CircularProgressIndicator(),
-                                                        );
-                                                      }
-                                                    },
-                                                  ),
-                                            ),
-                                          )
-                                              .whenComplete(() =>
-                                          {
-                                            setState(() {
-                                              _userDetails =
-                                                  fetchUserDetails();
-                                            })
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.edit,
-                                          color: Colors.grey,
+                                      Expanded(
+                                        child: IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    FutureBuilder(
+                                                      future: _userDetails,
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        if (snapshot.hasData) {
+                                                          return EditUserDataPage(
+                                                            userData:
+                                                            snapshot.data,
+                                                          );
+                                                        } else if (snapshot
+                                                            .hasError) {
+                                                          throw Exception(
+                                                            "Couldn't acquire user data!",
+                                                          );
+                                                        } else {
+                                                          return Center(
+                                                            child:
+                                                            CircularProgressIndicator(),
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
+                                              ),
+                                            )
+                                                .whenComplete(() =>
+                                            {
+                                              setState(() {
+                                                _userDetails =
+                                                    fetchUserDetails();
+                                              })
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.edit,
+                                            color: Colors.grey,
+                                          ),
                                         ),
                                       ),
                                     ],
