@@ -1,3 +1,4 @@
+import 'package:doggo_frontend/Authorization/dto/credentials.dart';
 import 'package:flutter/material.dart';
 import 'package:oauth2/oauth2.dart';
 
@@ -26,7 +27,7 @@ class LoginPageState extends State<LoginPage> {
         .catchError((e) {
       if (e.description == 'Account disabled') {
         Navigator.of(context)
-            .pushNamed('/verify', arguments: emailController.text);
+            .pushNamed('/verify', arguments: UserCredentials(emailController.text, passwordController.text));
       } else if (e.description == 'Invalid user credentials') {
         DoggoToast.of(context)
             .showToast('There is no account with given email/password.');
