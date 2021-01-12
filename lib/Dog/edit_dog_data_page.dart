@@ -16,7 +16,6 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
   final nameController = TextEditingController();
   final breedController = TextEditingController();
   final colorController = TextEditingController();
-  final descriptionController = TextEditingController();
   final vaccinationDateController = TextEditingController();
 
   @override
@@ -25,7 +24,6 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
       nameController.text = widget.dogData.name;
       breedController.text = widget.dogData.breed;
       colorController.text = widget.dogData.color;
-      descriptionController.text = widget.dogData.description;
       vaccinationDateController.text =
           DateFormat('yyyy-MM-dd').format(widget.dogData.vaccinationDate);
     }
@@ -37,7 +35,6 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
     nameController.dispose();
     breedController.dispose();
     colorController.dispose();
-    descriptionController.dispose();
     vaccinationDateController.dispose();
     super.dispose();
   }
@@ -48,7 +45,6 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
       'name': '${nameController.text}',
       'breed': '${breedController.text}',
       'color': '${colorController.text}',
-      'description': '${descriptionController.text}',
       'lastVaccinationDate': '${vaccinationDateController.text}'
     });
 
@@ -122,18 +118,6 @@ class _EditDogDataPageState extends State<EditDogDataPage> {
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Color",
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          Divider(color: Colors.grey),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            child: TextField(
-                              controller: descriptionController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Description",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),

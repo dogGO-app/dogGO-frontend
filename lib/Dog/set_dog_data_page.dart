@@ -16,7 +16,6 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
   final nameController = TextEditingController();
   final breedController = TextEditingController();
   final colorController = TextEditingController();
-  final descriptionController = TextEditingController();
   final vaccinationDateController = TextEditingController();
 
   @override
@@ -29,7 +28,6 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
     nameController.dispose();
     breedController.dispose();
     colorController.dispose();
-    descriptionController.dispose();
     vaccinationDateController.dispose();
     super.dispose();
   }
@@ -40,7 +38,6 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
       'name': '${nameController.text}',
       'breed': '${breedController.text}',
       'color': '${colorController.text}',
-      'description': '${descriptionController.text}',
       'lastVaccinationDate': '${vaccinationDateController.text}'
     });
 
@@ -128,18 +125,6 @@ class _SetDogDataPageState extends State<SetDogDataPage> {
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Color",
-                                hintStyle: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          Divider(color: Colors.grey),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            child: TextField(
-                              controller: descriptionController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Description",
                                 hintStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
