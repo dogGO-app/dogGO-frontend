@@ -411,11 +411,6 @@ class _DogsListPageState extends State<DogsListPage> {
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                      "Description: ${dogs[index].description}"),
-                                ),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
                                       "Last vaccination date: ${DateFormat("dd-MM-yyy").format(dogs[index].vaccinationDate)}"),
                                 )
                               ],

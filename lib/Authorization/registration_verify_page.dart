@@ -9,6 +9,7 @@ import 'package:oauth2/oauth2.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../Custom/doggo_toast.dart';
+import 'dto/credentials.dart';
 
 class RegistrationVerifyState extends State<RegistrationVerifyPage> {
   Client client;
@@ -37,7 +38,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
     super.dispose();
   }
 
-  Future verifyUser(String email, String activationCode) async {
+  Future verifyUser(String email, String password, String activationCode) async {
     client ??= await OAuth2Client().getClientCredentialsGrant();
     var body = jsonEncode({
       'email': '$email',
@@ -46,6 +47,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
 
     final response = await client.put(activateUrl, headers: headers, body: body);
     if (response.statusCode == 200) {
+      await OAuth2Client().getResourceOwnerPasswordGrant(email, password);
       Navigator.of(context).pushNamedAndRemoveUntil('/adduserdata', (route) => false);
     } else {
       DoggoToast.of(context).showToast('Failed to activate user - wrong activation code.');
@@ -71,7 +73,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    final String email = ModalRoute.of(context).settings.arguments;
+    final UserCredentials credentials = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(title: Text('Verify registration')),
@@ -137,7 +139,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                         hasError = true;
                         errorController.add(ErrorAnimationType.shake);
                       } else
-                      verifyUser(email, value);
+                      verifyUser(credentials.email, credentials.password, value);
                       setState(() {
                         currentText = value;
                       });
@@ -157,7 +159,7 @@ class RegistrationVerifyState extends State<RegistrationVerifyPage> {
                             text: " RESEND",
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                _sendVerificationEmail(email);
+                                _sendVerificationEmail(credentials.email);
                               },
                             style: TextStyle(
                                 color: Colors.orangeAccent,

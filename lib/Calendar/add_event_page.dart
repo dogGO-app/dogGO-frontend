@@ -132,7 +132,6 @@ class _AddEventPageState extends State<AddEventPage> {
                                   lastDate: DateTime(2025));
                             },
                           ),
-                          Divider(color: Colors.grey),
                           Text('Click below to select event time',
                               style: TextStyle(color: Colors.grey)),
                           DateTimeField(
@@ -147,7 +146,6 @@ class _AddEventPageState extends State<AddEventPage> {
                               return DateTimeField.convert(time);
                             },
                           ),
-                          Divider(color: Colors.grey),
                           Container(
                             padding: EdgeInsets.all(8),
                             child: TextField(

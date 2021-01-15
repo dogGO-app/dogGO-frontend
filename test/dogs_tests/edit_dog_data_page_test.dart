@@ -14,7 +14,7 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsOneWidget);
       expect(find.text('Edit Dog\'s Details'), findsOneWidget);
       expect(find.byType(Column), findsNWidgets(3));
-      expect(find.byType(TextField), findsNWidgets(5));
+      expect(find.byType(TextField), findsNWidgets(4));
       expect(find.byType(MaterialButton), findsOneWidget);
     });
   });
