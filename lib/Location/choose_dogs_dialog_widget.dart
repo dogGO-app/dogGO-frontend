@@ -81,9 +81,6 @@ class _ChooseDogDialogState extends State<ChooseDogDialog> {
                               children: [
                                 Text(
                                   dogs[index].breed
-                                ),
-                                Text(
-                                  dogs[index].color
                                 )
                               ],
                             ),
