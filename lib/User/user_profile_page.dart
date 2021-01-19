@@ -137,7 +137,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future _getImageFromCamera() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    final pickedFile = await picker.getImage(source: ImageSource.camera, imageQuality: 90);
 
     setState(() {
       if (pickedFile != null) {
