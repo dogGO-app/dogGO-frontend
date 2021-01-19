@@ -103,7 +103,7 @@ class _FollowedBlockedListPageState extends State<FollowedBlockedListPage> {
   Card _createFollowedBlockedCard(List<DogLover> followedBlocked, int userIndex,
       double screenHeight, double screenWidth) {
 
-    followedBlocked.sort((a, b) => a.user.nickname.compareTo(b.user.nickname));
+    followedBlocked.sort((a, b) => a.status.index.compareTo(b.status.index));
     followedBlocked.forEach((element) => element.dogs.sort((a, b) => a.name.compareTo(b.name)));
 
     return Card(
