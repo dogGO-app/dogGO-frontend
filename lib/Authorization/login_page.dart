@@ -186,7 +186,7 @@ class LoginPageState extends State<LoginPage> {
       ],
       image: DecorationImage(
         fit: BoxFit.fill,
-        image: AssetImage('images/doggo.jpg'),
+        image: AssetImage('images/doggo.png'),
       ),
     ),
   );
