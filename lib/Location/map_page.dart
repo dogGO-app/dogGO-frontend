@@ -524,6 +524,8 @@ class _MapPageState extends State<MapPage> {
     _changeWalkStatus(WalkStatus.CANCELED);
     _clearPolylines();
     _walkId = null;
+    _recommended = null;
+    _selectedDogs = null;
   }
 
   void _atLocation() async {
@@ -550,6 +552,8 @@ class _MapPageState extends State<MapPage> {
       }
       _callTimer();
       _walkId = null;
+      _recommended = null;
+      _selectedDogs = null;
     });
   }
 
@@ -700,13 +704,15 @@ class _MapPageState extends State<MapPage> {
                                       lat: _currentLocation.latitude,
                                     );
                                   });
-                              _currentLocationId = _recommended[0].id;
-                              _currentLocationName = _recommended[0].name;
-                              _selectedDogs = _recommended[1];
-                              _startWalk();
-                              _navigationOn();
-                              _setPolylines(LatLng(_recommended[0].latitude,
-                                  _recommended[0].longitude));
+                              if(_recommended != null &&_recommended[1] != null){
+                                _currentLocationId = _recommended[0].id;
+                                _currentLocationName = _recommended[0].name;
+                                _selectedDogs = _recommended[1];
+                                _startWalk();
+                                _navigationOn();
+                                _setPolylines(LatLng(_recommended[0].latitude,
+                                    _recommended[0].longitude));
+                              }
                             }),
                       )
                     : Container(),
